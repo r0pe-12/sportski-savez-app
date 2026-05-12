@@ -232,11 +232,22 @@ Pročitaj redom prije bilo kakve implementacije:
 - **Detaljnije:** `~/.claude/projects/{project}/memory/feedback_database_safety.md`
 
 ### 2.2 AI dnevnik workflow
+
+**OBAVEZNO — prije bilo kakvog rada u novoj sesiji.** Ako ovo propustiš, korisnik gubi evidenciju rada za ADIS predaju.
+
 - **Sesija = cio razgovor** (jedna conversation u Claude Code), NE pojedinačan prompt.
-- **Tabela:** `ai_dnevnik_sesije` · **Model:** `App\Models\AiDnevnikSesija` · **Public ruta:** `/ai-dnevnik`
+- **Tabela:** `ai_dnevnik_sesije` · **Model:** `App\Models\AiDnevnikSesija` · **Public ruta:** `/ai-dnevnik` · **Seeder:** `database/seeders/AiDnevnikSeeder.php`
+
+**Prvi tool call svake nove sesije MORA biti INSERT u dnevnik.** Ne piši kod, ne čitaj fajlove, ne odgovaraj — prvo upiši sesiju. Recept ispod.
+
 - **Prvi prompt sesije:** INSERT novi red sa `MAX(broj)+1`. Polja `instrukcije/output/odluke/ishod` sa `### Prompt 1` sekcijom.
 - **Svaki naredni prompt iste sesije:** UPDATE postojeći red. Append `### Prompt N` sekcije u sva četiri text polja.
-- **Recept (INSERT):** Pisati PHP fajl u `storage/app/tmp_session_N.php` (multiline puca u `tinker --execute`), pa `php artisan tinker --execute 'require base_path("storage/app/tmp_session_N.php");'`, pa obrisati temp fajl.
+- **Recept (INSERT/UPDATE):**
+  1. Piši PHP fajl u `storage/app/tmp_session_N.php` (multiline puca u `tinker --execute`)
+  2. `php artisan tinker --execute 'require base_path("storage/app/tmp_session_N.php");'`
+  3. **`php artisan ai-dnevnik:sync-seeder`** — regeneriše seeder iz baze (dual-write)
+  4. Obriši `storage/app/tmp_session_N.php`
+- **Dual-write pravilo:** baza i seeder MORAJU biti in-sync na kraju svake izmjene. Posle SVAKE INSERT/UPDATE-a u tabeli, **odmah** pokreni `php artisan ai-dnevnik:sync-seeder`. Komit sadrži samo seeder diff (DB je instant kroz tinker).
 - **Markdown markup koji se renderuje na `/ai-dnevnik`:** `### Heading`, `**bold**`, `` `code` ``, `- item`, `1. item`, prazne linije = paragrafi. **NE:** tabele, linkovi, code blokovi sa ```.
 - **Subagenti NE upisuju** — samo glavni conversation.
 - **Detaljnije:** `~/.claude/projects/{project}/memory/feedback_dnevnik_ai_logging.md`
