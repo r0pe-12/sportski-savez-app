@@ -1,0 +1,40 @@
+# Dependencies
+/vendor
+/node_modules
+
+# Build / generated artifacts
+/public/build
+/public/hot
+/public/storage
+/bootstrap/ssr
+/bootstrap/cache
+/storage
+/.phpunit.cache
+/.phpunit.result.cache
+
+# Wayfinder / Inertia auto-generated
+/resources/js/actions
+/resources/js/routes
+/resources/js/wayfinder
+
+# Graphify's own output (don't recurse into the graph)
+/graphify-out
+
+# Editor / OS
+.DS_Store
+/.fleet
+/.idea
+/.nova
+/.vscode
+/.zed
+/.phpactor.json
+
+# Env / secrets
+.env
+.env.backup
+.env.production
+/auth.json
+
+# Logs
+npm-debug.log
+yarn-error.log
