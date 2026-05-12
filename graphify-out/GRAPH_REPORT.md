@@ -1,7 +1,7 @@
 # Graph Report - C:\Users\simon\Desktop\UDG-2\ADIS\sportski_savez\sportski-savez-app  (2026-05-13)
 
 ## Corpus Check
-- 139 files · ~162,397 words
+- 139 files · ~173,167 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
