@@ -2,7 +2,11 @@
   "permissions": {
     "allow": [
       "PowerShell(python -c \"import sys; open\\('.graphify_python','w'\\).write\\(sys.executable\\)\"; python -c \"import json; from graphify.detect import detect; from pathlib import Path; result = detect\\(Path\\('.'\\)\\); open\\('.graphify_detect.json','w'\\).write\\(json.dumps\\(result\\)\\)\")",
-      "PowerShell(python -c \"import json; d = json.load\\(open\\('.claude/settings.local.json'\\)\\); hook = d['hooks']['PreToolUse'][0]; print\\('matcher:', hook['matcher']\\); print\\('type:', hook['hooks'][0]['type']\\); print\\('command OK:', 'graphify-out/graph.json' in hook['hooks'][0]['command']\\); print\\('permissions preserved:', len\\(d.get\\('permissions',{}\\).get\\('allow', []\\)\\) > 0\\)\")"
+      "PowerShell(python -c \"import json; d = json.load\\(open\\('.claude/settings.local.json'\\)\\); hook = d['hooks']['PreToolUse'][0]; print\\('matcher:', hook['matcher']\\); print\\('type:', hook['hooks'][0]['type']\\); print\\('command OK:', 'graphify-out/graph.json' in hook['hooks'][0]['command']\\); print\\('permissions preserved:', len\\(d.get\\('permissions',{}\\).get\\('allow', []\\)\\) > 0\\)\")",
+      "mcp__laravel-boost__database-query",
+      "mcp__laravel-boost__database-schema",
+      "Bash(php artisan *)",
+      "Bash(npm run *)"
     ]
   },
   "hooks": {

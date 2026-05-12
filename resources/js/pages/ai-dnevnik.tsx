@@ -1,5 +1,5 @@
 import { Head } from '@inertiajs/react';
-import { useEffect, useState } from 'react';
+import { Fragment, useEffect, useState, type ReactNode } from 'react';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -62,6 +62,89 @@ type VrstaId = (typeof VRSTE)[number]['id'];
 function formatDatum(iso: string): string {
     const d = new Date(iso);
     return d.toLocaleDateString('sr-Latn-ME', { day: '2-digit', month: '2-digit', year: 'numeric' });
+}
+
+function renderInline(text: string): ReactNode[] {
+    const tokens = text.split(/(\*\*[^*]+\*\*|`[^`]+`)/g);
+    return tokens.map((token, idx) => {
+        if (token.startsWith('**') && token.endsWith('**')) {
+            return <strong key={idx} className="font-semibold text-foreground">{token.slice(2, -2)}</strong>;
+        }
+        if (token.startsWith('`') && token.endsWith('`')) {
+            return (
+                <code key={idx} className="rounded bg-muted px-1.5 py-0.5 text-[0.85em] font-mono">
+                    {token.slice(1, -1)}
+                </code>
+            );
+        }
+        return <Fragment key={idx}>{token}</Fragment>;
+    });
+}
+
+function MarkdownText({ text }: { text: string }) {
+    const lines = text.replace(/\r\n/g, '\n').split('\n');
+    const blocks: ReactNode[] = [];
+    let paragraph: string[] = [];
+    let list: string[] = [];
+
+    const flushParagraph = () => {
+        if (paragraph.length === 0) return;
+        blocks.push(
+            <p key={`p-${blocks.length}`} className="text-sm leading-relaxed">
+                {renderInline(paragraph.join(' '))}
+            </p>,
+        );
+        paragraph = [];
+    };
+
+    const flushList = () => {
+        if (list.length === 0) return;
+        blocks.push(
+            <ul key={`ul-${blocks.length}`} className="list-disc space-y-1 pl-5 text-sm leading-relaxed">
+                {list.map((item, idx) => (
+                    <li key={idx}>{renderInline(item)}</li>
+                ))}
+            </ul>,
+        );
+        list = [];
+    };
+
+    for (const raw of lines) {
+        const line = raw.trim();
+        if (line === '') {
+            flushParagraph();
+            flushList();
+            continue;
+        }
+        const heading = line.match(/^#{1,6}\s+(.*)$/);
+        if (heading) {
+            flushParagraph();
+            flushList();
+            blocks.push(
+                <h5 key={`h-${blocks.length}`} className="text-sm font-semibold text-foreground mt-2 first:mt-0">
+                    {renderInline(heading[1])}
+                </h5>,
+            );
+            continue;
+        }
+        const listItem = line.match(/^[-*]\s+(.*)$/);
+        if (listItem) {
+            flushParagraph();
+            list.push(listItem[1]);
+            continue;
+        }
+        const numbered = line.match(/^\d+\.\s+(.*)$/);
+        if (numbered) {
+            flushParagraph();
+            list.push(numbered[1]);
+            continue;
+        }
+        paragraph.push(line);
+    }
+    flushParagraph();
+    flushList();
+
+    return <div className="space-y-2">{blocks}</div>;
 }
 
 function slugFazu(faza: string): string {
@@ -252,11 +335,13 @@ export default function AiDnevnik({ fazeSaSesijama }: { fazeSaSesijama: FazeSaSe
                                                 </CardHeader>
                                                 <CardContent className="space-y-4 pt-2">
                                                     {POLJA.map(({ kljuc: polje, label }) => (
-                                                        <div key={polje} className="space-y-1">
+                                                        <div key={polje} className="space-y-1.5">
                                                             <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
                                                                 {label}
                                                             </p>
-                                                            <p className="text-sm leading-relaxed whitespace-pre-wrap">{sesija[polje]}</p>
+                                                            <div className="text-muted-foreground">
+                                                                <MarkdownText text={sesija[polje]} />
+                                                            </div>
                                                         </div>
                                                     ))}
                                                 </CardContent>
