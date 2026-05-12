@@ -650,7 +650,7 @@ Tri role × ključni entiteti × CRUD akcije + ownership pravila. Implementacija
 
 ### 15.2 Seed strategija
 
-Cilj: nakon `php artisan migrate:fresh --seed` dev mora imati dovoljno realnih podataka da se može odmah testirati svaki UC bez ručnog kreiranja.
+Cilj: nakon `php artisan migrate && php artisan db:seed` dev mora imati dovoljno realnih podataka da se može odmah testirati svaki UC bez ručnog kreiranja. Svi seederi su idempotentni — bezbjedno za re-run. **NE koristi se `migrate:fresh`** jer drop-uje `ai_dnevnik_sesije` (Sesija 15+ postoje samo u bazi); vidjeti `feedback_database_safety` memoriju.
 
 **Seederi i redoslijed:**
 

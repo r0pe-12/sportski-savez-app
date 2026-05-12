@@ -205,3 +205,165 @@ Use Wayfinder to generate TypeScript functions for Laravel routes. Import from `
 - IMPORTANT: Activate `inertia-react-development` when working with Inertia React client-side patterns.
 
 </laravel-boost-guidelines>
+
+---
+
+# Projektne instrukcije — Sistem školskog sporta CG (ADIS)
+
+**Kontekst:** Ovaj repo je informacioni sistem za Sportski savez Crne Gore. Predmet: ADIS, Univerzitet Donja Gorica. Vlasnik: Petar Simonović.
+
+## 1. Source of truth (REDOSLIJED PRI SVAKOM POČETKU SESIJE)
+
+Pročitaj redom prije bilo kakve implementacije:
+1. **`specs/001-sportski-savez.md`** — Glavni spec (v1.1, 17 sekcija). Spec je single source of truth. Sadrži funkcionalne zahtjeve (UC1–UC10), domain model, NFR, arhitekturu, naming konvencije, permission matricu, state dijagrame, file storage konvenciju, glossary.
+2. **`specs/000-paralelni-plan.md`** — Meta-plan (v1.1). 14 track-ova kroz 4 phase grupe. Mapa zavisnosti, merge konvencije, worktree konvencije, demo scenari.
+3. **`specs/{1XX}-{track-id}-*.md`** — Per-track placeholderi (popunjavaju se kroz `/plan`).
+4. **`docs/fajlovi/`** — Originalni SVD/Analitika/Dizajn dokumenti (kontekst, ne ažurirati).
+
+## 2. KRITIČNA PRAVILA (čitaj prije svake destruktivne komande)
+
+### 2.1 Database safety — NIKAD ne brisati bazu
+- **ZABRANJENO:** `php artisan migrate:fresh`, `migrate:fresh --seed`, `migrate:refresh`, `migrate:rollback` (osim ako ne ide ispod 2026_05_12_194833), `db:wipe`, `schema:dump --prune`, direktan `DROP TABLE ai_dnevnik_sesije`, `TRUNCATE`.
+- **Razlog:** `ai_dnevnik_sesije` tabela čuva evidenciju rada za ADIS predaju. Sesija 15+ postoje **samo u bazi** (stari `Dnevnik_AI_v1.3.md` se više ne ažurira).
+- **Sigurne alternative:**
+  - Dev: `php artisan migrate` (additive) + `php artisan db:seed` (idempotent, svi seederi su `updateOrCreate`/by-unique-column)
+  - Testovi: `RefreshDatabase` trait (transaction rollback, ne dira radnu bazu) ili `:memory:` SQLite kroz `.env.testing`
+  - Ako MORA fresh: backup `ai_dnevnik_sesije` u JSON, `php artisan migrate:fresh`, restore odmah. Ali preferiraj **prvo predložiti korisniku alternativu**.
+- **Detaljnije:** `~/.claude/projects/{project}/memory/feedback_database_safety.md`
+
+### 2.2 AI dnevnik workflow
+- **Sesija = cio razgovor** (jedna conversation u Claude Code), NE pojedinačan prompt.
+- **Tabela:** `ai_dnevnik_sesije` · **Model:** `App\Models\AiDnevnikSesija` · **Public ruta:** `/ai-dnevnik`
+- **Prvi prompt sesije:** INSERT novi red sa `MAX(broj)+1`. Polja `instrukcije/output/odluke/ishod` sa `### Prompt 1` sekcijom.
+- **Svaki naredni prompt iste sesije:** UPDATE postojeći red. Append `### Prompt N` sekcije u sva četiri text polja.
+- **Recept (INSERT):** Pisati PHP fajl u `storage/app/tmp_session_N.php` (multiline puca u `tinker --execute`), pa `php artisan tinker --execute 'require base_path("storage/app/tmp_session_N.php");'`, pa obrisati temp fajl.
+- **Markdown markup koji se renderuje na `/ai-dnevnik`:** `### Heading`, `**bold**`, `` `code` ``, `- item`, `1. item`, prazne linije = paragrafi. **NE:** tabele, linkovi, code blokovi sa ```.
+- **Subagenti NE upisuju** — samo glavni conversation.
+- **Detaljnije:** `~/.claude/projects/{project}/memory/feedback_dnevnik_ai_logging.md`
+
+## 3. Stack i ključne odluke (iz spec sekcije 10)
+
+| Tema | Odluka | Razlog |
+|---|---|---|
+| Auth | **Fortify + Inertia sesije** (NE Sanctum) | Već instalirano, bolji fit za Inertia SPA bez API tokena |
+| DB (dev) | **SQLite** (`database/database.sqlite`) | Jednostavnije; spec piše schema agnostično |
+| Cache/queue (dev) | **`database` driver** | Default Laravel; Redis u produkciji |
+| OCR | **`FakeOcrAdapter`** (file-name konvencija) | Pravi Google Vision iza feature flag-a kasnije |
+| eDnevnik | **`FakeEDnevnikAdapter`** (deterministic by JMB) | Pravi HTTP iza feature flag-a kasnije |
+| Email | **`log` driver** u dev (u `storage/logs/laravel.log`) | `ses` u produkciji |
+| File storage | **`storage/app/private/`** lokalno | S3 u produkciji |
+| Frontend | React 19, Tailwind 4, shadcn/ui, Wayfinder | Već instalirano |
+
+## 4. Naming conventions (spec sekcija 10.4)
+
+**Princip:** engleski za tehničke artefakte, crnogorski za UI preko `lang/me/`.
+
+| Artefakt | Konvencija | Primjer |
+|---|---|---|
+| Tabele | `snake_case` množina engleski | `users`, `teams`, `team_members`, `medical_certificates` |
+| Modeli | `PascalCase` jednina engleski | `Student`, `Team`, `MedicalCertificate` |
+| Kontrolleri | `PascalCase + Controller` | `TeamRegistrationController` |
+| Service/Adapter/Policy/Job | `PascalCase + sufiks` | `TeamRegistrationService`, `FakeOcrAdapter`, `TeamPolicy`, `ValidateMedicalCertificateJob` |
+| Rute URL | `kebab-case` engleski | `/teams`, `/students/{student}/profile` |
+| React komponente | `PascalCase` u `kebab-case.tsx` | `TeamRegistrationForm` u `team-registration-form.tsx` |
+| UI tekst | crnogorski preko `__('key')` | `__('teams.create_button')` → "Nova prijava ekipe" |
+
+**Izuzeci:** `AiDnevnikSesija` (predmet-specifičan), `jmb` (CG-specific, ne `personal_id`).
+
+**Glossary:** spec sekcija 17 ima mapping crnogorski domain ↔ engleski tehnički za sve entitete i pojmove.
+
+## 5. Paralelni implementacijski plan (4 phase, 14 track-ova)
+
+```
+Phase 0 (sekvencijalno): F1 Setup → F2 Migracije+modeli
+Phase 1 (3 paralelna):   T1.1 Auth+UI shell · T1.2 Sportovi+raspored · T1.3 Cross-cutting infra
+Phase 2 (7 paralelnih):  T2.1a Form · T2.1b OCR · T2.1c Submit (UC5 split) ·
+                         T2.2 eDnevnik · T2.3 Rezultati · T2.4 Profil · T2.5 Raspored
+Phase 3 (sekvencijalno): T3.1 Audit log dashboard → T3.2 Smoke + e2e
+```
+
+**Phase merge cadence:** posle svake phase boundary, sve worktree-ove rebase na novi main. Detalji: meta-plan sekcija 6.
+
+**Worktree konvencija:**
+- Direktorij: `../sportski-savez-app-{track-id}/`
+- Branch: `feature/{track-id}-{kratki-naziv}`
+- PR title: `[{track-id}] {naslov}`
+- Subagent čita SAMO svoj plan + meta-plan + spec
+- Glavni conversation upravlja PR-ovima i merge-ovima
+
+## 6. Acceptance criteria pre-merge (svaki track)
+
+Iz spec sekcije 14 + meta-plan sekcija 8:
+- [ ] Pest feature test za glavni tok + 2 alt toka
+- [ ] `vendor/bin/pint --dirty --format agent` clean
+- [ ] `php artisan test --compact` zelena
+- [ ] `npm run build` bez warnings (regeneriše Wayfinder)
+- [ ] TypeScript bez `any` u javnim signaturama React komponenti
+- [ ] UI verifikovan na 360px (mobile) i 1280px (desktop)
+- [ ] Audit log zapis za svaku state izmjenu
+- [ ] Policy / Form Request `authorize()` odbija pogrešnu rolu
+- [ ] **NIJEDNA `migrate:fresh` referenca u kodu, CI, ili dokumentaciji**
+
+## 7. Shared edit zones (sprečavanje merge konflikata)
+
+Iz meta-plan sekcija 4.1:
+- `routes/web.php` razbijen na `require` pattern. Svaki feature edituje **isključivo** svoj fajl (`routes/teams.php`, `routes/sports.php`, itd.). `routes/admin.php` sadrži samo user/school admin; resource CRUD admin rute idu u resource-specific fajl sa `Route::middleware('role:admin')` group.
+- `DatabaseSeeder::run()` koristi alfabetsku listu, jedan poziv po liniji.
+- `HandleInertiaRequests` ne diramo direktno; feature ServiceProvider boot() registruje `Inertia::share()`.
+- `lang/me/{feature}.php` — po fajl po feature.
+
+## 8. NE radi liste (over-engineering prevencija)
+
+Iz meta-plan sekcija 9:
+- Repository pattern (koristi Eloquent direktno)
+- Sub-admin / per-school admin / read-only auditor role
+- Multi-tenancy škola
+- Mobilna app, plaćanja, bulk import (spec 2 van obima)
+- AZLP cleanup workflow (`purge-graduates`, `/profile/export`, saglasnost roditelja workflow)
+- Custom error catalog (Laravel default je dovoljan)
+- Multi-language UI (samo `me`)
+
+## 9. Skills aktivacija (kad raditi šta)
+
+| Domain | Skill | Kad aktivirati |
+|---|---|---|
+| Bilo koji Laravel backend | `laravel-best-practices` | Pisanje/review controller, model, migration, service, queries |
+| Autentifikacija | `fortify-development` | Login, register, password reset, 2FA, Fortify config |
+| Inertia React UI | `inertia-react-development` | React stranice, forme, `useForm`, `<Link>`, layouts |
+| Tailwind UI | `tailwindcss-development` | Bilo koji utility class rad |
+| Wayfinder rute | `wayfinder-development` | Frontend treba pozvati backend rutu |
+| Pest testovi | `pest-testing` | Bilo koji test piše, edit, fix |
+| Brainstorming | `superpowers:brainstorming` | Pre svake nove feature/track implementacije |
+| TDD | `superpowers:test-driven-development` | Pisanje testova pre implementacije |
+| Plan pisanje | `superpowers:writing-plans` | Pretvaranje placeholder fajla u konkretan plan |
+| Subagent paralelizam | `superpowers:dispatching-parallel-agents` | Kad više nezavisnih taskova mogu raditi paralelno |
+| Worktrees | `superpowers:using-git-worktrees` | Pre starta paralelnih track-ova |
+
+## 10. Boost MCP tool preference
+
+- **Pre-implementation:** `mcp__laravel-boost__search-docs` sa version-aware query-jima.
+- **DB inspekcija:** `mcp__laravel-boost__database-schema` (summary first), `mcp__laravel-boost__database-query` (read-only SQL).
+- **URL share:** `mcp__laravel-boost__get-absolute-url` prije slanja URL-a korisniku.
+- **Debugging:** `mcp__laravel-boost__browser-logs`, `mcp__laravel-boost__last-error`, `mcp__laravel-boost__read-log-entries`.
+
+## 11. Početak implementacije (kad krenemo iz sljedeće sesije)
+
+**Predloženi redoslijed:**
+1. `/plan` za F1 Setup (placeholder: `specs/100-f1-setup.md`) — sekvencijalno
+2. `/plan` za F2 Migracije+modeli (`specs/101-f2-migracije-modeli.md`) — sekvencijalno, blokira sve
+3. Phase 1 — paralelno 3 worktree-a za T1.1, T1.2, T1.3
+4. Phase 2 — paralelno 7 worktree-ova
+5. Phase 3 — sekvencijalno
+
+**Prvi conkretni korak:** kad korisnik kaže "kreni", pokreni `/plan` (ili `superpowers:writing-plans` skill) sa argumentom `specs/100-f1-setup.md` da popuniš placeholder u konkretan implementacioni plan.
+
+## 12. Reagovanje na otvorena pitanja iz spec sekcije 16
+
+Pitanja se **NE rješavaju unaprijed** — rješavaju se u relevantnom track planu. Trenutno otvorena (po spec v1.1):
+- JMB algoritam validacija (regex format check za sad u F2)
+- Foto učenika obavezna ili opciono (pretpostavka: opciono)
+- Saglasnost roditelja workflow (van obima — polje ostaje boolean, workflow ne)
+- Audit log retention (van obima)
+- 2FA scope (Fortify default — svi mogu opciono)
+- Multi-tenancy škola (van obima)
+- Notification digest (kasnije feature)
