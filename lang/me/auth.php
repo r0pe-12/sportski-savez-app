@@ -1,0 +1,25 @@
+<?php
+
+return [
+    'login' => 'Prijava',
+    'register' => 'Registracija',
+    'email' => 'Email adresa',
+    'password' => 'Lozinka',
+    'password_confirmation' => 'Potvrda lozinke',
+    'full_name' => 'Puno ime i prezime',
+    'school' => 'Škola',
+    'role' => 'Uloga',
+    'role.professor' => 'Profesor',
+    'role.student' => 'Učenik',
+    'jmb' => 'JMB',
+    'grade' => 'Razred',
+    'birth_date' => 'Datum rođenja',
+    'parental_consent' => 'Saglasnost roditelja',
+    'parental_consent_text' => 'Potvrđujem da imam saglasnost roditelja za obradu ličnih podataka.',
+    'failed' => 'Pogrešan email ili lozinka.',
+    'forgot_password' => 'Zaboravljena lozinka?',
+    'send_reset_link' => 'Pošalji link za reset',
+    'reset_password' => 'Postavi novu lozinku',
+    'verify_email_sent' => 'Poslat je verifikacioni link na vaš email.',
+    'logout' => 'Odjava',
+];

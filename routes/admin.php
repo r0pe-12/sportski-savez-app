@@ -8,6 +8,13 @@
 | competition, result idu u resource-specific fajl sa Route::middleware('role:admin').
 */
 
+use App\Http\Controllers\Admin\SchoolController;
+use App\Http\Controllers\Admin\UserController;
 use Illuminate\Support\Facades\Route;
 
-// Placeholder — T1.1 popunjava
+Route::middleware(['auth', 'verified', 'role:admin'])->prefix('admin')->name('admin.')->group(function () {
+    Route::redirect('/', '/admin/users');
+
+    Route::resource('users', UserController::class);
+    Route::resource('schools', SchoolController::class);
+});

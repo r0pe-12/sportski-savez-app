@@ -3,6 +3,7 @@
 namespace App\Http\Middleware;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Schema;
 use Inertia\Middleware;
 
 class HandleInertiaRequests extends Middleware
@@ -35,11 +36,30 @@ class HandleInertiaRequests extends Middleware
      */
     public function share(Request $request): array
     {
+        $user = $request->user();
+        $user?->loadMissing('school');
+
         return [
             ...parent::share($request),
             'name' => config('app.name'),
             'auth' => [
-                'user' => $request->user(),
+                'user' => $user ? [
+                    'id' => $user->id,
+                    'name' => $user->name,
+                    'email' => $user->email,
+                    'role' => $user->role->value,
+                    'school' => $user->school ? [
+                        'id' => $user->school->id,
+                        'code' => $user->school->code,
+                        'name' => $user->school->name,
+                    ] : null,
+                    'verified_at' => $user->verified_at?->toIso8601String(),
+                ] : null,
+            ],
+            'notifications' => [
+                'unread_count' => $user && Schema::hasTable('notifications')
+                    ? (int) $user->unreadNotifications()->count()
+                    : 0,
             ],
             'sidebarOpen' => ! $request->hasCookie('sidebar_state') || $request->cookie('sidebar_state') === 'true',
         ];

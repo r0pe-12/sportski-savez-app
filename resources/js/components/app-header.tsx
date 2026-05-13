@@ -34,17 +34,26 @@ import { useInitials } from '@/hooks/use-initials';
 import { cn, toUrl } from '@/lib/utils';
 import { dashboard } from '@/routes';
 import type { BreadcrumbItem, NavItem } from '@/types';
+import type { SharedData } from '@/types/auth';
 
 type Props = {
     breadcrumbs?: BreadcrumbItem[];
 };
 
-const mainNavItems: NavItem[] = [
-    {
-        title: 'Dashboard',
-        href: dashboard(),
-        icon: LayoutGrid,
-    },
+const professorNavItems: NavItem[] = [
+    { title: 'Dashboard', href: dashboard(), icon: LayoutGrid },
+    { title: 'Moje ekipe', href: '/teams' },
+    { title: 'Takmičenja', href: '/schedule' },
+    { title: 'Moj profil', href: '/settings/profile' },
+];
+
+const studentNavItems: NavItem[] = [
+    { title: 'Moj profil', href: '/profile' },
+    { title: 'Takmičenja', href: '/schedule' },
+];
+
+const defaultNavItems: NavItem[] = [
+    { title: 'Dashboard', href: dashboard(), icon: LayoutGrid },
 ];
 
 const rightNavItems: NavItem[] = [
@@ -64,8 +73,15 @@ const activeItemStyles =
     'text-neutral-900 dark:bg-neutral-800 dark:text-neutral-100';
 
 export function AppHeader({ breadcrumbs = [] }: Props) {
-    const page = usePage();
+    const page = usePage<SharedData>();
     const { auth } = page.props;
+    const role = auth?.user?.role;
+    const mainNavItems =
+        role === 'professor'
+            ? professorNavItems
+            : role === 'student'
+              ? studentNavItems
+              : defaultNavItems;
     const getInitials = useInitials();
     const { isCurrentUrl, whenCurrentUrl } = useCurrentUrl();
 
