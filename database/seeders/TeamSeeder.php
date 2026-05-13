@@ -10,7 +10,6 @@ use App\Models\Student;
 use App\Models\Team;
 use App\Models\TeamMember;
 use Illuminate\Database\Seeder;
-use Illuminate\Support\Str;
 
 class TeamSeeder extends Seeder
 {
@@ -36,8 +35,17 @@ class TeamSeeder extends Seeder
                 }
 
                 $uuidSeed = "demo-{$comp->id}-{$school->id}";
+                // Deterministic UUID-shaped string from seed (md5 32 chars formatted as UUID)
+                $hash = md5($uuidSeed);
+                $deterministicUuid = sprintf('%s-%s-%s-%s-%s',
+                    substr($hash, 0, 8),
+                    substr($hash, 8, 4),
+                    substr($hash, 12, 4),
+                    substr($hash, 16, 4),
+                    substr($hash, 20, 12)
+                );
                 $team = Team::firstOrCreate(
-                    ['team_uuid' => Str::uuid5(Str::uuid4()->toString(), $uuidSeed)],
+                    ['team_uuid' => $deterministicUuid],
                     [
                         'school_id' => $school->id,
                         'competition_id' => $comp->id,
