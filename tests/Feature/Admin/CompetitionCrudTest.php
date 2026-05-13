@@ -13,7 +13,46 @@ it('admin can list competitions', function () {
     $this->actingAs($this->admin)
         ->get('/admin/competitions')
         ->assertOk()
-        ->assertInertia(fn ($p) => $p->component('admin/competitions/index'));
+        ->assertInertia(fn ($p) => $p
+            ->component('admin/competitions/index')
+            ->has('competitions.data')
+            ->has('sports')
+            ->has('filters')
+        );
+});
+
+it('filters competitions by status', function () {
+    Competition::factory()->create(['status' => 'draft']);
+    Competition::factory()->create(['status' => 'open_registration']);
+    Competition::factory()->create(['status' => 'completed']);
+
+    $this->actingAs($this->admin)
+        ->get('/admin/competitions?status=draft')
+        ->assertOk()
+        ->assertInertia(fn ($p) => $p
+            ->component('admin/competitions/index')
+            ->has('competitions.data', 1)
+            ->where('competitions.data.0.status', 'draft')
+            ->where('filters.status', 'draft')
+        );
+});
+
+it('filters competitions by sport_id and year', function () {
+    $football = Sport::factory()->team()->create(['slug' => 'fudbal-filter']);
+    $basketball = Sport::factory()->team()->create(['slug' => 'kosarka-filter']);
+
+    Competition::factory()->create(['sport_id' => $football->id, 'year' => 2026]);
+    Competition::factory()->create(['sport_id' => $football->id, 'year' => 2025]);
+    Competition::factory()->create(['sport_id' => $basketball->id, 'year' => 2026]);
+
+    $this->actingAs($this->admin)
+        ->get("/admin/competitions?sport_id={$football->id}&year=2026")
+        ->assertOk()
+        ->assertInertia(fn ($p) => $p
+            ->has('competitions.data', 1)
+            ->where('filters.sport_id', $football->id)
+            ->where('filters.year', 2026)
+        );
 });
 
 it('admin can create competition', function () {
