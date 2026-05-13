@@ -2,9 +2,11 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Enums\MedicalCertificateStatus;
 use App\Enums\TeamStatus;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\RejectTeamRequest;
+use App\Models\AuditLogEntry;
 use App\Models\Competition;
 use App\Models\School;
 use App\Models\Team;
@@ -64,9 +66,57 @@ class TeamController extends Controller
             'members.medicalCertificate',
         ]);
 
+        $recentAudit = AuditLogEntry::with('user:id,name,role')
+            ->where('subject_type', $team->getMorphClass())
+            ->where('subject_id', $team->id)
+            ->orderByDesc('created_at')
+            ->limit(10)
+            ->get(['id', 'user_id', 'action', 'subject_type', 'subject_id', 'payload', 'created_at']);
+
+        $certificateSummary = $this->summarizeCertificates($team);
+
         return Inertia::render('admin/teams/show', [
             'team' => $team,
+            'recentAudit' => $recentAudit,
+            'certificateSummary' => $certificateSummary,
         ]);
+    }
+
+    /**
+     * @return array{valid: int, manual_review: int, expired: int, invalid: int, pending: int, missing: int, total: int}
+     */
+    private function summarizeCertificates(Team $team): array
+    {
+        $summary = [
+            'valid' => 0,
+            'manual_review' => 0,
+            'expired' => 0,
+            'invalid' => 0,
+            'pending' => 0,
+            'missing' => 0,
+            'total' => $team->members->count(),
+        ];
+
+        foreach ($team->members as $member) {
+            $cert = $member->medicalCertificate;
+
+            if ($cert === null) {
+                $summary['missing']++;
+
+                continue;
+            }
+
+            match ($cert->status) {
+                MedicalCertificateStatus::Valid => $summary['valid']++,
+                MedicalCertificateStatus::ManualReview => $summary['manual_review']++,
+                MedicalCertificateStatus::Expired => $summary['expired']++,
+                MedicalCertificateStatus::Invalid => $summary['invalid']++,
+                MedicalCertificateStatus::Pending => $summary['pending']++,
+                default => null,
+            };
+        }
+
+        return $summary;
     }
 
     public function approve(Team $team): RedirectResponse
