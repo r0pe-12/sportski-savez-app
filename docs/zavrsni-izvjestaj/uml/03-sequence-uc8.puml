@@ -1,0 +1,47 @@
+@startuml sequence-uc8
+!theme plain
+title UC8 — eDnevnik verifikacija učenika
+
+actor Admin as A
+participant "StudentVerificationController" as SVC
+participant "VerifyStudentWithEDnevnikJob" as Job
+participant "FakeEDnevnikAdapter" as Adapter
+participant "EDnevnikVerificationService" as Svc
+database "Student" as S
+database "School" as Sc
+participant "AuditLogger" as AL
+
+A -> SVC : POST /admin/students/{student}/verify
+SVC -> Job : dispatch(student_id)
+SVC --> A : 302 redirect "Verifikacija pokrenuta"
+
+note over Job : queue (async)
+Job -> S : load Student with school
+Job -> Adapter : getStudent(student.jmb)
+alt JMB nađen
+  Adapter --> Job : EDnevnikStudentDto(ime, prezime, razred, sifraSkole)
+  Job -> Svc : compare(student, dto)
+  Svc -> Svc : split name → ime + prezime
+  Svc -> Svc : CI poredi ime, prezime
+  Svc -> Sc : učitaj school.code
+  Svc -> Svc : compare grade, school.code vs sifraSkole
+  alt nema mismatches
+    Svc --> Job : VerificationResult(verified=true)
+    Job -> S : update(verification_status=Verified)
+    Job -> AL : log("student.verified", student, [verified=true])
+  else postoje mismatches
+    Svc --> Job : VerificationResult(verified=false, mismatches{...})
+    Job -> S : update(verification_status=Mismatched)
+    Job -> AL : log("student.verified", student, [mismatches=...])
+  end
+else JMB nije nađen
+  Adapter --> Job : throws EDnevnikNotFoundException
+  Job -> S : update(verification_status=Mismatched)
+  Job -> AL : log("student.verify_failed", student, [reason=not_found])
+else servis nedostupan
+  Adapter --> Job : throws EDnevnikUnavailableException
+  Job -> S : update(verification_status=Unavailable)
+  Job -> AL : log("student.verify_failed", student, [reason=unavailable])
+end
+
+@enduml
