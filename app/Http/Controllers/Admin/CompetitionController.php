@@ -10,6 +10,7 @@ use App\Models\Sport;
 use App\Services\AuditLogger;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -19,12 +20,34 @@ class CompetitionController extends Controller
 
     public function __construct(private AuditLogger $audit) {}
 
-    public function index(): Response
+    public function index(Request $request): Response
     {
         $this->authorize('viewAny', Competition::class);
 
+        $status = $request->string('status')->toString();
+        $sportId = $request->integer('sport_id');
+        $year = $request->integer('year');
+
+        $query = Competition::with('sport')->orderByDesc('start_date');
+
+        if ($status !== '') {
+            $query->where('status', $status);
+        }
+        if ($sportId) {
+            $query->where('sport_id', $sportId);
+        }
+        if ($year) {
+            $query->where('year', $year);
+        }
+
         return Inertia::render('admin/competitions/index', [
-            'competitions' => Competition::with('sport')->orderByDesc('start_date')->paginate(25),
+            'competitions' => $query->paginate(25)->withQueryString(),
+            'sports' => Sport::orderBy('name')->get(['id', 'name']),
+            'filters' => [
+                'status' => $status !== '' ? $status : null,
+                'sport_id' => $sportId ?: null,
+                'year' => $year ?: null,
+            ],
         ]);
     }
 
