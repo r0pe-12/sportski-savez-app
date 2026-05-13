@@ -1,7 +1,16 @@
 import { Link } from '@inertiajs/react';
-import { BookOpen, Building, Calendar, FolderGit2, LayoutGrid, ScrollText, Trophy, Users } from 'lucide-react';
+import {
+    Building,
+    Calendar,
+    FileCheck2,
+    GraduationCap,
+    LayoutGrid,
+    ScrollText,
+    Trophy,
+    Users,
+    Users2,
+} from 'lucide-react';
 import AppLogo from '@/components/app-logo';
-import { NavFooter } from '@/components/nav-footer';
 import { NavMain } from '@/components/nav-main';
 import { NavUser } from '@/components/nav-user';
 import {
@@ -16,6 +25,8 @@ import {
 import { dashboard } from '@/routes';
 import type { NavItem } from '@/types';
 
+// AppSidebar se renderuje SAMO za admin korisnike (vidi app-layout.tsx),
+// pa nav stavke pokrivaju isključivo admin sekcije.
 const mainNavItems: NavItem[] = [
     {
         title: 'Dashboard',
@@ -43,22 +54,24 @@ const mainNavItems: NavItem[] = [
         icon: Calendar,
     },
     {
+        title: 'Ekipe',
+        href: '/admin/teams',
+        icon: Users2,
+    },
+    {
+        title: 'Učenici (verifikacija)',
+        href: '/admin/students',
+        icon: GraduationCap,
+    },
+    {
+        title: 'Sertifikati',
+        href: '/admin/certificates',
+        icon: FileCheck2,
+    },
+    {
         title: 'Audit log',
         href: '/admin/audit-log',
         icon: ScrollText,
-    },
-];
-
-const footerNavItems: NavItem[] = [
-    {
-        title: 'Repository',
-        href: 'https://github.com/laravel/react-starter-kit',
-        icon: FolderGit2,
-    },
-    {
-        title: 'Documentation',
-        href: 'https://laravel.com/docs/starter-kits#react',
-        icon: BookOpen,
     },
 ];
 
@@ -82,7 +95,6 @@ export function AppSidebar() {
             </SidebarContent>
 
             <SidebarFooter>
-                <NavFooter items={footerNavItems} className="mt-auto" />
                 <NavUser />
             </SidebarFooter>
         </Sidebar>

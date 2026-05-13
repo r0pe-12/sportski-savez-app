@@ -8,6 +8,7 @@
 | NE dodavaj rute direktno ovde; dodaj ih u feature-specific fajl.
 */
 
+use App\Http\Controllers\DashboardController;
 use Illuminate\Support\Facades\Route;
 
 require __DIR__.'/auth.php';
@@ -23,5 +24,5 @@ require __DIR__.'/public.php';
 require __DIR__.'/settings.php';
 
 Route::middleware(['auth', 'verified'])->group(function () {
-    Route::inertia('dashboard', 'dashboard')->name('dashboard');
+    Route::get('dashboard', [DashboardController::class, 'index'])->name('dashboard');
 });
