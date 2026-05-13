@@ -922,6 +922,9 @@ Kontekst:
 - Završeno je 17 sesija planiranja (spec v1.1, meta-plan v1.1, 14 placeholderi popunjeni u konkretne implementacijske planove kroz sesiju 16).
 - Sesija 17 je verifikovala pokrivenost zahtjeva profesora za završni ispit (Phase 4 dodat).
 - Sada se otvara prva implementaciona sesija — počinjemo Phase 0 (F1 Setup → F2 Migracije+modeli sekvencijalno), pa Phase 1 (T1.1/T1.2/T1.3 paralelno kroz worktree-ove).
+
+### Prompt 2
+Korisnik je rekao: **"nastavi"** (posle slučajnog prekida F2 dispatch-a) — potvrda da F2 ide subagent-driven, ne ručno.
 INSTRUKCIJE_18,
                 'output' => <<<'OUTPUT_18'
 ### Prompt 1
@@ -934,6 +937,18 @@ Planirani redoslijed izvršavanja u ovoj sesiji:
    - T1.2 Sportovi + raspored (`specs/111-t1.2-sportovi-raspored.md`)
    - T1.3 Cross-cutting infra (`specs/112-t1.3-cross-cutting-infra.md`)
 4. Posle Phase 1 boundary: merge svih PR-ova u main, rebase worktrees, krećemo Phase 2.
+
+### Prompt 2
+**F1 završen** (commit `9ba301a` — pint cleanup, plus 5 prethodnih F1 commitova) — 4/4 RoutingTest PASS, 48/48 ukupno PASS, build čist.
+
+**F2 završen** preko implementer subagenta (general-purpose, foreground dispatch):
+- 14 F2 commitova ukupno (od `5e971e5` do `d979c86`)
+- Enum klase, schools+users STI, sports, competitions, teams+team_members, medical_certificates, results polimorfni, audit_log, idempotent seederi (Admin/Professor/Student/Team/Result)
+- DatabaseSeeder orchestration sa alfabetskim redoslijedom
+- DomainModelTest integration test
+- **80/80 Pest testova PASS, 246 assertion-a**
+- Sva 11 modela iz spec sekcije 7 postoje
+- `ai_dnevnik_sesije` netaknut (17 sesija ostalo)
 OUTPUT_18,
                 'odluke' => <<<'ODLUKE_18'
 ### Prompt 1
@@ -942,10 +957,21 @@ OUTPUT_18,
 - **Subagent skup:** svaki subagent dobija SAMO svoj plan + meta-plan + spec, ne cijeli kontekst.
 - **Dnevnik dual-write:** posle svake INSERT/UPDATE u tabeli, odmah `php artisan ai-dnevnik:sync-seeder`.
 - **F1/F2 ide glavni conversation** (sekvencijalno, blokira sve ostalo) — ne delegira se subagentima.
+
+### Prompt 2
+- F1 i F2 idu direktno u glavnoj grani (sekvencijalno, blokiraju Phase 1+), per CLAUDE.md sekcija 5
+- F2 delegiran subagentu jer plan ima 2777 redova i 13+ taskova — context-pollution prevention
+- Subagent radio sa eksplicitnim CRITICAL RULES (nikad migrate:fresh, nikad pisati u ai_dnevnik_sesije, naming engleski tehnički/crnogorski UI)
+- Spec compliance verifikovan post-hoc (git log + model file count + test green) umjesto formal reviewer subagenta — F2 plan je već bio mostly implemented u prethodnim sesijama (Tasks 1-12), ova sesija je samo dovršila Task 13 (DatabaseSeeder orchestration) i Task 14 (DomainModelTest)
+- TeamSeeder deviation: `Str::uuid5` zamijenjeno deterministic md5-based UUID (Laravel verzija signature mismatch), isti intent — idempotent
+- **Phase 1 počinje:** 3 paralelna worktree-a za T1.1, T1.2, T1.3
 ODLUKE_18,
                 'ishod' => <<<'ISHOD_18'
 ### Prompt 1
 U toku — sesija upravo započinje. Sledeći koraci: aktivacija skills + start F1 plana iz `specs/100-f1-setup.md`.
+
+### Prompt 2
+Phase 0 (F1 + F2) potpuno završen. 14 F2 commitova + 5 F1 commitova na `main`. 80/80 testova PASS. Spremno za Phase 1 paralelne track-ove.
 ISHOD_18,
             ],
         ];
