@@ -2,6 +2,8 @@
 
 namespace App\Providers;
 
+use App\Adapters\Ocr\FakeOcrAdapter;
+use App\Contracts\OcrAdapter;
 use Carbon\CarbonImmutable;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\DB;
@@ -15,7 +17,11 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        //
+        $this->app->bind(OcrAdapter::class, function () {
+            return config('ocr.adapter') === 'fake'
+                ? new FakeOcrAdapter
+                : throw new \LogicException('Real OcrAdapter not implemented yet. Set OCR_ADAPTER=fake.');
+        });
     }
 
     /**
