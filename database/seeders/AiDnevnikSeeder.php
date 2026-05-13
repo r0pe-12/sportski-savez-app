@@ -905,6 +905,49 @@ Phase 4 uspješno registrovan u meta-planu, CLAUDE.md i 3 placeholder fajla. Spr
 Sljedeći korak (kad korisnik kaže "kreni"): `/plan` za `specs/100-f1-setup.md`.
 ISHOD_17,
             ],
+            [
+                'broj' => 18,
+                'naslov' => 'Start implementacije — subagent-driven development + git worktrees za Phase 0/1',
+                'datum' => '2026-05-13',
+                'faza' => 'Implementacija',
+                'alat' => 'Claude Code (Opus 4.7, 1M context) + superpowers:subagent-driven-development + superpowers:using-git-worktrees',
+                'cilj' => <<<'CILJ_18'
+Prva implementaciona sesija: izvršiti Phase 0 (F1 Setup → F2 Migracije+modeli sekvencijalno) i pokrenuti Phase 1 paralelno kroz tri git worktree-a (T1.1, T1.2, T1.3) koristeći subagent-driven development workflow.
+CILJ_18,
+                'instrukcije' => <<<'INSTRUKCIJE_18'
+### Prompt 1
+Korisnik je zatražio: **"kreni sa implementacijom planova koristeci subagent driven developlment i git worktrees"**.
+
+Kontekst:
+- Završeno je 17 sesija planiranja (spec v1.1, meta-plan v1.1, 14 placeholderi popunjeni u konkretne implementacijske planove kroz sesiju 16).
+- Sesija 17 je verifikovala pokrivenost zahtjeva profesora za završni ispit (Phase 4 dodat).
+- Sada se otvara prva implementaciona sesija — počinjemo Phase 0 (F1 Setup → F2 Migracije+modeli sekvencijalno), pa Phase 1 (T1.1/T1.2/T1.3 paralelno kroz worktree-ove).
+INSTRUKCIJE_18,
+                'output' => <<<'OUTPUT_18'
+### Prompt 1
+Planirani redoslijed izvršavanja u ovoj sesiji:
+
+1. **F1 Setup** (sekvencijalno, glavni conversation) — `specs/100-f1-setup.md`
+2. **F2 Migracije + modeli** (sekvencijalno, glavni conversation) — `specs/101-f2-migracije-modeli.md` — blokira sve
+3. **Phase 1 — 3 paralelna worktree-a:**
+   - T1.1 Auth + korisnici + UI shell (`specs/110-t1.1-auth-korisnici-ui-shell.md`)
+   - T1.2 Sportovi + raspored (`specs/111-t1.2-sportovi-raspored.md`)
+   - T1.3 Cross-cutting infra (`specs/112-t1.3-cross-cutting-infra.md`)
+4. Posle Phase 1 boundary: merge svih PR-ova u main, rebase worktrees, krećemo Phase 2.
+OUTPUT_18,
+                'odluke' => <<<'ODLUKE_18'
+### Prompt 1
+- **Skill aktivacija:** `superpowers:subagent-driven-development` + `superpowers:using-git-worktrees` (eksplicitno zatraženi).
+- **Worktree konvencija:** `../sportski-savez-app-{track-id}/` sa branch `feature/{track-id}-{naziv}`.
+- **Subagent skup:** svaki subagent dobija SAMO svoj plan + meta-plan + spec, ne cijeli kontekst.
+- **Dnevnik dual-write:** posle svake INSERT/UPDATE u tabeli, odmah `php artisan ai-dnevnik:sync-seeder`.
+- **F1/F2 ide glavni conversation** (sekvencijalno, blokira sve ostalo) — ne delegira se subagentima.
+ODLUKE_18,
+                'ishod' => <<<'ISHOD_18'
+### Prompt 1
+U toku — sesija upravo započinje. Sledeći koraci: aktivacija skills + start F1 plana iz `specs/100-f1-setup.md`.
+ISHOD_18,
+            ],
         ];
 
         foreach ($sesije as $sesija) {
