@@ -8,6 +8,7 @@
 */
 
 use App\Http\Controllers\TeamController;
+use App\Http\Controllers\TeamMemberController;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware(['auth', 'verified'])->group(function () {
@@ -17,4 +18,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('teams/{team}/edit', [TeamController::class, 'edit'])->name('teams.edit');
     Route::patch('teams/{team}', [TeamController::class, 'update'])->name('teams.update');
     Route::delete('teams/{team}', [TeamController::class, 'destroy'])->name('teams.destroy');
+
+    Route::post('teams/{team}/members', [TeamMemberController::class, 'store'])->name('teams.members.store');
+    Route::delete('teams/{team}/members/{member}', [TeamMemberController::class, 'destroy'])->name('teams.members.destroy');
 });
