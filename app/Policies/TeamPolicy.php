@@ -48,6 +48,9 @@ class TeamPolicy
             && $team->status === TeamStatus::Draft;
     }
 
+    /**
+     * Samo profesor koji je vlasnik tima može potpisati i predati.
+     */
     public function submit(User $user, Team $team): bool
     {
         return $user->isProfessor()
@@ -55,11 +58,14 @@ class TeamPolicy
             && $team->status === TeamStatus::Draft;
     }
 
+    /**
+     * Profesor može povući svoju draft (cancelled) ili submitted (withdrawn) prijavu.
+     */
     public function cancel(User $user, Team $team): bool
     {
         return $user->isProfessor()
             && $team->professor_id === $user->id
-            && $team->status === TeamStatus::Draft;
+            && in_array($team->status, [TeamStatus::Draft, TeamStatus::Submitted], true);
     }
 
     public function addMember(User $user, Team $team): bool

@@ -45,3 +45,17 @@ Route::middleware(['auth', 'verified', 'role:admin'])->group(function () {
     Route::post('admin/certificates/{certificate}/manual-approve', [MedicalCertificateController::class, 'manualApprove'])
         ->name('admin.certificates.manual-approve');
 });
+
+// ============================================================
+// T2.1c — Team submission (draft → submitted → active|rejected, cancel)
+// ============================================================
+Route::middleware(['auth', 'verified'])->group(function () {
+    Route::get('teams/{team}/review', [TeamController::class, 'review'])
+        ->name('teams.review');
+
+    Route::post('teams/{team}/submit', [TeamController::class, 'submit'])
+        ->name('teams.submit');
+
+    Route::post('teams/{team}/cancel', [TeamController::class, 'cancel'])
+        ->name('teams.cancel');
+});

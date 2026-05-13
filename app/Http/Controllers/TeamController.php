@@ -4,12 +4,15 @@ namespace App\Http\Controllers;
 
 use App\Enums\TeamStatus;
 use App\Http\Requests\StoreTeamRequest;
+use App\Http\Requests\SubmitTeamRequest;
 use App\Http\Requests\UpdateTeamRequest;
 use App\Models\Competition;
 use App\Models\Student;
 use App\Models\Team;
 use App\Models\User;
 use App\Services\AuditLogger;
+use App\Services\Exceptions\TeamSubmissionException;
+use App\Services\TeamRegistrationService;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\RedirectResponse;
@@ -84,6 +87,56 @@ class TeamController extends Controller
         $this->audit->log('team.cancelled', $team);
 
         return redirect()->route('teams.index');
+    }
+
+    public function review(Team $team): Response
+    {
+        $this->authorize('view', $team);
+
+        $team->load([
+            'competition.sport',
+            'school',
+            'members.student',
+            'members.medicalCertificate',
+        ]);
+
+        return Inertia::render('teams/review', [
+            'team' => $team,
+        ]);
+    }
+
+    public function submit(
+        SubmitTeamRequest $request,
+        Team $team,
+        TeamRegistrationService $service,
+    ): RedirectResponse {
+        try {
+            $service->submit($team, $request->validated('signature'), (string) $request->ip());
+        } catch (TeamSubmissionException $e) {
+            return back()->withErrors(['signature' => $e->getMessage()]);
+        }
+
+        return redirect()->route('teams.index')
+            ->with('flash', 'Ekipa je predata.');
+    }
+
+    /**
+     * Profesor povlači draft (cancelled) ili submitted (withdrawn) prijavu.
+     */
+    public function cancel(Team $team): RedirectResponse
+    {
+        $this->authorize('cancel', $team);
+
+        $newStatus = $team->status === TeamStatus::Submitted
+            ? TeamStatus::Withdrawn
+            : TeamStatus::Cancelled;
+
+        $team->update(['status' => $newStatus]);
+
+        $this->audit->log("team.{$newStatus->value}", $team);
+
+        return redirect()->route('teams.index')
+            ->with('flash', $newStatus === TeamStatus::Withdrawn ? 'Prijava povučena.' : 'Prijava otkazana.');
     }
 
     /** @return Collection<int, Student> */
