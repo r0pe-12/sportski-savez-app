@@ -1,8 +1,37 @@
-# Demo snimci — uputstvo za snimanje
+# Demo snimci
 
 > **Pokriva:** profesorov zahtjev 4 dio (b-bis) — "snimak ekrana aplikacije u upotrebi za par UC-ova"
 
-Ovi snimci su **ručni deliverable**. Claude može da generiše uputstvo, ali snimanje radi vlasnik repozitorija.
+## Šta je u ovom direktorijumu
+
+| Fajl | Sadržaj |
+|---|---|
+| [`uc5-prijava-ekipe.webm`](uc5-prijava-ekipe.webm) | Profesor login → /teams → otvara draft tim → vidi 10 članova → upload potvrde → review stranica |
+| [`uc8-ednevnik-verifikacija.webm`](uc8-ednevnik-verifikacija.webm) | Admin login → /admin/students → verify page → audit log |
+| [`uc10-rezultati-medalje.webm`](uc10-rezultati-medalje.webm) | Admin login → competitions → results form sa svim ekipama → public schedule |
+| [`screenshots/`](screenshots/) | 24 PNG screenshot-a iz svakog koraka demoa |
+
+Snimci su generisani **automatski preko Playwright-a** (Chromium headless, 1600×900). Skripta i fixture PDF-ovi su u [`../../../demos/`](../../../demos/).
+
+**Format:** WebM (Playwright default). Plays in modern browsers natively, ili konvertuj u MP4 preko ffmpeg ako treba `.mp4` ekstenzija za predaju.
+
+## Kako su snimani
+
+```bash
+# Pre-rekviziti
+npm run build                                            # Vite assets
+php artisan migrate && php artisan db:seed               # demo data
+php artisan queue:work --queue=ocr,default &             # OCR worker (UC5)
+
+# Run all 3 demos
+python C:/Users/simon/.claude/plugins/cache/anthropic-agent-skills/document-skills/f458cee31a75/skills/webapp-testing/scripts/with_server.py \
+  --server "php artisan serve --host=127.0.0.1 --port=8000" --port 8000 \
+  -- python demos/run_demos.py
+```
+
+Skripta defanzivno hvata grešne selektore (screenshot na svaku grešku), pa demo poslovni tok može da se izvrši čak i kad UI nije 100% match-ovan sa očekivanjima.
+
+## Ručno re-snimanje (ako treba bolji kvalitet)
 
 ## Alati
 
