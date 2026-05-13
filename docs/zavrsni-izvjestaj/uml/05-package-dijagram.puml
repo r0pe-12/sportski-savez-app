@@ -1,0 +1,73 @@
+@startuml package-dijagram
+!theme plain
+title Package dijagram — Laravel app struktura
+
+package "app" {
+  package "Http" {
+    package "Controllers" {
+      [Admin (CRUD)] as AdminCtrls
+      [Public + Auth] as PublicCtrls
+    }
+    [Middleware] as MW
+    [Requests] as Requests
+  }
+  package "Models" as Models
+  package "Services" as Services
+  package "Adapters" {
+    [EDnevnik (Fake + DTO + Exceptions)] as Edn
+    [Ocr (Fake + DTO)] as Ocr
+  }
+  package "Jobs" as Jobs
+  package "Enums" as Enums
+  package "Notifications" as Notif
+  package "Policies" as Policies
+}
+
+package "routes" {
+  [web.php (root)] as RWeb
+  [admin.php] as RAdmin
+  [teams.php] as RTeams
+  [sports.php] as RSports
+  [competitions.php] as RComps
+  [students.php] as RStudents
+  [results.php] as RResults
+  [auth.php] as RAuth
+  [public.php] as RPublic
+  [audit.php] as RAudit
+}
+
+package "resources/js" {
+  package "pages (Inertia)" as Pages
+  package "components (React)" as Components
+  package "layouts" as Layouts
+}
+
+package "database" {
+  package "migrations" as Migrations
+  package "seeders" as Seeders
+  package "factories" as Factories
+}
+
+package "tests" {
+  [Feature] as TFeature
+  [Browser (smoke + e2e)] as TBrowser
+  [Unit] as TUnit
+}
+
+AdminCtrls ..> Services
+PublicCtrls ..> Services
+Services ..> Models
+Services ..> Adapters
+Jobs ..> Adapters
+Jobs ..> Models
+Models ..> Enums
+Policies ..> Models
+RWeb ..> RAdmin : require
+RWeb ..> RTeams : require
+RWeb ..> RSports : require
+Pages ..> AdminCtrls : Inertia POST
+TFeature ..> Models
+TFeature ..> Factories
+TBrowser ..> Pages
+
+@enduml

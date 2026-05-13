@@ -1,0 +1,79 @@
+@startuml component-dijagram
+!theme plain
+title Component dijagram — slojevita arhitektura (v1.0)
+
+skinparam component {
+  BackgroundColor #FEFEFE
+  BorderColor #555555
+}
+
+package "Presentation (Browser)" {
+  [Inertia React SPA] as React
+  [Tailwind 4] as Tailwind
+  [Wayfinder gen] as Wayfinder
+}
+
+package "HTTP Layer" {
+  [Controllers (Admin + Public)] as Controllers
+  [Middleware (auth, role)] as Middleware
+  [Form Requests] as FormRequests
+}
+
+package "Application Layer" {
+  [TeamRegistrationService] as TRS
+  [EDnevnikVerificationService] as EVS
+  [ResultEntryService] as RES
+  [AuditLogger] as AL
+  [PrivateFileStorage] as PFS
+  [MedicalCertificateStateMachine] as SM
+}
+
+package "Domain Layer" {
+  [Eloquent Models (STI User, Student, Team...)] as Models
+  [Policies] as Policies
+  [Enums] as Enums
+}
+
+package "Infrastructure Layer" {
+  [FakeOcrAdapter] as OcrAdapter
+  [FakeEDnevnikAdapter] as EdnAdapter
+  [Notifications (Mail+DB)] as Notif
+  [Queue Jobs] as Jobs
+}
+
+cloud "Eksterni servisi" {
+  [eDnevnik (mock dev / pravi prod)] as eDnevnik
+  [Google Vision OCR (mock dev)] as Vision
+  [AWS SES (log driver dev)] as SES
+  database "Storage S3 (lokalno dev)" as S3
+  database "DB SQLite dev / PostgreSQL prod" as DB
+}
+
+React --> Controllers : Inertia POST/GET
+Wayfinder ..> React : type-safe rute
+Controllers --> Middleware : kroz route group
+Controllers --> FormRequests : validate()
+Controllers --> TRS
+Controllers --> EVS
+Controllers --> RES
+TRS --> Models
+TRS --> AL
+TRS --> Notif
+TRS --> SM
+EVS --> EdnAdapter
+EVS --> Models
+RES --> Models
+RES --> AL
+AL --> Models : AuditLogEntry
+PFS --> S3
+SM --> Models
+Jobs --> OcrAdapter
+Jobs --> EdnAdapter
+Jobs --> Models
+OcrAdapter ..> Vision : prod (iza feature flag)
+EdnAdapter ..> eDnevnik : prod (iza feature flag)
+Notif --> SES
+Models --> DB
+Policies ..> Models
+
+@enduml
