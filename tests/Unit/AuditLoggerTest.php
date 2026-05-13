@@ -1,6 +1,5 @@
 <?php
 
-use App\Models\AuditLogEntry;
 use App\Models\School;
 use App\Models\User;
 use App\Services\AuditLogger;
