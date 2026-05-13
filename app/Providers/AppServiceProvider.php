@@ -11,10 +11,12 @@ use App\Models\Professor;
 use App\Models\School;
 use App\Models\Sport;
 use App\Models\Student;
+use App\Models\Team;
 use App\Models\User;
 use App\Observers\CompetitionObserver;
 use App\Observers\SportObserver;
 use App\Policies\SchoolPolicy;
+use App\Policies\TeamPolicy;
 use App\Policies\UserPolicy;
 use App\Services\AuditLogger;
 use Carbon\CarbonImmutable;
@@ -83,6 +85,7 @@ class AppServiceProvider extends ServiceProvider
         Gate::policy(Professor::class, UserPolicy::class);
         Gate::policy(Student::class, UserPolicy::class);
         Gate::policy(School::class, SchoolPolicy::class);
+        Gate::policy(Team::class, TeamPolicy::class);
     }
 
     /**

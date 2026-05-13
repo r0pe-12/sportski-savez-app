@@ -9,6 +9,7 @@
 */
 
 use App\Http\Controllers\Admin\SchoolController;
+use App\Http\Controllers\Admin\TeamController as AdminTeamController;
 use App\Http\Controllers\Admin\UserController;
 use Illuminate\Support\Facades\Route;
 
@@ -17,4 +18,10 @@ Route::middleware(['auth', 'verified', 'role:admin'])->prefix('admin')->name('ad
 
     Route::resource('users', UserController::class);
     Route::resource('schools', SchoolController::class);
+
+    // T2.1c admin team approval/rejection
+    Route::get('teams', [AdminTeamController::class, 'index'])->name('teams.index');
+    Route::get('teams/{team}', [AdminTeamController::class, 'show'])->name('teams.show');
+    Route::post('teams/{team}/approve', [AdminTeamController::class, 'approve'])->name('teams.approve');
+    Route::post('teams/{team}/reject', [AdminTeamController::class, 'reject'])->name('teams.reject');
 });
