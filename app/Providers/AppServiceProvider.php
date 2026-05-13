@@ -2,6 +2,10 @@
 
 namespace App\Providers;
 
+use App\Models\Competition;
+use App\Models\Sport;
+use App\Observers\CompetitionObserver;
+use App\Observers\SportObserver;
 use Carbon\CarbonImmutable;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\DB;
@@ -24,6 +28,9 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         $this->configureDefaults();
+
+        Sport::observe(SportObserver::class);
+        Competition::observe(CompetitionObserver::class);
     }
 
     /**
