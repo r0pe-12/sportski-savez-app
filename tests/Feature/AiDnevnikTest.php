@@ -2,11 +2,12 @@
 
 use App\Models\AiDnevnikSesija;
 use Database\Seeders\AiDnevnikSeeder;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 
 use function Pest\Laravel\get;
 use function Pest\Laravel\seed;
 
-uses(Illuminate\Foundation\Testing\RefreshDatabase::class);
+uses(RefreshDatabase::class);
 
 it('javna /ai-dnevnik ruta odgovara 200 bez auth-a', function () {
     seed(AiDnevnikSeeder::class);

@@ -7,6 +7,4 @@
 | Owner: T1.2 (Sportovi + raspored)
 */
 
-use Illuminate\Support\Facades\Route;
-
 // Placeholder — T1.2 popunjava

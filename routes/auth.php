@@ -9,6 +9,4 @@
 | custom auth rute (npr. role-based redirect, 2FA recovery UI ako bude trebao).
 */
 
-use Illuminate\Support\Facades\Route;
-
 // Placeholder — T1.1 popunjava

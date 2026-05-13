@@ -1,5 +1,7 @@
 <?php
 
+use Illuminate\Support\Facades\Artisan;
+
 use function Pest\Laravel\get;
 
 it('welcome route renders', function () {
@@ -15,6 +17,6 @@ it('dashboard route requires auth', function () {
 });
 
 it('route list is loadable without fatal', function () {
-    $exitCode = \Illuminate\Support\Facades\Artisan::call('route:list');
+    $exitCode = Artisan::call('route:list');
     expect($exitCode)->toBe(0);
 });
