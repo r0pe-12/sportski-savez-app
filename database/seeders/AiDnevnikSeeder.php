@@ -1152,6 +1152,57 @@ Phase 3 ide sekvencijalno (per meta-plan) — može u glavnom conversation-u ili
 **Funkcionalnost je spremna za produkciju.** Phase 4 ide POSLIJE implementacije — UML iz koda, V&V citira sesije, demo iz radne aplikacije.
 ISHOD_18,
             ],
+            [
+                'broj' => 19,
+                'naslov' => 'Phase 4 dokumentacija — kick-off (UML + V&V + finalni izvještaj)',
+                'datum' => '2026-05-13',
+                'faza' => 'Faza 4 — Dokumentacija za ADIS predaju',
+                'alat' => 'Claude Code (Opus 4.7, 1M context)',
+                'cilj' => 'Generisati kompletnu dokumentaciju za završni ispit (UML, V&V + AI u SDLC, deployment uputstva, konsolidovani izvještaj sa prethodne tri iteracije izvještavanja, demo snimci UC5/UC8/UC10).',
+                'instrukcije' => <<<'INSTRUKCIJE_19'
+### Prompt 1
+
+Korisnik: "ajde idemo da generisemo dokumentaciju po planu koji imas".
+
+Cilj: krenuti Phase 4 (dokumentacija za ADIS predaju za završni ispit) prema postojećim placeholder planovima u `specs/140-*`, `specs/141-*`, `specs/142-*`.
+
+Phase 4 ima 3 track-a (sa pre-flight: T3.2 merge-an, aplikacija na v1.0):
+
+- **T4.1 — UML dijagrami** (2 dana, paralelan sa T4.2). 6 dijagrama (klasni, sequence UC5, sequence UC8, component, package, deployment) iz IMPLEMENTIRANOG koda, ne iz specifikacije. PlantUML izvori + PNG/SVG render u `docs/zavrsni-izvjestaj/uml/`.
+- **T4.2 — V&V + deployment uputstvo** (2 dana, paralelan sa T4.1). Tri dokumenta: `04-vv-i-ai-u-sdlc.md` (refleksija o AI u SDLC), `deployment/01-lokalna-instalacija.md`, `deployment/02-staging-rollout.md` + `03-production-readiness.md`.
+- **T4.3 — Konsolidovani finalni izvještaj + demo snimak** (3 dana, sekvencijalan poslije T4.1+T4.2). Integriše prvu+drugu+treću iteraciju izvještavanja. `docs/zavrsni-izvjestaj/` stablo + snimci UC5/UC8/UC10.
+INSTRUKCIJE_19,
+                'output' => <<<'OUTPUT_19'
+### Prompt 1
+
+Pročitana sva 3 placeholder fajla (T4.1, T4.2, T4.3) + provjereno trenutno stanje dnevnika (zadnja sesija = 18, Phase 3 v1.0 tag urađen, 329 testova zelena, 9 UC implementirano).
+
+Predstavljena 3 moguća pristupa korisniku za realizaciju Phase 4:
+
+1. **Sekvencijalno T4.1 → T4.2 → T4.3** u jednoj sesiji (kontrolisan tok, sporiji ali predvidljiv)
+2. **Paralelno T4.1 + T4.2 preko subagent-driven u worktree-ovima**, pa T4.3 sekvencijalan (brže, ali traži više koordinacije)
+3. **Samo T4.1** za sada, pa odlučiti dalje
+
+Identifikovane zavisnosti: T4.3 blokiran od T4.1 (UML render slike za inline embed) i T4.2 (V&V poglavlje + deployment dokumenti za link).
+
+Sljedeći korak: korisnikov izbor pristupa, pa popunjavanje konkretnog plana iz placeholder-a (preko `superpowers:writing-plans` skill-a).
+OUTPUT_19,
+                'odluke' => <<<'ODLUKE_19'
+### Prompt 1
+
+- **Phase 4 startovan** — implementacija (Phase 0–3) potvrđeno završena u Sesiji 18 + v1.0 tag.
+- **Plan po placeholder strukturi** — ne improvizujemo, koristimo dogovorenu strukturu iz `specs/140-*`, `141-*`, `142-*`.
+- **Worktree konvencija ostaje** — ako paralelizujemo T4.1+T4.2, koristimo `../sportski-savez-app-t4.1/` i `../sportski-savez-app-t4.2/` po meta-plan §6.
+- **Konkretni pristup čeka korisnikov izbor** — ne kreiramo nijedan fajl u `docs/zavrsni-izvjestaj/` dok ne padne odluka.
+ODLUKE_19,
+                'ishod' => <<<'ISHOD_19'
+### Prompt 1
+
+U toku — čeka se korisnikov odgovor na pitanje o pristupu Phase 4 (sekvencijalno vs paralelno preko subagenta vs samo T4.1).
+
+Sesija 19 INSERT-ovana u `ai_dnevnik_sesije`, sync-seeder pokrenut radi dual-write.
+ISHOD_19,
+            ],
         ];
 
         foreach ($sesije as $sesija) {
