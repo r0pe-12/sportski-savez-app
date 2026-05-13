@@ -7,13 +7,16 @@ use App\Adapters\Ocr\FakeOcrAdapter;
 use App\Contracts\EDnevnikAdapter;
 use App\Contracts\OcrAdapter;
 use App\Models\Competition;
+use App\Models\MedicalCertificate;
 use App\Models\Professor;
 use App\Models\School;
 use App\Models\Sport;
 use App\Models\Student;
+use App\Models\TeamMember;
 use App\Models\User;
 use App\Observers\CompetitionObserver;
 use App\Observers\SportObserver;
+use App\Policies\MedicalCertificatePolicy;
 use App\Policies\SchoolPolicy;
 use App\Policies\StudentPolicy;
 use App\Policies\UserPolicy;
@@ -84,6 +87,8 @@ class AppServiceProvider extends ServiceProvider
         Gate::policy(Professor::class, UserPolicy::class);
         Gate::policy(Student::class, StudentPolicy::class);
         Gate::policy(School::class, SchoolPolicy::class);
+        Gate::policy(MedicalCertificate::class, MedicalCertificatePolicy::class);
+        Gate::policy(TeamMember::class, MedicalCertificatePolicy::class);
     }
 
     /**
