@@ -107,4 +107,110 @@ Ukupan obim sesije 18:
 
 ---
 
-(nastavlja se u Task 2 — sekcije 4–7)
+## 4. AI u testiranju (Pest)
+
+**Najopasniji rizik svih:** AI piše testove koji prolaze ali ne validiraju ništa stvarno. Test koji samo provjerava `assertTrue(true)` ili `expect($result)->not->toBeNull()` može da "preživi" review jer izgleda OK.
+
+**Konkretne sumnjive situacije:**
+
+1. **Tautološki test** — AI je u nekoliko slučajeva u toku Phase 2 napisao test gdje su input i očekivani izlaz iste konstante. Primjer (pseudokod):
+   ```php
+   it('computes total', function () {
+       $expected = 42;
+       expect(compute(42))->toBe($expected); // nije test, kopija
+   });
+   ```
+   Popravak: TDD red-green-refactor sa eksplicitnom verifikacijom da test prvo padne sa očekivanom porukom prije nego što se implementira logika.
+
+2. **Test bez assertion-a** — Pest dozvoljava `it('does something', function () { doSomething(); });`. Prolazi ako exception nije bačen. AI je generisao nekoliko takvih u prvom draft-u Phase 2 (T2.1a Team form). Otkriveno tek na merge review-u i refaktorisano da koristi `expect(...)`.
+
+3. **Coupled test koji "prati" implementaciju** — kad AI generiše test koji testira `Service::compute()` tako što kopira logiku iz Service-a u test (umjesto da nezavisno izračuna očekivani rezultat). Test prolazi ali ne validira ništa. Pojavilo se u T2.1b OCR fixture-ima, popravljeno tako što su očekivani izlazi hard-coded u testu (file-name konvencija: `valid.pdf` → status `valid`, `expired.pdf` → status `expired`).
+
+**Mitigacija:**
+
+1. **TDD red-green-refactor disciplina** — `superpowers:test-driven-development` skill nameće: prvo piši test koji pada, vidi failure poruku, pa implementiraj kod.
+2. **Browser smoke testovi (Pest 4)** — `tests/Browser/SmokePagesTest.php` validira da stranice rade end-to-end, hvata regresije koje unit testovi ne mogu (npr. Inertia prop koji se zove drugačije u backend-u i frontend-u). Iz dnevnika Sesije 18: T3.2 dodao 7 commitova "Integration smoke + e2e" + 32 nova testa.
+3. **Manual UAT za UC5 i UC8** — demo scenariji se ručno prolaze prije v1.0 tag-a, što hvata UX nedostatke koje testovi ne mogu (npr. confusing copy, missing helper text).
+4. **Test count + assertion count metrika** — Sesija 18 ishod izvještava 329 testova i 957 assertion-a — odnos 2.9 assertion/test je health-check da testovi nisu prazni shell-ovi.
+
+**Konkretan citat:** Sesija 18, Prompt 4 (završetak Phase 2): *"Phase 2 100% završen. Sva 7 track-ova implementirano + verifikovano + mergovano u main. 297/297 testova prolaze."* — odmah nakon Phase 3 (T3.1 + T3.2): *"329/329 testova prolaze, 957 assertion-a, 9 use case-a implementirano"*. T3.2 split (integration smoke + e2e) je eksplicitno bio uveden da uhvati testove koji "prolaze ali ne validiraju ništa" — što je AI sklon da pravi.
+
+---
+
+## 5. AI u deployment-u
+
+**Rizik:** AI generiše `.env` vrijednosti, deployment skripte, ili infrastrukturne konfige koji "izgledaju" tačno ali nisu testirani na ciljnoj infrastrukturi. Posebno opasno za:
+
+- `.env` produkcijske ključeve (može da unese `APP_KEY` koji se ne podudara sa serializovanim sesijama)
+- Database migracije koje rade na SQLite a padaju na PostgreSQL (npr. `ENUM` umjesto `VARCHAR + CHECK`)
+- Queue konfiguracije gdje `sync` driver radi u dev-u ali blokira request u produkciji
+
+**Konkretni preventivni mehanizmi:**
+
+1. **`.env.example` mora biti single source za env shape** — produkcijski `.env` se generiše iz template-a, ne kopira iz druge instance.
+2. **Migracije moraju biti DB-agnostične** — koristi `Schema::table` API umjesto raw SQL. Spec piše schema agnostično (sekcija 7), implementacija prati.
+3. **Database safety pravila** (CLAUDE.md sekcija 2.1) — zabranjene `migrate:fresh`, `db:wipe`, `migrate:refresh`, `migrate:rollback` ispod `2026_05_12_194833`. Razlog: `ai_dnevnik_sesije` tabela čuva ADIS evidenciju (18 sesija, irreplaceable).
+4. **Dual-write u seeder** — pored DB zapisa, svaka izmjena dnevnika regeneriše `database/seeders/AiDnevnikSeeder.php`. Ako se baza obriše, seeder restoreuje sve sesije (mehanizam ustanovljen u Sesiji 16 — *"uspostaviti pravilo da se svaki novi zapis u ai_dnevnik_sesije istovremeno upiše i u AiDnevnikSeeder, kako bi se kompletna istorija dnevnika mogla reprodukovati iz code-a"*).
+5. **Pilot deployment** — staging environment (1 škola, 1 takmičenje) prije production rollout-a. Detalji u `deployment/02-staging-rollout.md`.
+
+**Otvoreni rizik:** monitoring AI deployment-a u produkciji je ručan. Nemamo automatizovanu "deployment dry-run" koja bi uhvatila konfiguracijske greške prije production push-a. Za predaju (akademski kontekst) je prihvatljivo; za regulator-ready produkciju potrebna automatizacija (vidi `03-production-readiness.md`).
+
+---
+
+## 6. Auditabilnost AI doprinosa
+
+**Ključni infrastrukturni izbor:** sav rad sa Claude Code se zapisuje u `ai_dnevnik_sesije` tabelu sa strukturom `(broj, naslov, datum, faza, cilj, alat, instrukcije, output, odluke, ishod)`.
+
+**Statistika do v1.0 tag-a (read iz baze):**
+
+| Faza | Broj sesija |
+|---|---|
+| Faza 1 — Analitička dokumentacija | 7 |
+| Faza 2 — Skraćivanje, refaktor i projektni dizajn | 4 |
+| Faza 3 — Kontinuirano dokumentovanje upotrebe AI | 2 |
+| Specifikacija | 3 (sesije 15, 16, 17) |
+| Implementacija | 1 (sesija 18 — Phase 0/1/2/3, ~103 commita) |
+| Faza 4 — Dokumentacija za ADIS predaju | 1 (sesija 19) |
+| **Ukupno** | **18** |
+
+(Brojevi sesija idu od 1 do 19; broj 13 nije korišćen — preskočen u toku Faze 3.)
+
+**Dual-write u seeder.** Mehanizam ustanovljen u Sesiji 16 (citat iz `cilj` polja): *"uspostaviti pravilo da se svaki novi zapis u ai_dnevnik_sesije istovremeno upiše i u AiDnevnikSeeder, kako bi se kompletna istorija dnevnika mogla reprodukovati iz code-a (backup u versioned source)"*. Svaka izmjena dnevnika regeneriše `database/seeders/AiDnevnikSeeder.php` preko `php artisan ai-dnevnik:sync-seeder`. Komit sadrži samo seeder diff, ali baza ima istu istinu.
+
+**Šta dnevnik NE pokriva:**
+
+- Subagent rad (samo glavni conversation upisuje, per CLAUDE.md sekcija 2.2)
+- Promptove koji su odbačeni unutar iste sesije (samo finalni state se vidi)
+- Real-time tool izlazi (samo "ishod" sumarum)
+
+**Limitacija za regulator audit:** dnevnik je samostalan i ne sadrži cryptographic hash chain (nema `previous_hash` polje, nema tamper-evident append-only constraint na DB nivou). Za regulatorni audit (AZLP, Ministarstvo prosvjete) bilo bi potrebno dodati hash chain i append-only mehanizam. Trenutno je dovoljno za ADIS predaju (akademski kontekst).
+
+**Public ruta:** `/ai-dnevnik` — Inertia stranica koja renderuje sve sesije sa markdown formatiranjem (podržava `### heading`, `**bold**`, `` `code` ``, liste, paragrafe). Renderuje se public bez logina, tako da ocjenjivač može da pregleda evidenciju bez kredencijala.
+
+---
+
+## 7. Otvorena pitanja
+
+Šta i dalje **ne znamo** o AI u SDLC nakon Phase 0–3:
+
+1. **Long-context refaktoring pouzdanost** — AI sa 1M token context-om može da drži cijeli `app/` u kontekstu, ali ne znamo da li su izmjene koherentne kroz cijeli kod ili lokalno tačne ali globalno drift-ovane. Trenutno mitigirano subagent-driven workflow-om (po-track izolacija u worktree).
+2. **Mjerenje AI bug rate-a** — nemamo automatizovan način da kažemo "X% bug-ova su AI greške naspram Y% ljudske greške". Sve baselineu nedostaje human-only kontrolna grupa.
+3. **Da li je dnevnik dovoljan audit** — za akademsku predaju da, za regulatornu vjerovatno ne. Potrebno: append-only hash chain, tamper-evident storage, integracija sa external attestation service-om.
+4. **Skill konflikti** — kad više `superpowers:*` skill-ova istovremeno aktivnih, prioritet je nedeterministički. CLAUDE.md sekcija 9 mapira skill aktivaciju, ali konflikti se ručno rješavaju.
+5. **AI cost vs human cost** — nemamo metriku "vrijeme uštede vs API trošak". Predmet ADIS izvještaja je AI **u** SDLC, ne ekonomska analiza.
+6. **Reproducibility** — isti prompt sa istim modelom može da generiše različit kod između runova (LLM temperature > 0). Trenutno mitigirano kroz dnevnik (zapamtujemo ishod, ne ulaz), ali za naučni audit potrebno bi bilo `temperature=0` + zapamćeni seed.
+
+---
+
+## Reference
+
+- CLAUDE.md sekcija 2.2 — AI dnevnik workflow
+- Meta-plan (`specs/000-paralelni-plan.md`) §9 — NE-radi liste
+- Spec (`specs/001-sportski-savez.md`) §10.3 — eksterni servisi i adapter strategija (FakeOcr, FakeEDnevnik)
+- Spec §11 — deployment opis
+- Spec §14 — Acceptance criteria po track-u
+- Pest test izlaz iz Sesije 18 ishod-a (329/329 zelena, 957 assertion-a, v1.0 tag)
+- `database/seeders/AiDnevnikSeeder.php` — append-only zapis svih sesija
+- `/ai-dnevnik` public Inertia ruta — renderuje dnevnik bez logina za ocjenjivače
+- `docs/zavrsni-izvjestaj/deployment/01-lokalna-instalacija.md` — vezano za sekciju 5 (AI u deployment-u)
+- `docs/zavrsni-izvjestaj/deployment/03-production-readiness.md` — pre-production checklist koji adresira otvorene rizike
