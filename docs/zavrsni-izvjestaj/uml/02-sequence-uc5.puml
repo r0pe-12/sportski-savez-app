@@ -1,0 +1,50 @@
+@startuml sequence-uc5
+!theme plain
+title UC5 — Prijava ekipe za takmičenje
+
+actor Profesor as P
+participant "MedicalCertificateController" as MCC
+participant "ValidateMedicalCertificateJob" as Job
+participant "FakeOcrAdapter" as Ocr
+database "MedicalCertificate" as MC
+participant "TeamController" as TC
+participant "TeamRegistrationService" as TRS
+database "Team" as T
+participant "AuditLogger" as AL
+participant "NotificationService" as NS
+
+== Async: upload ljekarske potvrde ==
+P -> MCC : POST /team-members/{member}/certificate (file)
+MCC -> MC : create(status=Pending, file_path)
+MCC -> Job : dispatch(certificate_id)
+note right of Job : queue (database driver dev / redis prod)
+Job -> Ocr : extract(file_path)
+Ocr --> Job : OcrResult(doctor, institution, valid_to)
+alt OCR uspješan + valid_to > today
+  Job -> MC : update(status=Valid, doctor, institution, valid_to)
+  Job -> NS : notify Profesor "Potvrda validna"
+else OCR neuspješan ili istekla
+  Job -> MC : update(status=Invalid)
+  Job -> NS : notify Profesor "Potvrda nevažeća"
+end
+
+== Sync: submit ekipe ==
+P -> TC : POST /teams/{team}/submit (signature, ip)
+TC -> TRS : submit(team, signature, ip)
+TRS -> T : check status == Draft
+TRS -> T : check professor != null
+TRS -> T : check signature == professor.name
+TRS -> T : count members ∈ [members_count, members_count + substitutes_count]
+TRS -> MC : count members WITHOUT Valid certificate
+alt sve validacije prošle
+  TRS -> T : update(status=Submitted, signature, signed_at, signature_ip)
+  TRS -> AL : log("team.submitted", team, payload)
+  TRS -> NS : send TeamSubmittedNotification to Profesor + Admin*
+  TRS --> TC : Team (Submitted)
+  TC --> P : 302 redirect /teams/{team} + flash success
+else validacija pala
+  TRS --> TC : TeamSubmissionException(poruka)
+  TC --> P : 422 + greška
+end
+
+@enduml
