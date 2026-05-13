@@ -1,0 +1,168 @@
+@startuml klasni-dijagram
+!theme plain
+skinparam classAttributeIconSize 0
+skinparam packageStyle rectangle
+
+title Klasni dijagram — Sistem školskog sporta CG (v1.0)
+
+package "Korisnici" {
+  abstract class User {
+    +id : int
+    +name : string
+    +email : string
+    +role : UserRole <<enum>>
+    +school_id : ?int
+    +two_factor_secret : ?string
+  }
+  class Professor {
+    +title : ?string
+    +phone : ?string
+  }
+  User <|-- Professor
+  enum UserRole {
+    Admin
+    Professor
+    Student
+  }
+}
+
+package "Organizacija" {
+  class School {
+    +id : int
+    +name : string
+    +code : string <<unique>>
+    +address : string
+    +city : string
+    +phone : ?string
+  }
+  class Student {
+    +id : int
+    +name : string
+    +jmb : string <<13 cifara>>
+    +birth_date : date
+    +grade : int <<1-4>>
+    +school_id : int
+    +verification_status : StudentVerificationStatus <<enum>>
+    +photo_path : ?string
+  }
+  enum StudentVerificationStatus {
+    Unverified
+    Verified
+    Mismatched
+    Unavailable
+  }
+}
+
+package "Takmičenja" {
+  class Sport {
+    +id : int
+    +name : string
+    +type : SportType <<enum>>
+    +members_count : int
+    +substitutes_count : int
+  }
+  enum SportType {
+    Individual
+    Team
+  }
+  class Competition {
+    +id : int
+    +sport_id : int
+    +name : string
+    +start_date : date
+    +end_date : date
+    +status : CompetitionStatus <<enum>>
+    +location : string
+  }
+  enum CompetitionStatus {
+    Draft
+    Open
+    Closed
+    Completed
+  }
+}
+
+package "Ekipe i članstvo" {
+  class Team {
+    +id : int
+    +competition_id : int
+    +school_id : int
+    +professor_id : int
+    +name : string
+    +status : TeamStatus <<enum>>
+    +signature : ?string
+    +signed_at : ?datetime
+    +signature_ip : ?string
+  }
+  enum TeamStatus {
+    Draft
+    Submitted
+    Approved
+    Rejected
+  }
+  class TeamMember {
+    +id : int
+    +team_id : int
+    +student_id : int
+    +role : string
+  }
+}
+
+package "Medicina i rezultati" {
+  class MedicalCertificate {
+    +id : int
+    +student_id : int
+    +file_path : string
+    +status : MedicalCertificateStatus <<enum>>
+    +valid_from : ?date
+    +valid_to : ?date
+    +doctor_name : ?string
+    +institution : ?string
+  }
+  enum MedicalCertificateStatus {
+    Pending
+    Valid
+    Invalid
+    Expired
+  }
+  class Result {
+    +id : int
+    +competition_id : int
+    +team_id : int
+    +place : int
+    +medal : ?MedalType <<enum>>
+    +points : int
+  }
+  enum MedalType {
+    Gold
+    Silver
+    Bronze
+  }
+}
+
+package "Auditabilnost" {
+  class AuditLogEntry {
+    +id : int
+    +user_id : ?int
+    +action : string
+    +subject_type : string
+    +subject_id : int
+    +payload : json
+    +created_at : datetime
+  }
+}
+
+School "1" -- "*" User
+School "1" -- "*" Student
+School "1" -- "*" Team
+Sport "1" -- "*" Competition
+Competition "1" -- "*" Team
+Competition "1" -- "*" Result
+Team "1" -- "*" TeamMember
+Team "1" -- "0..1" Result
+Team "*" -- "1" Professor : professor_id
+Student "1" -- "*" TeamMember
+Student "1" -- "*" MedicalCertificate
+User "1" -- "*" AuditLogEntry
+
+@enduml
