@@ -6,10 +6,14 @@ use App\Adapters\EDnevnik\FakeEDnevnikAdapter;
 use App\Adapters\Ocr\FakeOcrAdapter;
 use App\Contracts\EDnevnikAdapter;
 use App\Contracts\OcrAdapter;
+use App\Models\Competition;
 use App\Models\Professor;
 use App\Models\School;
+use App\Models\Sport;
 use App\Models\Student;
 use App\Models\User;
+use App\Observers\CompetitionObserver;
+use App\Observers\SportObserver;
 use App\Policies\SchoolPolicy;
 use App\Policies\UserPolicy;
 use App\Services\AuditLogger;
@@ -51,6 +55,7 @@ class AppServiceProvider extends ServiceProvider
         $this->configureDefaults();
         $this->configurePolicies();
         $this->configureAuthEventLogging();
+        $this->configureObservers();
     }
 
     /**
@@ -78,6 +83,15 @@ class AppServiceProvider extends ServiceProvider
         Gate::policy(Professor::class, UserPolicy::class);
         Gate::policy(Student::class, UserPolicy::class);
         Gate::policy(School::class, SchoolPolicy::class);
+    }
+
+    /**
+     * Register model observers for cache invalidation.
+     */
+    protected function configureObservers(): void
+    {
+        Sport::observe(SportObserver::class);
+        Competition::observe(CompetitionObserver::class);
     }
 
     /**
