@@ -1,5 +1,5 @@
 import { Link } from '@inertiajs/react';
-import { BookOpen, FolderGit2, LayoutGrid } from 'lucide-react';
+import { BookOpen, Building, FolderGit2, LayoutGrid, Users } from 'lucide-react';
 import AppLogo from '@/components/app-logo';
 import { NavFooter } from '@/components/nav-footer';
 import { NavMain } from '@/components/nav-main';
@@ -22,6 +22,18 @@ const mainNavItems: NavItem[] = [
         href: dashboard(),
         icon: LayoutGrid,
     },
+    {
+        title: 'Korisnici',
+        href: '/admin/users',
+        icon: Users,
+    },
+    {
+        title: 'Škole',
+        href: '/admin/schools',
+        icon: Building,
+    },
+    // T1.2 doda: Sportovi, Takmičenja
+    // T3.1 doda: Audit log
 ];
 
 const footerNavItems: NavItem[] = [
