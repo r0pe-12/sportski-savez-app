@@ -4,14 +4,23 @@
 
 ## Šta je u ovom direktorijumu
 
-| Fajl | Sadržaj |
-|---|---|
-| [`uc5-prijava-ekipe.webm`](uc5-prijava-ekipe.webm) | Profesor login → /teams → otvara draft tim → vidi 10 članova → upload potvrde → review stranica |
-| [`uc8-ednevnik-verifikacija.webm`](uc8-ednevnik-verifikacija.webm) | Admin login → /admin/students → verify page → audit log |
-| [`uc10-rezultati-medalje.webm`](uc10-rezultati-medalje.webm) | Admin login → competitions → results form sa svim ekipama → public schedule |
-| [`screenshots/`](screenshots/) | 24 PNG screenshot-a iz svakog koraka demoa |
+| Fajl | Sadržaj | State u DB |
+|---|---|---|
+| [`uc5-prijava-ekipe.webm`](uc5-prijava-ekipe.webm) | Profesor login → /teams → draft tim → upload PDF potvrde → review stranica | UI navigacija završena; cert upload kroz Inertia custom handler nije completed end-to-end |
+| [`uc8-ednevnik-verifikacija.webm`](uc8-ednevnik-verifikacija.webm) | Admin login → student verify forma → klik **Pokreni verifikaciju** → queue obrada → status "Razlika sa eDnevnik" + tabela razlika → audit log | ✅ Student 2 promijenjen `unverified` → `mismatched`, eDnevnik mock vratio razred 9-9 vs lokalno 8-1 |
+| [`uc10-rezultati-medalje.webm`](uc10-rezultati-medalje.webm) | Admin login → results forma → popunjava 1=Zlato/2=Srebro/3=Bronza → klik **Sačuvaj rezultate** → public schedule | ✅ 6 zapisa kreirano u `results` tabeli (3 za Team + 3 za TeamMember kod individual_sport) |
+| [`screenshots/`](screenshots/) | 24 PNG screenshot-a iz svakog koraka demoa | |
 
 Snimci su generisani **automatski preko Playwright-a** (Chromium headless, 1600×900). Skripta i fixture PDF-ovi su u [`../../../demos/`](../../../demos/).
+
+## Vidljivost klikova
+
+Demo skripta inject-uje JavaScript overlay u svaku stranicu koji:
+- prati kretanje miša crvenom kružnicom (28px, glow shadow)
+- pravi pulse ripple animaciju (60px crveni krug koji se širi i fade-uje) na svakom mouse-down event-u
+- prikazuje tekstualnu labelu na dnu stranice koja opisuje trenutnu akciju
+
+**U videima** je sve vidljivo — kursor animira ka cilju (15 koraka), klik trigeruje ripple. **U screenshot-ovima** kursor obično nije vidljiv jer su uzeti nakon `networkidle` (kursor pozicija nije recent prije snimka).
 
 **Format:** WebM (Playwright default). Plays in modern browsers natively, ili konvertuj u MP4 preko ffmpeg ako treba `.mp4` ekstenzija za predaju.
 
