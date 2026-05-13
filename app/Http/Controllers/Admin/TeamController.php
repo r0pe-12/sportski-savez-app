@@ -2,12 +2,16 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Enums\TeamStatus;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\RejectTeamRequest;
+use App\Models\Competition;
+use App\Models\School;
 use App\Models\Team;
 use App\Services\Exceptions\TeamSubmissionException;
 use App\Services\TeamRegistrationService;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -15,14 +19,38 @@ class TeamController extends Controller
 {
     public function __construct(private TeamRegistrationService $service) {}
 
-    public function index(): Response
+    public function index(Request $request): Response
     {
-        $teams = Team::with(['competition.sport', 'school', 'professor'])
-            ->orderByDesc('created_at')
-            ->paginate(25);
+        $status = $request->string('status')->toString() ?: null;
+        $competitionId = $request->integer('competition_id') ?: null;
+        $schoolId = $request->integer('school_id') ?: null;
+
+        $query = Team::with(['competition.sport', 'school', 'professor'])
+            ->orderByDesc('created_at');
+
+        if ($status !== null && TeamStatus::tryFrom($status) !== null) {
+            $query->where('status', $status);
+        }
+
+        if ($competitionId !== null) {
+            $query->where('competition_id', $competitionId);
+        }
+
+        if ($schoolId !== null) {
+            $query->where('school_id', $schoolId);
+        }
+
+        $teams = $query->paginate(25)->withQueryString();
 
         return Inertia::render('admin/teams/index', [
             'teams' => $teams,
+            'competitions' => Competition::orderBy('name')->get(['id', 'name']),
+            'schools' => School::orderBy('name')->get(['id', 'name']),
+            'filters' => [
+                'status' => $status,
+                'competition_id' => $competitionId,
+                'school_id' => $schoolId,
+            ],
         ]);
     }
 
