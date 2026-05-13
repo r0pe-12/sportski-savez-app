@@ -15,6 +15,7 @@ require __DIR__.'/admin.php';
 require __DIR__.'/sports.php';
 require __DIR__.'/competitions.php';
 require __DIR__.'/teams.php';
+require __DIR__.'/certificates.php';
 require __DIR__.'/students.php';
 require __DIR__.'/results.php';
 require __DIR__.'/audit.php';

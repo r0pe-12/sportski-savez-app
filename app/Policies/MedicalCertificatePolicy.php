@@ -45,4 +45,10 @@ class MedicalCertificatePolicy
     {
         return $user->isAdmin() && $cert->status->value === 'manual_review';
     }
+
+    public function reject(User $user, MedicalCertificate $cert): bool
+    {
+        return $user->isAdmin()
+            && in_array($cert->status->value, ['manual_review', 'pending'], true);
+    }
 }
