@@ -7,6 +7,7 @@ use App\Enums\UserRole;
 use App\Models\Professor;
 use App\Models\Student;
 use App\Models\User;
+use App\Services\AuditLogger;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
 use Laravel\Fortify\Contracts\CreatesNewUsers;
@@ -36,7 +37,7 @@ class CreateNewUser implements CreatesNewUsers
 
         $role = UserRole::from($validated['role']);
 
-        return match ($role) {
+        $user = match ($role) {
             UserRole::Professor => Professor::create([
                 'name' => $validated['name'],
                 'email' => $validated['email'],
@@ -56,5 +57,9 @@ class CreateNewUser implements CreatesNewUsers
             ]),
             UserRole::Admin => throw new \LogicException('Admin role cannot be created through public registration.'),
         };
+
+        app(AuditLogger::class)->log('user.registered', $user, ['role' => $role->value]);
+
+        return $user;
     }
 }

@@ -8,9 +8,13 @@ use App\Models\Student;
 use App\Models\User;
 use App\Policies\SchoolPolicy;
 use App\Policies\UserPolicy;
+use App\Services\AuditLogger;
 use Carbon\CarbonImmutable;
+use Illuminate\Auth\Events\Login;
+use Illuminate\Auth\Events\Logout;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Validation\Rules\Password;
@@ -32,6 +36,23 @@ class AppServiceProvider extends ServiceProvider
     {
         $this->configureDefaults();
         $this->configurePolicies();
+        $this->configureAuthEventLogging();
+    }
+
+    /**
+     * Audit log entries for login/logout events.
+     */
+    protected function configureAuthEventLogging(): void
+    {
+        Event::listen(Login::class, function (Login $event): void {
+            app(AuditLogger::class)->log('user.logged_in', $event->user);
+        });
+
+        Event::listen(Logout::class, function (Logout $event): void {
+            if ($event->user) {
+                app(AuditLogger::class)->log('user.logged_out', $event->user);
+            }
+        });
     }
 
     /**
