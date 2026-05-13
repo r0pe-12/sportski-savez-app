@@ -991,6 +991,40 @@ Planirani redoslijed izvršavanja u ovoj sesiji:
 - `npm run build` clean (Wayfinder regenerated svih kontrolera)
 - Pint clean (sa final cleanup commit `0e4d2bc`)
 - Sva 3 worktree-a obrisana, sva 3 feature branch obrisana
+
+### Prompt 4 — Phase 2 paralelno završeno (7 track-ova)
+
+**Sedam implementer subagent-a paralelno** u zasebnim worktree-ima sa junction-cleanup → realna `composer install` + `npm install` po worktree-u:
+
+**T2.1a — UC5 Team form** (7 commitova): `TeamPolicy`, `TeamController` (index/create/store/edit/update/destroy + draft autosave), `TeamMemberController` (add/remove), Form Requests sa validation (same school + no overlapping draft + sport rules). +19 testova.
+
+**T2.1b — UC5 OCR pipeline** (7 commitova): `MedicalCertificateController`, `ValidateMedicalCertificateJob` (async OCR preko `OcrAdapter`), `ExpireMedicalCertificatesJob` (cron 02:00), `MedicalCertificateStateMachine` service (deviation: state methods na servisu umjesto model — model immutability iz F2), `MedicalCertificatePolicy`. +23 testa.
+
+**T2.1c — UC5 Submission** (3 commita): `TeamRegistrationService` (submit/cancel/withdraw), `TeamController::submit/review/cancel`, `AdminTeamController::approve/reject`, notifications (TeamSubmittedToAdmin, TeamApproved, TeamRejected, mail+database channel). +31 test.
+
+**T2.2 — UC8 eDnevnik** (5 commitova): `EDnevnikVerificationService` + `VerifyStudentWithEDnevnikJob` (async preko `EDnevnikAdapter`), `AdminStudentVerificationController`, mismatch table UI, status badge. StudentVerificationStatus transitions (`unverified → pending → verified | mismatched | failed`). +20 testova.
+
+**T2.3 — UC10 Rezultati** (5 commitova): Admin bulk results entry polimorfno (Team OR TeamMember), `ResultEntryService` (auto-complete Team kad svi članovi imaju rezultat), `ResultPolicy`, `ResultEnteredNotification`. +15 testova.
+
+**T2.4 — UC3 Učenički profil** (4 commita): `StudentProfileController` + `StudentPhotoController`, `StudentHistoryService` (medalje + takmičenja istorija), `StudentPolicy extends UserPolicy` sa `viewProfile/updateLimited/uploadPhoto`. PrivateFileStorage integracija za foto upload. +34 testa.
+
+**T2.5 — UC4 Public raspored** (3 commita): `ScheduleController` + schedule/index.tsx, filter po sportu i statusu, 5-min cache. +3 testa.
+
+**Merge na main** (sekvencijalno radi UC5 split + shared file konflikata):
+1. T2.5 (clean, no conflicts)
+2. T2.3 (clean)
+3. T2.2 (clean)
+4. T2.4 — konflikt u `routes/students.php` (T2.2 i T2.4 dijele fajl): kombinovano admin verification + profile rute
+5. T2.1a (clean)
+6. T2.1b — konflikt u `routes/teams.php` (T2.1a postavio T2.1a sekciju, T2.1b dodaje OCR sekciju): kombinovano
+7. T2.1c — **4 konflikta**: `routes/teams.php` (dodaje submit sekciju), `app/Http/Controllers/TeamController.php` (kombinacija index+create+store+edit+update+destroy iz T2.1a sa review+submit+cancel iz T2.1c), `app/Policies/TeamPolicy.php` (kombinacija sa svim abilities), `app/Providers/AppServiceProvider.php` (Gate::policy za Team::class + use kombinovan)
+
+**Finalni status na `main`:**
+- 7 PR mergova + cleanup = **+34 nova feature commita + 7 merge commitova**
+- **297/297 Pest testova PASS, 786 assertion-a** (152 → 297, +145 novih testova)
+- `npm run build` clean (Wayfinder regenerated svih kontrolera)
+- Pint clean
+- Sva 7 worktree-a obrisana, 7 feature branch obrisana
 OUTPUT_18,
                 'odluke' => <<<'ODLUKE_18'
 ### Prompt 1
@@ -1015,6 +1049,17 @@ OUTPUT_18,
 - **Test caching gotcha:** posle T1.1 merge-a `php artisan test` je dao 11 fails (admin.users.* 404). Razlog: route cache. `php artisan route:clear` riješio.
 - **Vite manifest gotcha:** posle T1.2 merge 3 fail (admin/competitions/index.tsx). Razlog: nove TSX stranice. `npm run build` riješio.
 - **Subagent deviation tracking:** sva 3 reportovali deviations razumno (T1.3 — restoreDiacritics helper za FakeOcrAdapter, private disk URL config; T1.1 — STI policy Gate registration, parental_consent validation rule; T1.2 — controller+UI combined commits radi Vite test stability).
+
+### Prompt 4
+- **Worktree setup deviation:** prvo pokušao junction (mklink /J) za vendor i node_modules — nije radio jer `composer/autoload_classmap.php` ima absolute paths iz main repo-a, što je polomilo Pest discovery (test fajlovi iz worktree-a generisani sa pune putanje kao namespace). Switched na realni `composer install` + `npm install` po worktree-u. Sporo ali ispravno.
+- **7 subagent-a paralelno** — radilo bez issue-a. Svaki je dobio precizan track scope, edit zone (markirana sekcija u shared fajlovima poput `routes/teams.php`), i CRITICAL RULES (nikad migrate:fresh, ne dirati `app/Models/*`, koristiti F2 modele kakvi jesu).
+- **UC5 split coordination** — T2.1a/b/c svi dijele `routes/teams.php`, `app/Http/Controllers/TeamController.php`, `app/Policies/TeamPolicy.php`. Subagent-i su pisali `// T2.1{a,b,c} section` markeri u routes/. Posle merge-a, ručno kombinovano u jedinstven fajl bez gubitka funkcionalnosti.
+- **Subagent deviations razumne i dokumentovane:**
+  - T2.1b: state machine kao service umjesto na MedicalCertificate model (F2 immutability rule) — equivalentno API: `app(MedicalCertificateStateMachine::class)->markValid(...)`
+  - T2.4: route names `profile.{show,update}` preimenovani u `student-profile.{show,update}` da izbjegnu sudar sa `routes/settings.php` Fortify rutama
+  - T2.4: `StudentPolicy extends UserPolicy` umjesto separate — postojeći kod već je registrovao UserPolicy za Student::class
+  - T2.1c: TeamPolicy.submit/cancel + minimal TeamController stub kreirani; merge time spojeno sa T2.1a full controller
+  - T2.5: rute pod `auth+verified` (ne public bez auth) — plan eksplicitno traži tako; landing page ostaje F1 welcome
 ODLUKE_18,
                 'ishod' => <<<'ISHOD_18'
 ### Prompt 1
@@ -1027,6 +1072,27 @@ Phase 0 (F1 + F2) potpuno završen. 14 F2 commitova + 5 F1 commitova na `main`. 
 **Phase 1 100% završen.** Sve od plana implementirano + verifikovano + mergovano u main. 152/152 testova prolaze. Spremno za Phase 2 (7 paralelnih track-ova).
 
 Sljedeći korak: Phase 2 worktree-i i subagent dispatch za T2.1a (Team form), T2.1b (OCR pipeline), T2.1c (Submit), T2.2 (eDnevnik), T2.3 (Rezultati), T2.4 (Profil), T2.5 (Public raspored).
+
+### Prompt 4
+**Phase 2 100% završen.** Sva 7 track-ova implementirano + verifikovano + mergovano u main. 297/297 testova prolaze. Phase 0 + Phase 1 + Phase 2 ukupno = **80 commitova na main** (5 F1 + 14 F2 + 13 T1.1 + 7 T1.2 + 6 T1.3 + 7 T2.1a + 7 T2.1b + 3 T2.1c + 5 T2.2 + 5 T2.3 + 4 T2.4 + 3 T2.5 + 10 merge/dnevnik/cleanup).
+
+**Funkcionalna pokrivenost:**
+- UC1 (registracija profesor+učenik) ✓
+- UC2 (login role-redirect) ✓
+- UC3 (učenički profil + istorija) ✓
+- UC4 (public raspored) ✓
+- UC5 (team registration + OCR + submission + admin approve/reject) ✓
+- UC7 (admin user+school CRUD) ✓
+- UC8 (eDnevnik verifikacija) ✓
+- UC9 (admin sport+competition CRUD) ✓
+- UC10 (rezultati i medalje) ✓
+
+**Sljedeći korak (Phase 3 — sekvencijalno):**
+- T3.1 Audit log dashboard (`specs/130-t3.1-audit-log-dashboard.md`)
+- T3.2 Integration smoke + e2e (`specs/131-t3.2-integration-smoke-e2e.md`)
+- v1.0 tag (funkcionalnost spremna)
+
+Phase 3 ide sekvencijalno (per meta-plan) — može u glavnom conversation-u ili kao dva odvojena subagent-a u worktree-ima.
 ISHOD_18,
             ],
         ];
