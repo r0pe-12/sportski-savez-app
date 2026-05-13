@@ -64,7 +64,9 @@ test('user can delete their account', function () {
         ->assertRedirect(route('home'));
 
     $this->assertGuest();
-    expect($user->fresh())->toBeNull();
+    // User soft-deletes: trashed but recoverable via withTrashed()
+    expect(User::find($user->id))->toBeNull();
+    expect(User::withTrashed()->find($user->id)?->trashed())->toBeTrue();
 });
 
 test('correct password must be provided to delete account', function () {
