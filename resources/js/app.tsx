@@ -19,7 +19,8 @@ createInertiaApp({
             case name.startsWith('settings/'):
                 return [AppLayout, SettingsLayout];
             default:
-                return AppLayout;
+                // Pages own their AppLayout wrap explicitly. Avoid double-wrap.
+                return null;
         }
     },
     strictMode: true,
