@@ -1,12 +1,12 @@
 # Graph Report - C:\Users\simon\Desktop\UDG-2\ADIS\sportski_savez\sportski-savez-app  (2026-05-13)
 
 ## Corpus Check
-- 139 files · ~208,634 words
+- 140 files · ~217,253 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 327 nodes · 225 edges · 125 communities detected
-- Extraction: 91% EXTRACTED · 9% INFERRED · 0% AMBIGUOUS · INFERRED: 20 edges (avg confidence: 0.8)
+- 334 nodes · 236 edges · 125 communities detected
+- Extraction: 91% EXTRACTED · 9% INFERRED · 0% AMBIGUOUS · INFERRED: 21 edges (avg confidence: 0.8)
 - Token cost: 0 input · 0 output
 
 ## Community Hubs (Navigation)
@@ -138,15 +138,15 @@
 
 ## God Nodes (most connected - your core abstractions)
 1. `User` - 11 edges
-2. `FortifyServiceProvider` - 6 edges
-3. `profileRules()` - 5 edges
-4. `initializeTheme()` - 5 edges
-5. `ProfileController` - 4 edges
-6. `SecurityController` - 4 edges
-7. `AiDnevnikSesija` - 4 edges
-8. `AppServiceProvider` - 4 edges
-9. `UserFactory` - 4 edges
-10. `isDarkMode()` - 4 edges
+2. `SyncAiDnevnikSeeder` - 6 edges
+3. `FortifyServiceProvider` - 6 edges
+4. `profileRules()` - 5 edges
+5. `AiDnevnikSesija` - 5 edges
+6. `initializeTheme()` - 5 edges
+7. `ProfileController` - 4 edges
+8. `SecurityController` - 4 edges
+9. `AppServiceProvider` - 4 edges
+10. `UserFactory` - 4 edges
 
 ## Surprising Connections (you probably didn't know these)
 - `NavUser()` --calls--> `useSidebar()`  [INFERRED]
@@ -171,20 +171,20 @@ Cohesion: 0.12
 Nodes (4): NavUser(), SidebarMenuButton(), useSidebar(), useIsMobile()
 
 ### Community 2 - "Community 2"
-Cohesion: 0.19
-Nodes (11): Toaster(), applyTheme(), getStoredAppearance(), handleSystemThemeChange(), initializeTheme(), isDarkMode(), mediaQuery(), prefersDark() (+3 more)
+Cohesion: 0.16
+Nodes (4): AiDnevnikController, AiDnevnikSeeder, AiDnevnikSesija, SyncAiDnevnikSeeder
 
 ### Community 3 - "Community 3"
-Cohesion: 0.2
-Nodes (0): 
+Cohesion: 0.19
+Nodes (11): Toaster(), applyTheme(), getStoredAppearance(), handleSystemThemeChange(), initializeTheme(), isDarkMode(), mediaQuery(), prefersDark() (+3 more)
 
 ### Community 4 - "Community 4"
 Cohesion: 0.2
 Nodes (0): 
 
 ### Community 5 - "Community 5"
-Cohesion: 0.22
-Nodes (3): AiDnevnikController, AiDnevnikSeeder, AiDnevnikSesija
+Cohesion: 0.2
+Nodes (0): 
 
 ### Community 6 - "Community 6"
 Cohesion: 0.22
@@ -224,7 +224,7 @@ Nodes (0):
 
 ### Community 15 - "Community 15"
 Cohesion: 0.5
-Nodes (2): useMobileNavigation(), UserMenuContent()
+Nodes (0): 
 
 ### Community 16 - "Community 16"
 Cohesion: 0.5
@@ -240,7 +240,7 @@ Nodes (0):
 
 ### Community 19 - "Community 19"
 Cohesion: 0.5
-Nodes (0): 
+Nodes (2): useMobileNavigation(), UserMenuContent()
 
 ### Community 20 - "Community 20"
 Cohesion: 0.67
@@ -865,9 +865,9 @@ _Questions this graph is uniquely positioned to answer:_
   _`User` has 9 INFERRED edges - model-reasoned connections that need verification._
 - **Are the 2 inferred relationships involving `profileRules()` (e.g. with `.create()` and `.rules()`) actually correct?**
   _`profileRules()` has 2 INFERRED edges - model-reasoned connections that need verification._
+- **Are the 3 inferred relationships involving `AiDnevnikSesija` (e.g. with `.handle()` and `.show()`) actually correct?**
+  _`AiDnevnikSesija` has 3 INFERRED edges - model-reasoned connections that need verification._
 - **What connects `Controller` to the rest of the system?**
   _1 weakly-connected nodes found - possible documentation gaps or missing edges._
 - **Should `Community 0` be split into smaller, more focused modules?**
   _Cohesion score 0.1 - nodes in this community are weakly interconnected._
-- **Should `Community 1` be split into smaller, more focused modules?**
-  _Cohesion score 0.12 - nodes in this community are weakly interconnected._

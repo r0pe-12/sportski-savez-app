@@ -85,12 +85,75 @@
       "norm_label": "emailrules()"
     },
     {
+      "label": "SyncAiDnevnikSeeder.php",
+      "file_type": "code",
+      "source_file": "C:\\Users\\simon\\Desktop\\UDG-2\\ADIS\\sportski_savez\\sportski-savez-app\\app\\Console\\Commands\\SyncAiDnevnikSeeder.php",
+      "source_location": "L1",
+      "id": "c_users_simon_desktop_udg_2_adis_sportski_savez_sportski_savez_app_app_console_commands_syncaidnevnikseeder_php",
+      "community": 2,
+      "norm_label": "syncaidnevnikseeder.php"
+    },
+    {
+      "label": "SyncAiDnevnikSeeder",
+      "file_type": "code",
+      "source_file": "C:\\Users\\simon\\Desktop\\UDG-2\\ADIS\\sportski_savez\\sportski-savez-app\\app\\Console\\Commands\\SyncAiDnevnikSeeder.php",
+      "source_location": "L10",
+      "id": "syncaidnevnikseeder_syncaidnevnikseeder",
+      "community": 2,
+      "norm_label": "syncaidnevnikseeder"
+    },
+    {
+      "label": ".handle()",
+      "file_type": "code",
+      "source_file": "C:\\Users\\simon\\Desktop\\UDG-2\\ADIS\\sportski_savez\\sportski-savez-app\\app\\Console\\Commands\\SyncAiDnevnikSeeder.php",
+      "source_location": "L16",
+      "id": "syncaidnevnikseeder_syncaidnevnikseeder_handle",
+      "community": 2,
+      "norm_label": ".handle()"
+    },
+    {
+      "label": ".entryFor()",
+      "file_type": "code",
+      "source_file": "C:\\Users\\simon\\Desktop\\UDG-2\\ADIS\\sportski_savez\\sportski-savez-app\\app\\Console\\Commands\\SyncAiDnevnikSeeder.php",
+      "source_location": "L39",
+      "id": "syncaidnevnikseeder_syncaidnevnikseeder_entryfor",
+      "community": 2,
+      "norm_label": ".entryfor()"
+    },
+    {
+      "label": ".shouldUseHeredoc()",
+      "file_type": "code",
+      "source_file": "C:\\Users\\simon\\Desktop\\UDG-2\\ADIS\\sportski_savez\\sportski-savez-app\\app\\Console\\Commands\\SyncAiDnevnikSeeder.php",
+      "source_location": "L69",
+      "id": "syncaidnevnikseeder_syncaidnevnikseeder_shoulduseheredoc",
+      "community": 2,
+      "norm_label": ".shoulduseheredoc()"
+    },
+    {
+      "label": ".phpString()",
+      "file_type": "code",
+      "source_file": "C:\\Users\\simon\\Desktop\\UDG-2\\ADIS\\sportski_savez\\sportski-savez-app\\app\\Console\\Commands\\SyncAiDnevnikSeeder.php",
+      "source_location": "L78",
+      "id": "syncaidnevnikseeder_syncaidnevnikseeder_phpstring",
+      "community": 2,
+      "norm_label": ".phpstring()"
+    },
+    {
+      "label": ".seederTemplate()",
+      "file_type": "code",
+      "source_file": "C:\\Users\\simon\\Desktop\\UDG-2\\ADIS\\sportski_savez\\sportski-savez-app\\app\\Console\\Commands\\SyncAiDnevnikSeeder.php",
+      "source_location": "L87",
+      "id": "syncaidnevnikseeder_syncaidnevnikseeder_seedertemplate",
+      "community": 2,
+      "norm_label": ".seedertemplate()"
+    },
+    {
       "label": "AiDnevnikController.php",
       "file_type": "code",
       "source_file": "app\\Http\\Controllers\\AiDnevnikController.php",
       "source_location": "L1",
       "id": "app_http_controllers_aidnevnikcontroller_php",
-      "community": 5,
+      "community": 2,
       "norm_label": "aidnevnikcontroller.php"
     },
     {
@@ -99,7 +162,7 @@
       "source_file": "app\\Http\\Controllers\\AiDnevnikController.php",
       "source_location": "L9",
       "id": "aidnevnikcontroller_aidnevnikcontroller",
-      "community": 5,
+      "community": 2,
       "norm_label": "aidnevnikcontroller"
     },
     {
@@ -108,7 +171,7 @@
       "source_file": "app\\Http\\Controllers\\AiDnevnikController.php",
       "source_location": "L11",
       "id": "aidnevnikcontroller_aidnevnikcontroller_show",
-      "community": 5,
+      "community": 2,
       "norm_label": ".show()"
     },
     {
@@ -369,7 +432,7 @@
       "source_file": "app\\Models\\AiDnevnikSesija.php",
       "source_location": "L1",
       "id": "app_models_aidnevniksesija_php",
-      "community": 5,
+      "community": 2,
       "norm_label": "aidnevniksesija.php"
     },
     {
@@ -378,7 +441,7 @@
       "source_file": "app\\Models\\AiDnevnikSesija.php",
       "source_location": "L8",
       "id": "aidnevniksesija_aidnevniksesija",
-      "community": 5,
+      "community": 2,
       "norm_label": "aidnevniksesija"
     },
     {
@@ -387,7 +450,7 @@
       "source_file": "app\\Models\\AiDnevnikSesija.php",
       "source_location": "L29",
       "id": "aidnevniksesija_aidnevniksesija_scopeorderedbybroj",
-      "community": 5,
+      "community": 2,
       "norm_label": ".scopeorderedbybroj()"
     },
     {
@@ -834,28 +897,28 @@
     {
       "label": "AiDnevnikSeeder.php",
       "file_type": "code",
-      "source_file": "database\\seeders\\AiDnevnikSeeder.php",
+      "source_file": "C:\\Users\\simon\\Desktop\\UDG-2\\ADIS\\sportski_savez\\sportski-savez-app\\database\\seeders\\AiDnevnikSeeder.php",
       "source_location": "L1",
-      "id": "database_seeders_aidnevnikseeder_php",
-      "community": 5,
+      "id": "c_users_simon_desktop_udg_2_adis_sportski_savez_sportski_savez_app_database_seeders_aidnevnikseeder_php",
+      "community": 2,
       "norm_label": "aidnevnikseeder.php"
     },
     {
       "label": "AiDnevnikSeeder",
       "file_type": "code",
-      "source_file": "database\\seeders\\AiDnevnikSeeder.php",
+      "source_file": "C:\\Users\\simon\\Desktop\\UDG-2\\ADIS\\sportski_savez\\sportski-savez-app\\database\\seeders\\AiDnevnikSeeder.php",
       "source_location": "L8",
       "id": "aidnevnikseeder_aidnevnikseeder",
-      "community": 5,
+      "community": 2,
       "norm_label": "aidnevnikseeder"
     },
     {
       "label": ".run()",
       "file_type": "code",
-      "source_file": "database\\seeders\\AiDnevnikSeeder.php",
-      "source_location": "L10",
+      "source_file": "C:\\Users\\simon\\Desktop\\UDG-2\\ADIS\\sportski_savez\\sportski-savez-app\\database\\seeders\\AiDnevnikSeeder.php",
+      "source_location": "L18",
       "id": "aidnevnikseeder_aidnevnikseeder_run",
-      "community": 5,
+      "community": 2,
       "norm_label": ".run()"
     },
     {
@@ -1197,7 +1260,7 @@
       "source_file": "C:\\Users\\simon\\Desktop\\UDG-2\\ADIS\\sportski_savez\\sportski-savez-app\\resources\\js\\components\\user-menu-content.tsx",
       "source_location": "L1",
       "id": "c_users_simon_desktop_udg_2_adis_sportski_savez_sportski_savez_app_resources_js_components_user_menu_content_tsx",
-      "community": 15,
+      "community": 19,
       "norm_label": "user-menu-content.tsx"
     },
     {
@@ -1206,7 +1269,7 @@
       "source_file": "C:\\Users\\simon\\Desktop\\UDG-2\\ADIS\\sportski_savez\\sportski-savez-app\\resources\\js\\components\\user-menu-content.tsx",
       "source_location": "L19",
       "id": "user_menu_content_usermenucontent",
-      "community": 15,
+      "community": 19,
       "norm_label": "usermenucontent()"
     },
     {
@@ -1242,7 +1305,7 @@
       "source_file": "C:\\Users\\simon\\Desktop\\UDG-2\\ADIS\\sportski_savez\\sportski-savez-app\\resources\\js\\components\\ui\\avatar.tsx",
       "source_location": "L1",
       "id": "c_users_simon_desktop_udg_2_adis_sportski_savez_sportski_savez_app_resources_js_components_ui_avatar_tsx",
-      "community": 16,
+      "community": 15,
       "norm_label": "avatar.tsx"
     },
     {
@@ -1251,7 +1314,7 @@
       "source_file": "C:\\Users\\simon\\Desktop\\UDG-2\\ADIS\\sportski_savez\\sportski-savez-app\\resources\\js\\components\\ui\\avatar.tsx",
       "source_location": "L6",
       "id": "avatar_avatar",
-      "community": 16,
+      "community": 15,
       "norm_label": "avatar()"
     },
     {
@@ -1260,7 +1323,7 @@
       "source_file": "C:\\Users\\simon\\Desktop\\UDG-2\\ADIS\\sportski_savez\\sportski-savez-app\\resources\\js\\components\\ui\\avatar.tsx",
       "source_location": "L22",
       "id": "avatar_avatarimage",
-      "community": 16,
+      "community": 15,
       "norm_label": "avatarimage()"
     },
     {
@@ -1269,7 +1332,7 @@
       "source_file": "C:\\Users\\simon\\Desktop\\UDG-2\\ADIS\\sportski_savez\\sportski-savez-app\\resources\\js\\components\\ui\\avatar.tsx",
       "source_location": "L35",
       "id": "avatar_avatarfallback",
-      "community": 16,
+      "community": 15,
       "norm_label": "avatarfallback()"
     },
     {
@@ -1548,7 +1611,7 @@
       "source_file": "C:\\Users\\simon\\Desktop\\UDG-2\\ADIS\\sportski_savez\\sportski-savez-app\\resources\\js\\components\\ui\\dropdown-menu.tsx",
       "source_location": "L1",
       "id": "c_users_simon_desktop_udg_2_adis_sportski_savez_sportski_savez_app_resources_js_components_ui_dropdown_menu_tsx",
-      "community": 17,
+      "community": 16,
       "norm_label": "dropdown-menu.tsx"
     },
     {
@@ -1557,7 +1620,7 @@
       "source_file": "C:\\Users\\simon\\Desktop\\UDG-2\\ADIS\\sportski_savez\\sportski-savez-app\\resources\\js\\components\\ui\\dropdown-menu.tsx",
       "source_location": "L7",
       "id": "dropdown_menu_dropdownmenu",
-      "community": 17,
+      "community": 16,
       "norm_label": "dropdownmenu()"
     },
     {
@@ -1566,7 +1629,7 @@
       "source_file": "C:\\Users\\simon\\Desktop\\UDG-2\\ADIS\\sportski_savez\\sportski-savez-app\\resources\\js\\components\\ui\\dropdown-menu.tsx",
       "source_location": "L92",
       "id": "dropdown_menu_cn",
-      "community": 17,
+      "community": 16,
       "norm_label": "cn()"
     },
     {
@@ -1575,7 +1638,7 @@
       "source_file": "C:\\Users\\simon\\Desktop\\UDG-2\\ADIS\\sportski_savez\\sportski-savez-app\\resources\\js\\components\\ui\\dropdown-menu.tsx",
       "source_location": "L223",
       "id": "dropdown_menu_dropdownmenusubcontent",
-      "community": 17,
+      "community": 16,
       "norm_label": "dropdownmenusubcontent()"
     },
     {
@@ -1710,7 +1773,7 @@
       "source_file": "C:\\Users\\simon\\Desktop\\UDG-2\\ADIS\\sportski_savez\\sportski-savez-app\\resources\\js\\components\\ui\\select.tsx",
       "source_location": "L1",
       "id": "c_users_simon_desktop_udg_2_adis_sportski_savez_sportski_savez_app_resources_js_components_ui_select_tsx",
-      "community": 3,
+      "community": 4,
       "norm_label": "select.tsx"
     },
     {
@@ -1719,7 +1782,7 @@
       "source_file": "C:\\Users\\simon\\Desktop\\UDG-2\\ADIS\\sportski_savez\\sportski-savez-app\\resources\\js\\components\\ui\\select.tsx",
       "source_location": "L7",
       "id": "select_select",
-      "community": 3,
+      "community": 4,
       "norm_label": "select()"
     },
     {
@@ -1728,7 +1791,7 @@
       "source_file": "C:\\Users\\simon\\Desktop\\UDG-2\\ADIS\\sportski_savez\\sportski-savez-app\\resources\\js\\components\\ui\\select.tsx",
       "source_location": "L13",
       "id": "select_selectgroup",
-      "community": 3,
+      "community": 4,
       "norm_label": "selectgroup()"
     },
     {
@@ -1737,7 +1800,7 @@
       "source_file": "C:\\Users\\simon\\Desktop\\UDG-2\\ADIS\\sportski_savez\\sportski-savez-app\\resources\\js\\components\\ui\\select.tsx",
       "source_location": "L19",
       "id": "select_selectvalue",
-      "community": 3,
+      "community": 4,
       "norm_label": "selectvalue()"
     },
     {
@@ -1746,7 +1809,7 @@
       "source_file": "C:\\Users\\simon\\Desktop\\UDG-2\\ADIS\\sportski_savez\\sportski-savez-app\\resources\\js\\components\\ui\\select.tsx",
       "source_location": "L25",
       "id": "select_selecttrigger",
-      "community": 3,
+      "community": 4,
       "norm_label": "selecttrigger()"
     },
     {
@@ -1755,7 +1818,7 @@
       "source_file": "C:\\Users\\simon\\Desktop\\UDG-2\\ADIS\\sportski_savez\\sportski-savez-app\\resources\\js\\components\\ui\\select.tsx",
       "source_location": "L93",
       "id": "select_selectlabel",
-      "community": 3,
+      "community": 4,
       "norm_label": "selectlabel()"
     },
     {
@@ -1764,7 +1827,7 @@
       "source_file": "C:\\Users\\simon\\Desktop\\UDG-2\\ADIS\\sportski_savez\\sportski-savez-app\\resources\\js\\components\\ui\\select.tsx",
       "source_location": "L106",
       "id": "select_selectitem",
-      "community": 3,
+      "community": 4,
       "norm_label": "selectitem()"
     },
     {
@@ -1773,7 +1836,7 @@
       "source_file": "C:\\Users\\simon\\Desktop\\UDG-2\\ADIS\\sportski_savez\\sportski-savez-app\\resources\\js\\components\\ui\\select.tsx",
       "source_location": "L133",
       "id": "select_selectseparator",
-      "community": 3,
+      "community": 4,
       "norm_label": "selectseparator()"
     },
     {
@@ -1782,7 +1845,7 @@
       "source_file": "C:\\Users\\simon\\Desktop\\UDG-2\\ADIS\\sportski_savez\\sportski-savez-app\\resources\\js\\components\\ui\\select.tsx",
       "source_location": "L146",
       "id": "select_selectscrollupbutton",
-      "community": 3,
+      "community": 4,
       "norm_label": "selectscrollupbutton()"
     },
     {
@@ -1791,7 +1854,7 @@
       "source_file": "C:\\Users\\simon\\Desktop\\UDG-2\\ADIS\\sportski_savez\\sportski-savez-app\\resources\\js\\components\\ui\\select.tsx",
       "source_location": "L164",
       "id": "select_selectscrolldownbutton",
-      "community": 3,
+      "community": 4,
       "norm_label": "selectscrolldownbutton()"
     },
     {
@@ -1818,7 +1881,7 @@
       "source_file": "C:\\Users\\simon\\Desktop\\UDG-2\\ADIS\\sportski_savez\\sportski-savez-app\\resources\\js\\components\\ui\\sheet.tsx",
       "source_location": "L1",
       "id": "c_users_simon_desktop_udg_2_adis_sportski_savez_sportski_savez_app_resources_js_components_ui_sheet_tsx",
-      "community": 4,
+      "community": 5,
       "norm_label": "sheet.tsx"
     },
     {
@@ -1827,7 +1890,7 @@
       "source_file": "C:\\Users\\simon\\Desktop\\UDG-2\\ADIS\\sportski_savez\\sportski-savez-app\\resources\\js\\components\\ui\\sheet.tsx",
       "source_location": "L7",
       "id": "sheet_sheet",
-      "community": 4,
+      "community": 5,
       "norm_label": "sheet()"
     },
     {
@@ -1836,7 +1899,7 @@
       "source_file": "C:\\Users\\simon\\Desktop\\UDG-2\\ADIS\\sportski_savez\\sportski-savez-app\\resources\\js\\components\\ui\\sheet.tsx",
       "source_location": "L11",
       "id": "sheet_sheettrigger",
-      "community": 4,
+      "community": 5,
       "norm_label": "sheettrigger()"
     },
     {
@@ -1845,7 +1908,7 @@
       "source_file": "C:\\Users\\simon\\Desktop\\UDG-2\\ADIS\\sportski_savez\\sportski-savez-app\\resources\\js\\components\\ui\\sheet.tsx",
       "source_location": "L17",
       "id": "sheet_sheetclose",
-      "community": 4,
+      "community": 5,
       "norm_label": "sheetclose()"
     },
     {
@@ -1854,7 +1917,7 @@
       "source_file": "C:\\Users\\simon\\Desktop\\UDG-2\\ADIS\\sportski_savez\\sportski-savez-app\\resources\\js\\components\\ui\\sheet.tsx",
       "source_location": "L23",
       "id": "sheet_sheetportal",
-      "community": 4,
+      "community": 5,
       "norm_label": "sheetportal()"
     },
     {
@@ -1863,7 +1926,7 @@
       "source_file": "C:\\Users\\simon\\Desktop\\UDG-2\\ADIS\\sportski_savez\\sportski-savez-app\\resources\\js\\components\\ui\\sheet.tsx",
       "source_location": "L29",
       "id": "sheet_sheetoverlay",
-      "community": 4,
+      "community": 5,
       "norm_label": "sheetoverlay()"
     },
     {
@@ -1872,7 +1935,7 @@
       "source_file": "C:\\Users\\simon\\Desktop\\UDG-2\\ADIS\\sportski_savez\\sportski-savez-app\\resources\\js\\components\\ui\\sheet.tsx",
       "source_location": "L82",
       "id": "sheet_sheetheader",
-      "community": 4,
+      "community": 5,
       "norm_label": "sheetheader()"
     },
     {
@@ -1881,7 +1944,7 @@
       "source_file": "C:\\Users\\simon\\Desktop\\UDG-2\\ADIS\\sportski_savez\\sportski-savez-app\\resources\\js\\components\\ui\\sheet.tsx",
       "source_location": "L92",
       "id": "sheet_sheetfooter",
-      "community": 4,
+      "community": 5,
       "norm_label": "sheetfooter()"
     },
     {
@@ -1890,7 +1953,7 @@
       "source_file": "C:\\Users\\simon\\Desktop\\UDG-2\\ADIS\\sportski_savez\\sportski-savez-app\\resources\\js\\components\\ui\\sheet.tsx",
       "source_location": "L102",
       "id": "sheet_sheettitle",
-      "community": 4,
+      "community": 5,
       "norm_label": "sheettitle()"
     },
     {
@@ -1899,7 +1962,7 @@
       "source_file": "C:\\Users\\simon\\Desktop\\UDG-2\\ADIS\\sportski_savez\\sportski-savez-app\\resources\\js\\components\\ui\\sheet.tsx",
       "source_location": "L115",
       "id": "sheet_sheetdescription",
-      "community": 4,
+      "community": 5,
       "norm_label": "sheetdescription()"
     },
     {
@@ -2016,7 +2079,7 @@
       "source_file": "C:\\Users\\simon\\Desktop\\UDG-2\\ADIS\\sportski_savez\\sportski-savez-app\\resources\\js\\components\\ui\\sonner.tsx",
       "source_location": "L1",
       "id": "c_users_simon_desktop_udg_2_adis_sportski_savez_sportski_savez_app_resources_js_components_ui_sonner_tsx",
-      "community": 2,
+      "community": 3,
       "norm_label": "sonner.tsx"
     },
     {
@@ -2025,7 +2088,7 @@
       "source_file": "C:\\Users\\simon\\Desktop\\UDG-2\\ADIS\\sportski_savez\\sportski-savez-app\\resources\\js\\components\\ui\\sonner.tsx",
       "source_location": "L5",
       "id": "sonner_toaster",
-      "community": 2,
+      "community": 3,
       "norm_label": "toaster()"
     },
     {
@@ -2052,7 +2115,7 @@
       "source_file": "C:\\Users\\simon\\Desktop\\UDG-2\\ADIS\\sportski_savez\\sportski-savez-app\\resources\\js\\components\\ui\\tabs.tsx",
       "source_location": "L1",
       "id": "c_users_simon_desktop_udg_2_adis_sportski_savez_sportski_savez_app_resources_js_components_ui_tabs_tsx",
-      "community": 18,
+      "community": 17,
       "norm_label": "tabs.tsx"
     },
     {
@@ -2061,7 +2124,7 @@
       "source_file": "C:\\Users\\simon\\Desktop\\UDG-2\\ADIS\\sportski_savez\\sportski-savez-app\\resources\\js\\components\\ui\\tabs.tsx",
       "source_location": "L6",
       "id": "tabs_tabs",
-      "community": 18,
+      "community": 17,
       "norm_label": "tabs()"
     },
     {
@@ -2070,7 +2133,7 @@
       "source_file": "C:\\Users\\simon\\Desktop\\UDG-2\\ADIS\\sportski_savez\\sportski-savez-app\\resources\\js\\components\\ui\\tabs.tsx",
       "source_location": "L19",
       "id": "tabs_tabslist",
-      "community": 18,
+      "community": 17,
       "norm_label": "tabslist()"
     },
     {
@@ -2079,7 +2142,7 @@
       "source_file": "C:\\Users\\simon\\Desktop\\UDG-2\\ADIS\\sportski_savez\\sportski-savez-app\\resources\\js\\components\\ui\\tabs.tsx",
       "source_location": "L35",
       "id": "tabs_tabstrigger",
-      "community": 18,
+      "community": 17,
       "norm_label": "tabstrigger()"
     },
     {
@@ -2088,7 +2151,7 @@
       "source_file": "C:\\Users\\simon\\Desktop\\UDG-2\\ADIS\\sportski_savez\\sportski-savez-app\\resources\\js\\components\\ui\\toggle-group.tsx",
       "source_location": "L1",
       "id": "c_users_simon_desktop_udg_2_adis_sportski_savez_sportski_savez_app_resources_js_components_ui_toggle_group_tsx",
-      "community": 19,
+      "community": 18,
       "norm_label": "toggle-group.tsx"
     },
     {
@@ -2097,7 +2160,7 @@
       "source_file": "C:\\Users\\simon\\Desktop\\UDG-2\\ADIS\\sportski_savez\\sportski-savez-app\\resources\\js\\components\\ui\\toggle-group.tsx",
       "source_location": "L15",
       "id": "toggle_group_togglegroup",
-      "community": 19,
+      "community": 18,
       "norm_label": "togglegroup()"
     },
     {
@@ -2106,7 +2169,7 @@
       "source_file": "C:\\Users\\simon\\Desktop\\UDG-2\\ADIS\\sportski_savez\\sportski-savez-app\\resources\\js\\components\\ui\\toggle-group.tsx",
       "source_location": "L41",
       "id": "toggle_group_togglegroupitem",
-      "community": 19,
+      "community": 18,
       "norm_label": "togglegroupitem()"
     },
     {
@@ -2115,7 +2178,7 @@
       "source_file": "C:\\Users\\simon\\Desktop\\UDG-2\\ADIS\\sportski_savez\\sportski-savez-app\\resources\\js\\components\\ui\\toggle-group.tsx",
       "source_location": "L56",
       "id": "toggle_group_cn",
-      "community": 19,
+      "community": 18,
       "norm_label": "cn()"
     },
     {
@@ -2151,7 +2214,7 @@
       "source_file": "C:\\Users\\simon\\Desktop\\UDG-2\\ADIS\\sportski_savez\\sportski-savez-app\\resources\\js\\hooks\\use-appearance.tsx",
       "source_location": "L1",
       "id": "c_users_simon_desktop_udg_2_adis_sportski_savez_sportski_savez_app_resources_js_hooks_use_appearance_tsx",
-      "community": 2,
+      "community": 3,
       "norm_label": "use-appearance.tsx"
     },
     {
@@ -2160,7 +2223,7 @@
       "source_file": "C:\\Users\\simon\\Desktop\\UDG-2\\ADIS\\sportski_savez\\sportski-savez-app\\resources\\js\\hooks\\use-appearance.tsx",
       "source_location": "L15",
       "id": "use_appearance_prefersdark",
-      "community": 2,
+      "community": 3,
       "norm_label": "prefersdark()"
     },
     {
@@ -2169,7 +2232,7 @@
       "source_file": "C:\\Users\\simon\\Desktop\\UDG-2\\ADIS\\sportski_savez\\sportski-savez-app\\resources\\js\\hooks\\use-appearance.tsx",
       "source_location": "L23",
       "id": "use_appearance_setcookie",
-      "community": 2,
+      "community": 3,
       "norm_label": "setcookie()"
     },
     {
@@ -2178,7 +2241,7 @@
       "source_file": "C:\\Users\\simon\\Desktop\\UDG-2\\ADIS\\sportski_savez\\sportski-savez-app\\resources\\js\\hooks\\use-appearance.tsx",
       "source_location": "L32",
       "id": "use_appearance_getstoredappearance",
-      "community": 2,
+      "community": 3,
       "norm_label": "getstoredappearance()"
     },
     {
@@ -2187,7 +2250,7 @@
       "source_file": "C:\\Users\\simon\\Desktop\\UDG-2\\ADIS\\sportski_savez\\sportski-savez-app\\resources\\js\\hooks\\use-appearance.tsx",
       "source_location": "L40",
       "id": "use_appearance_isdarkmode",
-      "community": 2,
+      "community": 3,
       "norm_label": "isdarkmode()"
     },
     {
@@ -2196,7 +2259,7 @@
       "source_file": "C:\\Users\\simon\\Desktop\\UDG-2\\ADIS\\sportski_savez\\sportski-savez-app\\resources\\js\\hooks\\use-appearance.tsx",
       "source_location": "L44",
       "id": "use_appearance_applytheme",
-      "community": 2,
+      "community": 3,
       "norm_label": "applytheme()"
     },
     {
@@ -2205,7 +2268,7 @@
       "source_file": "C:\\Users\\simon\\Desktop\\UDG-2\\ADIS\\sportski_savez\\sportski-savez-app\\resources\\js\\hooks\\use-appearance.tsx",
       "source_location": "L55",
       "id": "use_appearance_subscribe",
-      "community": 2,
+      "community": 3,
       "norm_label": "subscribe()"
     },
     {
@@ -2214,7 +2277,7 @@
       "source_file": "C:\\Users\\simon\\Desktop\\UDG-2\\ADIS\\sportski_savez\\sportski-savez-app\\resources\\js\\hooks\\use-appearance.tsx",
       "source_location": "L61",
       "id": "use_appearance_notify",
-      "community": 2,
+      "community": 3,
       "norm_label": "notify()"
     },
     {
@@ -2223,7 +2286,7 @@
       "source_file": "C:\\Users\\simon\\Desktop\\UDG-2\\ADIS\\sportski_savez\\sportski-savez-app\\resources\\js\\hooks\\use-appearance.tsx",
       "source_location": "L63",
       "id": "use_appearance_mediaquery",
-      "community": 2,
+      "community": 3,
       "norm_label": "mediaquery()"
     },
     {
@@ -2232,7 +2295,7 @@
       "source_file": "C:\\Users\\simon\\Desktop\\UDG-2\\ADIS\\sportski_savez\\sportski-savez-app\\resources\\js\\hooks\\use-appearance.tsx",
       "source_location": "L71",
       "id": "use_appearance_handlesystemthemechange",
-      "community": 2,
+      "community": 3,
       "norm_label": "handlesystemthemechange()"
     },
     {
@@ -2241,7 +2304,7 @@
       "source_file": "C:\\Users\\simon\\Desktop\\UDG-2\\ADIS\\sportski_savez\\sportski-savez-app\\resources\\js\\hooks\\use-appearance.tsx",
       "source_location": "L73",
       "id": "use_appearance_initializetheme",
-      "community": 2,
+      "community": 3,
       "norm_label": "initializetheme()"
     },
     {
@@ -2250,7 +2313,7 @@
       "source_file": "C:\\Users\\simon\\Desktop\\UDG-2\\ADIS\\sportski_savez\\sportski-savez-app\\resources\\js\\hooks\\use-appearance.tsx",
       "source_location": "L90",
       "id": "use_appearance_useappearance",
-      "community": 2,
+      "community": 3,
       "norm_label": "useappearance()"
     },
     {
@@ -2295,7 +2358,7 @@
       "source_file": "C:\\Users\\simon\\Desktop\\UDG-2\\ADIS\\sportski_savez\\sportski-savez-app\\resources\\js\\hooks\\use-flash-toast.ts",
       "source_location": "L1",
       "id": "c_users_simon_desktop_udg_2_adis_sportski_savez_sportski_savez_app_resources_js_hooks_use_flash_toast_ts",
-      "community": 2,
+      "community": 3,
       "norm_label": "use-flash-toast.ts"
     },
     {
@@ -2304,7 +2367,7 @@
       "source_file": "C:\\Users\\simon\\Desktop\\UDG-2\\ADIS\\sportski_savez\\sportski-savez-app\\resources\\js\\hooks\\use-flash-toast.ts",
       "source_location": "L6",
       "id": "use_flash_toast_useflashtoast",
-      "community": 2,
+      "community": 3,
       "norm_label": "useflashtoast()"
     },
     {
@@ -2331,7 +2394,7 @@
       "source_file": "C:\\Users\\simon\\Desktop\\UDG-2\\ADIS\\sportski_savez\\sportski-savez-app\\resources\\js\\hooks\\use-mobile-navigation.ts",
       "source_location": "L1",
       "id": "c_users_simon_desktop_udg_2_adis_sportski_savez_sportski_savez_app_resources_js_hooks_use_mobile_navigation_ts",
-      "community": 15,
+      "community": 19,
       "norm_label": "use-mobile-navigation.ts"
     },
     {
@@ -2340,7 +2403,7 @@
       "source_file": "C:\\Users\\simon\\Desktop\\UDG-2\\ADIS\\sportski_savez\\sportski-savez-app\\resources\\js\\hooks\\use-mobile-navigation.ts",
       "source_location": "L5",
       "id": "use_mobile_navigation_usemobilenavigation",
-      "community": 15,
+      "community": 19,
       "norm_label": "usemobilenavigation()"
     },
     {
@@ -3079,6 +3142,138 @@
       "_tgt": "profileupdaterequest_profileupdaterequest_rules",
       "source": "profilevalidationrules_profilerules",
       "target": "profileupdaterequest_profileupdaterequest_rules"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "C:\\Users\\simon\\Desktop\\UDG-2\\ADIS\\sportski_savez\\sportski-savez-app\\app\\Console\\Commands\\SyncAiDnevnikSeeder.php",
+      "source_location": "L10",
+      "weight": 1.0,
+      "_src": "c_users_simon_desktop_udg_2_adis_sportski_savez_sportski_savez_app_app_console_commands_syncaidnevnikseeder_php",
+      "_tgt": "syncaidnevnikseeder_syncaidnevnikseeder",
+      "source": "c_users_simon_desktop_udg_2_adis_sportski_savez_sportski_savez_app_app_console_commands_syncaidnevnikseeder_php",
+      "target": "syncaidnevnikseeder_syncaidnevnikseeder",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "C:\\Users\\simon\\Desktop\\UDG-2\\ADIS\\sportski_savez\\sportski-savez-app\\app\\Console\\Commands\\SyncAiDnevnikSeeder.php",
+      "source_location": "L16",
+      "weight": 1.0,
+      "_src": "syncaidnevnikseeder_syncaidnevnikseeder",
+      "_tgt": "syncaidnevnikseeder_syncaidnevnikseeder_handle",
+      "source": "syncaidnevnikseeder_syncaidnevnikseeder",
+      "target": "syncaidnevnikseeder_syncaidnevnikseeder_handle",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "C:\\Users\\simon\\Desktop\\UDG-2\\ADIS\\sportski_savez\\sportski-savez-app\\app\\Console\\Commands\\SyncAiDnevnikSeeder.php",
+      "source_location": "L39",
+      "weight": 1.0,
+      "_src": "syncaidnevnikseeder_syncaidnevnikseeder",
+      "_tgt": "syncaidnevnikseeder_syncaidnevnikseeder_entryfor",
+      "source": "syncaidnevnikseeder_syncaidnevnikseeder",
+      "target": "syncaidnevnikseeder_syncaidnevnikseeder_entryfor",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "C:\\Users\\simon\\Desktop\\UDG-2\\ADIS\\sportski_savez\\sportski-savez-app\\app\\Console\\Commands\\SyncAiDnevnikSeeder.php",
+      "source_location": "L69",
+      "weight": 1.0,
+      "_src": "syncaidnevnikseeder_syncaidnevnikseeder",
+      "_tgt": "syncaidnevnikseeder_syncaidnevnikseeder_shoulduseheredoc",
+      "source": "syncaidnevnikseeder_syncaidnevnikseeder",
+      "target": "syncaidnevnikseeder_syncaidnevnikseeder_shoulduseheredoc",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "C:\\Users\\simon\\Desktop\\UDG-2\\ADIS\\sportski_savez\\sportski-savez-app\\app\\Console\\Commands\\SyncAiDnevnikSeeder.php",
+      "source_location": "L78",
+      "weight": 1.0,
+      "_src": "syncaidnevnikseeder_syncaidnevnikseeder",
+      "_tgt": "syncaidnevnikseeder_syncaidnevnikseeder_phpstring",
+      "source": "syncaidnevnikseeder_syncaidnevnikseeder",
+      "target": "syncaidnevnikseeder_syncaidnevnikseeder_phpstring",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "C:\\Users\\simon\\Desktop\\UDG-2\\ADIS\\sportski_savez\\sportski-savez-app\\app\\Console\\Commands\\SyncAiDnevnikSeeder.php",
+      "source_location": "L87",
+      "weight": 1.0,
+      "_src": "syncaidnevnikseeder_syncaidnevnikseeder",
+      "_tgt": "syncaidnevnikseeder_syncaidnevnikseeder_seedertemplate",
+      "source": "syncaidnevnikseeder_syncaidnevnikseeder",
+      "target": "syncaidnevnikseeder_syncaidnevnikseeder_seedertemplate",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "C:\\Users\\simon\\Desktop\\UDG-2\\ADIS\\sportski_savez\\sportski-savez-app\\app\\Console\\Commands\\SyncAiDnevnikSeeder.php",
+      "source_location": "L26",
+      "weight": 1.0,
+      "_src": "syncaidnevnikseeder_syncaidnevnikseeder_handle",
+      "_tgt": "syncaidnevnikseeder_syncaidnevnikseeder_entryfor",
+      "source": "syncaidnevnikseeder_syncaidnevnikseeder_handle",
+      "target": "syncaidnevnikseeder_syncaidnevnikseeder_entryfor",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "C:\\Users\\simon\\Desktop\\UDG-2\\ADIS\\sportski_savez\\sportski-savez-app\\app\\Console\\Commands\\SyncAiDnevnikSeeder.php",
+      "source_location": "L28",
+      "weight": 1.0,
+      "_src": "syncaidnevnikseeder_syncaidnevnikseeder_handle",
+      "_tgt": "syncaidnevnikseeder_syncaidnevnikseeder_seedertemplate",
+      "source": "syncaidnevnikseeder_syncaidnevnikseeder_handle",
+      "target": "syncaidnevnikseeder_syncaidnevnikseeder_seedertemplate",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "C:\\Users\\simon\\Desktop\\UDG-2\\ADIS\\sportski_savez\\sportski-savez-app\\app\\Console\\Commands\\SyncAiDnevnikSeeder.php",
+      "source_location": "L18",
+      "weight": 1.0,
+      "_src": "syncaidnevnikseeder_syncaidnevnikseeder_handle",
+      "_tgt": "aidnevniksesija_aidnevniksesija",
+      "source": "syncaidnevnikseeder_syncaidnevnikseeder_handle",
+      "target": "aidnevniksesija_aidnevniksesija"
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "C:\\Users\\simon\\Desktop\\UDG-2\\ADIS\\sportski_savez\\sportski-savez-app\\app\\Console\\Commands\\SyncAiDnevnikSeeder.php",
+      "source_location": "L44",
+      "weight": 1.0,
+      "_src": "syncaidnevnikseeder_syncaidnevnikseeder_entryfor",
+      "_tgt": "syncaidnevnikseeder_syncaidnevnikseeder_phpstring",
+      "source": "syncaidnevnikseeder_syncaidnevnikseeder_entryfor",
+      "target": "syncaidnevnikseeder_syncaidnevnikseeder_phpstring",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "C:\\Users\\simon\\Desktop\\UDG-2\\ADIS\\sportski_savez\\sportski-savez-app\\app\\Console\\Commands\\SyncAiDnevnikSeeder.php",
+      "source_location": "L52",
+      "weight": 1.0,
+      "_src": "syncaidnevnikseeder_syncaidnevnikseeder_entryfor",
+      "_tgt": "syncaidnevnikseeder_syncaidnevnikseeder_shoulduseheredoc",
+      "source": "syncaidnevnikseeder_syncaidnevnikseeder_entryfor",
+      "target": "syncaidnevnikseeder_syncaidnevnikseeder_shoulduseheredoc",
+      "confidence_score": 1.0
     },
     {
       "relation": "contains",
@@ -3863,20 +4058,20 @@
     {
       "relation": "contains",
       "confidence": "EXTRACTED",
-      "source_file": "database\\seeders\\AiDnevnikSeeder.php",
+      "source_file": "C:\\Users\\simon\\Desktop\\UDG-2\\ADIS\\sportski_savez\\sportski-savez-app\\database\\seeders\\AiDnevnikSeeder.php",
       "source_location": "L8",
       "weight": 1.0,
-      "_src": "database_seeders_aidnevnikseeder_php",
+      "_src": "c_users_simon_desktop_udg_2_adis_sportski_savez_sportski_savez_app_database_seeders_aidnevnikseeder_php",
       "_tgt": "aidnevnikseeder_aidnevnikseeder",
-      "source": "database_seeders_aidnevnikseeder_php",
+      "source": "c_users_simon_desktop_udg_2_adis_sportski_savez_sportski_savez_app_database_seeders_aidnevnikseeder_php",
       "target": "aidnevnikseeder_aidnevnikseeder",
       "confidence_score": 1.0
     },
     {
       "relation": "method",
       "confidence": "EXTRACTED",
-      "source_file": "database\\seeders\\AiDnevnikSeeder.php",
-      "source_location": "L10",
+      "source_file": "C:\\Users\\simon\\Desktop\\UDG-2\\ADIS\\sportski_savez\\sportski-savez-app\\database\\seeders\\AiDnevnikSeeder.php",
+      "source_location": "L18",
       "weight": 1.0,
       "_src": "aidnevnikseeder_aidnevnikseeder",
       "_tgt": "aidnevnikseeder_aidnevnikseeder_run",

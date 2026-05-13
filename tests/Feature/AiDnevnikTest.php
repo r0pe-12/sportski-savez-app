@@ -14,29 +14,35 @@ it('javna /ai-dnevnik ruta odgovara 200 bez auth-a', function () {
     get('/ai-dnevnik')->assertOk();
 });
 
-it('seeder upisuje 12 postojećih sesija', function () {
+it('seeder upisuje sve postojeće sesije iz seeder fajla', function () {
     seed(AiDnevnikSeeder::class);
 
-    expect(AiDnevnikSesija::count())->toBe(12);
+    // Broj raste kako se sesije dodaju — provjeravamo da je seeder
+    // upisao bar inicijalnih 15 sesija (sesija 13 ostaje gap).
+    expect(AiDnevnikSesija::count())->toBeGreaterThanOrEqual(15);
 });
 
 it('sesije se grupišu po fazi i prosleđuju u Inertia komponentu', function () {
     seed(AiDnevnikSeeder::class);
 
-    get('/ai-dnevnik')
-        ->assertInertia(
-            fn ($page) => $page
-                ->component('ai-dnevnik')
-                ->has('fazeSaSesijama')
-                ->where('fazeSaSesijama.Faza 1 — Analitička dokumentacija', fn ($sesije) => count($sesije) === 7)
-                ->where('fazeSaSesijama.Faza 2 — Skraćivanje, refaktor i projektni dizajn', fn ($sesije) => count($sesije) === 4)
-                ->where('fazeSaSesijama.Faza 3 — Kontinuirano dokumentovanje upotrebe AI', fn ($sesije) => count($sesije) === 1)
-        );
+    $expectedFaze = AiDnevnikSesija::query()
+        ->selectRaw('faza, count(*) as c')
+        ->groupBy('faza')
+        ->pluck('c', 'faza');
+
+    $assertion = fn ($page) => $expectedFaze->reduce(
+        fn ($p, $count, $faza) => $p->where("fazeSaSesijama.{$faza}", fn ($s) => count($s) === (int) $count),
+        $page->component('ai-dnevnik')->has('fazeSaSesijama')
+    );
+
+    get('/ai-dnevnik')->assertInertia($assertion);
 });
 
 it('seeder je idempotentan (drugi run ne duplira sesije)', function () {
     seed(AiDnevnikSeeder::class);
+    $countAfterFirst = AiDnevnikSesija::count();
+
     seed(AiDnevnikSeeder::class);
 
-    expect(AiDnevnikSesija::count())->toBe(12);
+    expect(AiDnevnikSesija::count())->toBe($countAfterFirst);
 });
