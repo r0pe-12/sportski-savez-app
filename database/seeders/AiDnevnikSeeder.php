@@ -824,6 +824,87 @@ Verifikacija dual-write workflow-a:
 - Pipeline blockage riješen. Spreman za commit i push.
 ISHOD_16,
             ],
+            [
+                'broj' => 17,
+                'naslov' => 'Provjera pokrivenosti zahtjeva profesora za završni ispit',
+                'datum' => '2026-05-13',
+                'faza' => 'Specifikacija',
+                'alat' => 'Claude Code (Opus 4.7, 1M context)',
+                'cilj' => <<<'CILJ_17'
+Mapirati 5 zahtjeva profesora (iteracije + AI, UI demo za UC-ove, integracija/deploy/testing, konsolidovan finalni izvještaj sa svim artefaktima iz prethodne dvije iteracije, V&V izazovi sa AI u SDLC) na postojeći spec + meta-plan + 14 track-planova i identifikovati gap-ove koji moraju biti adresirani prije završnog ispita.
+CILJ_17,
+                'instrukcije' => <<<'INSTRUKCIJE_17'
+### Prompt 1
+
+Korisnik je dostavio listu zahtjeva profesora za završni ispit i pita da li će implementacijom postojećeg paralelnog plana biti pokriveni svi sljedeći zahtjevi:
+
+1. 1-2 iteracije implementacije/demonstracije uz pomoć AI alata
+2. Prikaz UI ekrana za 1-2 važnija Use Case-a + demonstracija rada
+3. Komentar pristupa sistemskoj integraciji (šta i kako se integriše), priprema za puštanje u rad, testiranje, prijedlog deployment-a
+4. Integracija prethodna dva izvještavanja sa finalnim: (4a) vizija i analiza artefakti, (4b) projekat artefakti (arhitektura, okruženje, tehnologije, UML — klase, sekvence, komponente, paketi, deployment), (4b-bis) demonstracija i implementacija (snimak ekrana, integracija, instalacija, testiranje)
+5. Komentar izazova V&V (verifikacije i validacije) iz ugla korišćenja AI u svim koracima SDLC-a
+
+Pripremiti demo za završni ispit.
+
+### Prompt 2
+
+Korisnik je dao saglasnost ("upisi sada") da se Phase 4 (Predaja za završni ispit) doda u meta-plan.
+
+Akcije izvršene:
+1. Ažuriran `specs/000-paralelni-plan.md`:
+   - §1.1 Skala paralelizma: dodata Phase 4 (2 paralelna + 1 sekvencijalan)
+   - §1.2 Šta dobijamo: dodati UML + finalni izvještaj + V&V + demo deliverable
+   - §2 Mapa zavisnosti: ASCII dijagram proširen sa Phase 4 i v1.1 tag
+   - §3 Track katalog: 3 nova reda (T4.1, T4.2, T4.3) sa zavisnostima
+   - §6.5 Posle Phase 4: nova boundary checkpoint sekcija
+   - §10 Demo scenario: dodata Phase 4 deliverable struktura sa kompletnim docs/zavrsni-izvjestaj/ stablom + 6 koraka demo flow-a za ispit
+   - §12 Changelog: bump na v1.2
+
+2. Kreirana 3 placeholder fajla u `specs/`:
+   - `140-t4.1-uml-dijagrami.md` — 6 UML dijagrama generisanih iz koda (klasni, sequence UC5, sequence UC8, component, package, deployment)
+   - `141-t4.2-vv-deployment.md` — V&V refleksija sa 7 poglavlja + lokalna instalacija + staging/production rollout
+   - `142-t4.3-finalni-izvjestaj-demo.md` — konsolidovan izvještaj koji integriše SVD + Analitika + Dizajn + implementacija + snimak ekrana UC5/UC8
+
+3. Ažuriran CLAUDE.md sekcija 5 (Paralelni implementacijski plan): ASCII pregled phase-ova dopunjen Phase 4 redom + napomenom da se radi POSLIJE implementacije.
+INSTRUKCIJE_17,
+                'output' => <<<'OUTPUT_17'
+### Prompt 1
+
+Analiza pokrivenosti zahtjeva profesora kroz postojeći plan i identifikacija gap-ova koji moraju biti dodatno adresirani prije završnog ispita.
+
+### Prompt 2
+
+Phase 4 registrovan u sistemu kao zasebna phase grupa. Sve dokumentacijske artefakte (UML, V&V, finalni izvještaj, demo) odgođene su za nakon merge-a T3.2 (kraj Phase 3, v1.0 tag).
+
+Rationale za odgađanje (slaganje korisnika):
+1. UML dijagrami tačniji ako se generišu iz stvarnog koda nego iz spec teksta
+2. Snimak ekrana ne postoji dok aplikacija ne radi end-to-end
+3. V&V refleksija jača sa stvarnim citatima iz dnevnika i Pest izlaza
+OUTPUT_17,
+                'odluke' => <<<'ODLUKE_17'
+### Prompt 1
+
+Mapiranje zahtjeva 1-5 na postojeće spec/plan artefakte i ocjena pokrivenosti (pokriveno/djelomično/gap).
+
+### Prompt 2
+
+- Phase 4 organizovan kao 2+1 (T4.1 i T4.2 paralelno, T4.3 sekvencijalan na kraju jer integriše izlaze iz T4.1 i T4.2).
+- Tag-ovanje: v1.0 ostaje za kraj Phase 3 (funkcionalnost), v1.1 dodan za kraj Phase 4 (predaja za ADIS završni ispit).
+- Placeholder fajlovi sadrže visok-nivo strukturu i acceptance criteria; konkretni plan generiše se kroz `/plan` skill nakon T3.2 merge-a.
+- Sve eksplicitne profesorovo zahtjeve (1-5 iz zadatka za završni ispit) pokriveni u placeholder dokumentima: zahtjev 1 (1-2 iteracije + AI) → meta-plan §6 boundary demos; 2 (UI demo UC-ova) → T4.3 demo snimak; 3 (integracija + deploy + testing) → T4.2 deployment dokumenti; 4 (integracija 3 izvještavanja) → T4.3 konsolidovan izvještaj; 5 (V&V sa AI u SDLC) → T4.2 refleksija.
+ODLUKE_17,
+                'ishod' => <<<'ISHOD_17'
+### Prompt 1
+
+Sesija u toku.
+
+### Prompt 2
+
+Phase 4 uspješno registrovan u meta-planu, CLAUDE.md i 3 placeholder fajla. Spremni smo za nastavak implementacije od F1 (Setup) bez gubitka konteksta o tome šta dolazi na samom kraju za završni ispit.
+
+Sljedeći korak (kad korisnik kaže "kreni"): `/plan` za `specs/100-f1-setup.md`.
+ISHOD_17,
+            ],
         ];
 
         foreach ($sesije as $sesija) {

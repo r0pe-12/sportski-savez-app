@@ -14,17 +14,22 @@
 - **Phase 1:** **3 paralelna track-a**
 - **Phase 2:** **7 paralelnih track-ova** (UC5 razbijen na 3 podtrak-a)
 - **Phase 3:** sekvencijalno (2 koraka)
+- **Phase 4 (Predaja za završni ispit):** **2 paralelna + 1 sekvencijalni** — dokumentacijski artefakti nakon implementacije
 
 Teorijsko ubrzanje u odnosu na linearno: **~3–4×**.
 
 ### 1.2 Šta dobijamo na kraju
-Funkcionalan sistem koji demonstrira sve što spec opisuje:
+Funkcionalan sistem + kompletna predajna dokumentacija:
 - 10 UC-ova rade end-to-end
 - Audit log za svaku state izmjenu
 - In-app notifikacije + email u log fajlu
 - Mock OCR i eDnevnik adapter-i
 - Zelena Pest test suita > 70% coverage
 - Browser smoke testovi prošli
+- **UML dijagrami (klase, sekvence, komponente, paketi, deployment) — generisani iz implementiranog koda**
+- **Konsolidovani finalni izvještaj (vizija + analiza + projekat + demonstracija) — integracija sve tri iteracije izvještavanja**
+- **V&V + AI u SDLC refleksija sa konkretnim citatima iz `ai_dnevnik_sesije` i Pest rezultata**
+- **Snimak ekrana demo-a + deployment/instalaciono uputstvo**
 
 ### 1.3 Šta NE dobijamo (eksplicitno out-of-scope)
 - Pravi OCR (Google Cloud Vision), pravi eDnevnik, AWS SES, S3, RDS — mock-ovi su dovoljni za demo
@@ -70,10 +75,26 @@ Funkcionalan sistem koji demonstrira sve što spec opisuje:
                     ┌─────────────────────┐
                     │ T3.1 Audit log UI   │
                     │ T3.2 Smoke + e2e    │
-                    └─────────────────────┘
-                            │
-                            ▼
-                       v1.0 release
+                    └─────────┬───────────┘
+                              │ v1.0 release (funkcionalnost)
+                              │
+                    ┌─────────┼─────────┐
+                    ▼         ▼         │
+              PHASE 4 (2 paralelna + 1 sekvencijalan)
+        ┌─────────────┐ ┌─────────────┐ │
+        │ T4.1 UML    │ │ T4.2 V&V +  │ │
+        │ dijagrami   │ │ Deploy uput │ │
+        └──────┬──────┘ └──────┬──────┘ │
+               └───────┬───────┘        │
+                       ▼                │
+              ┌─────────────────────┐   │
+              │ T4.3 Konsolidovan   │◄──┘
+              │ finalni izvještaj + │
+              │ demo snimak ekrana  │
+              └─────────────────────┘
+                       │
+                       ▼
+                  v1.1 predaja (ADIS završni ispit)
 ```
 
 ---
@@ -95,7 +116,10 @@ Funkcionalan sistem koji demonstrira sve što spec opisuje:
 | T2.4 | UC3 Učenički profil + istorija | 2 | UC3 | 1.5 nedjelje | — | T1.1 | [`125-t2.4-uc3-ucenicki-profil.md`](125-t2.4-uc3-ucenicki-profil.md) |
 | T2.5 | UC4 Public raspored | 2 | UC4 | 1 nedjelja | — | T1.2 | [`126-t2.5-uc4-public-raspored.md`](126-t2.5-uc4-public-raspored.md) |
 | T3.1 | Audit log UI dashboard | 3 | (cross) | 3 dana | T3.2 | T1.3, sve T2.* | [`130-t3.1-audit-log-dashboard.md`](130-t3.1-audit-log-dashboard.md) |
-| T3.2 | Integration smoke + e2e | 3 | (cross) | 4 dana | — | T3.1 | [`131-t3.2-integration-smoke-e2e.md`](131-t3.2-integration-smoke-e2e.md) |
+| T3.2 | Integration smoke + e2e | 3 | (cross) | 4 dana | T4.* | T3.1 | [`131-t3.2-integration-smoke-e2e.md`](131-t3.2-integration-smoke-e2e.md) |
+| T4.1 | UML dijagrami (5 vrsta) | 4 | (predaja) | 2 dana | T4.3 | T3.2 | [`140-t4.1-uml-dijagrami.md`](140-t4.1-uml-dijagrami.md) |
+| T4.2 | V&V + AI u SDLC + deployment uputstvo | 4 | (predaja) | 2 dana | T4.3 | T3.2 | [`141-t4.2-vv-deployment.md`](141-t4.2-vv-deployment.md) |
+| T4.3 | Konsolidovani finalni izvještaj + demo snimak | 4 | (predaja) | 3 dana | — | T4.1, T4.2 | [`142-t4.3-finalni-izvjestaj-demo.md`](142-t4.3-finalni-izvjestaj-demo.md) |
 
 ---
 
@@ -221,8 +245,17 @@ git branch -d feature/t2.1a-uc5-team-form
 **Trigger:** T3.2 merge-an.
 **Akcije:**
 1. Browser smoke prošao (sve ključne stranice bez JS errora)
-2. `git tag v1.0`
-3. Demo cutoff — ovo je predaja za ADIS.
+2. `git tag v1.0` — funkcionalnost zaključana
+3. **Posle ovog:** kreiraju se 2 worktree-a za Phase 4 paralelni dio (T4.1, T4.2). T4.3 čeka oba.
+
+### 6.5 Posle Phase 4
+**Trigger:** T4.3 merge-an.
+**Akcije:**
+1. `docs/zavrsni-izvjestaj/` postoji sa kompletnim sadržajem (vidi §10 Phase 4 demo).
+2. `docs/zavrsni-izvjestaj/uml/` ima 5 PlantUML/Mermaid fajlova + render PNG/SVG.
+3. `docs/zavrsni-izvjestaj/demo/` ima snimak ekrana (mp4/gif) za UC5 i UC8.
+4. V&V poglavlje citira konkretne `ai_dnevnik_sesije` zapise i Pest rezultate.
+5. `git tag v1.1` — predaja za ADIS završni ispit zaključana.
 
 ---
 
@@ -326,7 +359,42 @@ php artisan tinker --execute 'echo App\Models\Student::count();'
 1. Admin → `/admin/audit-log` → vidi sve akcije u tabeli sa filterima (po user-u, action, datum)
 2. Browser smoke (Pest 4 Browser): `php artisan test --filter=SmokeTest` zelena
 3. Sve stranice rade bez console errora
-4. `git tag v1.0` — predaja spremna
+4. `git tag v1.0` — funkcionalnost spremna
+
+### Posle Phase 4 (predaja za završni ispit)
+
+**Deliverable struktura (`docs/zavrsni-izvjestaj/`):**
+```
+docs/zavrsni-izvjestaj/
+├── 01-vizija-i-analiza.md          ← integriše SVD_v2.1 + Projektna_analitika_v3.1
+├── 02-projekat.md                  ← arhitektura + tehnologije + okruženje (iz spec §9–§11)
+├── 03-implementacija-demonstracija.md ← demo scenariji + diskusija integracije/instalacije/testiranja
+├── 04-vv-i-ai-u-sdlc.md            ← refleksija: V&V izazovi sa AI kroz svih 10+ sesija
+├── uml/
+│   ├── 01-klasni-dijagram.puml     ← Domain model iz app/Models/
+│   ├── 02-sequence-uc5.puml        ← UC5 prijava ekipe sa OCR pipeline-om
+│   ├── 03-sequence-uc8.puml        ← UC8 eDnevnik verifikacija
+│   ├── 04-component-dijagram.puml  ← Http → App → Domain → Infra slojevi + adapteri
+│   ├── 05-package-dijagram.puml    ← Laravel app struktura (app/, resources/, routes/, ...)
+│   ├── 06-deployment-dijagram.puml ← Laravel Cloud / lokalni dev (server, DB, queue, storage, eksterni)
+│   └── render/                     ← PNG/SVG izlazi
+├── demo/
+│   ├── uc5-prijava-ekipe.mp4       ← snimak ekrana UC5 end-to-end
+│   ├── uc8-ednevnik-verifikacija.mp4
+│   └── README.md                   ← linkovi + verbalni opis
+└── deployment/
+    ├── 01-lokalna-instalacija.md   ← korak-po-korak za ocjenjivača
+    ├── 02-staging-rollout.md       ← Laravel Cloud / VPS deployment plan
+    └── 03-production-readiness.md  ← checklist za pilot (S3 migracija, SES, pravi adapteri)
+```
+
+**Demo flow za ispit:**
+1. Otvori `docs/zavrsni-izvjestaj/01-vizija-i-analiza.md` — pokazi problem, rješenje, stakeholdere.
+2. Otvori `docs/zavrsni-izvjestaj/uml/render/04-component-dijagram.png` — pokaži arhitekturu.
+3. Pokreni aplikaciju: `composer run dev` → demonstriraj UC5 + UC8 uživo (ili pusti `demo/uc5-prijava-ekipe.mp4`).
+4. Otvori `/ai-dnevnik` u browseru — pokaži evidenciju 17+ sesija rada sa AI.
+5. Otvori `docs/zavrsni-izvjestaj/04-vv-i-ai-u-sdlc.md` — diskutuj izazove (halucinacije, code drift, AI-generated test risk, dnevnik kao audit trail).
+6. `php artisan test --compact` uživo — zelena suita.
 
 ---
 
@@ -348,3 +416,4 @@ Pitanja se rješavaju u relevantnom track planu, ne sad.
 |---|---|---|
 | 1.0 | 2026-05-13 | Inicijalni meta-plan. 14 track-ova kroz 4 phase grupe. Brainstorm odluke: roadmap + placeholderi, UC5 razbijen na 3 podtrak-a, T1.4 spojen sa T1.1, phase boundary merges, per-track testovi, fokus na funkcionalnost (ne AZLP regulator). |
 | 1.1 | 2026-05-13 | **Database safety constraint:** `migrate:fresh` zabranjen u svim phase-ovima — čuvamo `ai_dnevnik_sesije`. Phase 0 checkpoint koristi `migrate` + `db:seed` (oba aditivna/idempotentna). Demo skripta i F2 acceptance ažurirani. Nova `feedback_database_safety` memorija dokumentuje pravilo. |
+| 1.2 | 2026-05-13 | **Phase 4 (Predaja za završni ispit)** dodat kao zasebna phase grupa nakon Phase 3. Tri track-a (T4.1 UML, T4.2 V&V+deployment, T4.3 konsolidovan izvještaj+demo) pokrivaju zahtjeve profesora za završni ispit (snimak ekrana UC-ova, UML klase/sekvence/komponente/paketi/deployment, integracija prethodna dva izvještavanja, V&V refleksija sa fokusom na AI u SDLC). Phase 4 se radi **poslije** implementacije — UML iz stvarnog koda, V&V citira stvarne sesije, demo snimak iz radne aplikacije. Track katalog ažuriran, dependency diagram, §6.5 boundary checkpoint, §10 Phase 4 demo struktura. |

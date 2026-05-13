@@ -291,6 +291,10 @@ Phase 1 (3 paralelna):   T1.1 Auth+UI shell · T1.2 Sportovi+raspored · T1.3 Cr
 Phase 2 (7 paralelnih):  T2.1a Form · T2.1b OCR · T2.1c Submit (UC5 split) ·
                          T2.2 eDnevnik · T2.3 Rezultati · T2.4 Profil · T2.5 Raspored
 Phase 3 (sekvencijalno): T3.1 Audit log dashboard → T3.2 Smoke + e2e
+                         → v1.0 tag (funkcionalnost spremna)
+Phase 4 (predaja za     T4.1 UML dijagrami · T4.2 V&V + deployment · T4.3 finalni izvještaj + demo
+završni ispit):          → v1.1 tag (predaja za ADIS spremna)
+                         **Radi se POSLIJE implementacije** — UML iz koda, V&V citira sesije, demo iz radne aplikacije.
 ```
 
 **Phase merge cadence:** posle svake phase boundary, sve worktree-ove rebase na novi main. Detalji: meta-plan sekcija 6.
