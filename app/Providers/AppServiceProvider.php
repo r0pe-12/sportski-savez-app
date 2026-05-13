@@ -2,7 +2,9 @@
 
 namespace App\Providers;
 
+use App\Adapters\EDnevnik\FakeEDnevnikAdapter;
 use App\Adapters\Ocr\FakeOcrAdapter;
+use App\Contracts\EDnevnikAdapter;
 use App\Contracts\OcrAdapter;
 use Carbon\CarbonImmutable;
 use Illuminate\Support\Facades\Date;
@@ -21,6 +23,12 @@ class AppServiceProvider extends ServiceProvider
             return config('ocr.adapter') === 'fake'
                 ? new FakeOcrAdapter
                 : throw new \LogicException('Real OcrAdapter not implemented yet. Set OCR_ADAPTER=fake.');
+        });
+
+        $this->app->bind(EDnevnikAdapter::class, function () {
+            return config('ednevnik.adapter') === 'fake'
+                ? new FakeEDnevnikAdapter
+                : throw new \LogicException('Real EDnevnikAdapter not implemented yet. Set EDNEVNIK_ADAPTER=fake.');
         });
     }
 
