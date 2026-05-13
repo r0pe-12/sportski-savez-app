@@ -9,7 +9,7 @@ use Illuminate\Support\Facades\Request;
 class AuditLogger
 {
     /**
-     * Log an action to the audit trail.
+     * Zapiši audit log entry.
      *
      * @param  array<string, mixed>  $payload
      */

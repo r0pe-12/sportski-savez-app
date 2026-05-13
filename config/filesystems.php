@@ -47,6 +47,15 @@ return [
             'report' => false,
         ],
 
+        'private' => [
+            'driver' => 'local',
+            'root' => storage_path('app/private'),
+            'url' => rtrim(env('APP_URL', 'http://localhost'), '/').'/private-storage',
+            'serve' => true,
+            'throw' => false,
+            'visibility' => 'private',
+        ],
+
         's3' => [
             'driver' => 's3',
             'key' => env('AWS_ACCESS_KEY_ID'),

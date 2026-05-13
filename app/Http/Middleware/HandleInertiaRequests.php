@@ -56,12 +56,12 @@ class HandleInertiaRequests extends Middleware
                     'verified_at' => $user->verified_at?->toIso8601String(),
                 ] : null,
             ],
+            'sidebarOpen' => ! $request->hasCookie('sidebar_state') || $request->cookie('sidebar_state') === 'true',
             'notifications' => [
                 'unread_count' => $user && Schema::hasTable('notifications')
                     ? (int) $user->unreadNotifications()->count()
                     : 0,
             ],
-            'sidebarOpen' => ! $request->hasCookie('sidebar_state') || $request->cookie('sidebar_state') === 'true',
         ];
     }
 }
