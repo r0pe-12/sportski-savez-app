@@ -1,9 +1,23 @@
+import { Form, Head, Link } from '@inertiajs/react';
+import { Trophy } from 'lucide-react';
 import InputError from '@/components/input-error';
+import {
+    FormCard,
+    FormCardBody,
+    FormCardFooter,
+} from '@/components/forms/form-card';
+import {
+    FormField,
+    FormGrid,
+    FormHint,
+    FormSection,
+} from '@/components/forms/form-section';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { NativeSelect } from '@/components/ui/native-select';
+import { Textarea } from '@/components/ui/textarea';
 import AppLayout from '@/layouts/app-layout';
-import { Form, Head } from '@inertiajs/react';
 
 type Sport = {
     id: number;
@@ -24,88 +38,184 @@ export default function SportsEdit({ sport }: { sport: Sport }) {
             ]}
         >
             <Head title={`Uredi: ${sport.name}`} />
-            <div className="max-w-xl p-6">
+            <FormCard
+                title={`Uredi sport — ${sport.name}`}
+                description="Izmjeni parametre sporta. Aktivna takmičenja neće biti pogođena."
+                icon={Trophy}
+                backHref="/admin/sports"
+                backLabel="Nazad na listu sportova"
+                sidebar={
+                    <div className="bg-muted/30 rounded-xl border p-4 text-sm">
+                        <h3 className="mb-2 font-medium">Pažnja</h3>
+                        <p className="text-muted-foreground text-xs leading-relaxed">
+                            Promjena broja članova/rezervi važi samo za buduće
+                            prijave. Već submitovane ekipe zadržavaju pravila iz
+                            trenutka prijave.
+                        </p>
+                        <dl className="text-muted-foreground mt-3 space-y-1 text-xs">
+                            <div className="flex justify-between">
+                                <dt>ID</dt>
+                                <dd className="font-mono">#{sport.id}</dd>
+                            </div>
+                            <div className="flex justify-between">
+                                <dt>Slug</dt>
+                                <dd className="font-mono">{sport.slug}</dd>
+                            </div>
+                        </dl>
+                    </div>
+                }
+            >
                 <Form
                     action={`/admin/sports/${sport.id}`}
                     method="put"
-                    className="flex flex-col gap-4"
+                    className="contents"
                 >
-                    {({ errors }) => (
+                    {({ errors, processing }) => (
                         <>
-                            <div className="grid gap-2">
-                                <Label htmlFor="name">Naziv</Label>
-                                <Input id="name" name="name" defaultValue={sport.name} required />
-                                <InputError message={errors.name} />
-                            </div>
-                            <div className="grid gap-2">
-                                <Label htmlFor="slug">Slug</Label>
-                                <Input
-                                    id="slug"
-                                    name="slug"
-                                    pattern="[a-z0-9-]+"
-                                    defaultValue={sport.slug}
-                                    required
-                                />
-                                <InputError message={errors.slug} />
-                            </div>
-                            <div className="grid gap-2">
-                                <Label htmlFor="type">Tip</Label>
-                                <select
-                                    id="type"
-                                    name="type"
-                                    defaultValue={sport.type}
-                                    className="h-9 rounded-md border bg-background px-3"
-                                    required
+                            <FormCardBody>
+                                <FormSection
+                                    title="Osnovni podaci"
+                                    description="Naziv vidljiv u listama, slug je URL identifikator (mala slova, brojevi, crtice)."
                                 >
-                                    <option value="team_sport">Timski</option>
-                                    <option value="individual_sport">Individualni</option>
-                                </select>
-                                <InputError message={errors.type} />
-                            </div>
-                            <div className="grid grid-cols-2 gap-2">
-                                <div>
-                                    <Label htmlFor="members_count">Broj članova</Label>
-                                    <Input
-                                        id="members_count"
-                                        name="members_count"
-                                        type="number"
-                                        min={1}
-                                        max={30}
-                                        defaultValue={sport.members_count}
-                                        required
-                                    />
-                                    <InputError message={errors.members_count} />
-                                </div>
-                                <div>
-                                    <Label htmlFor="substitutes_count">Rezerve</Label>
-                                    <Input
-                                        id="substitutes_count"
-                                        name="substitutes_count"
-                                        type="number"
-                                        min={0}
-                                        max={30}
-                                        defaultValue={sport.substitutes_count}
-                                        required
-                                    />
-                                    <InputError message={errors.substitutes_count} />
-                                </div>
-                            </div>
-                            <div className="grid gap-2">
-                                <Label htmlFor="rules_description">Pravila</Label>
-                                <textarea
-                                    id="rules_description"
-                                    name="rules_description"
-                                    rows={4}
-                                    defaultValue={sport.rules_description ?? ''}
-                                    className="rounded-md border bg-background px-3 py-2"
-                                />
-                                <InputError message={errors.rules_description} />
-                            </div>
-                            <Button type="submit">Sačuvaj</Button>
+                                    <FormGrid cols={2}>
+                                        <FormField>
+                                            <Label htmlFor="name">Naziv</Label>
+                                            <Input
+                                                id="name"
+                                                name="name"
+                                                defaultValue={sport.name}
+                                                required
+                                            />
+                                            <InputError message={errors.name} />
+                                        </FormField>
+                                        <FormField>
+                                            <Label htmlFor="slug">
+                                                Slug (URL)
+                                            </Label>
+                                            <Input
+                                                id="slug"
+                                                name="slug"
+                                                pattern="[a-z0-9-]+"
+                                                defaultValue={sport.slug}
+                                                required
+                                            />
+                                            <InputError message={errors.slug} />
+                                        </FormField>
+                                    </FormGrid>
+                                    <FormField>
+                                        <Label htmlFor="type">Tip sporta</Label>
+                                        <NativeSelect
+                                            id="type"
+                                            name="type"
+                                            defaultValue={sport.type}
+                                            required
+                                        >
+                                            <option value="team_sport">
+                                                Timski sport
+                                            </option>
+                                            <option value="individual_sport">
+                                                Individualni sport
+                                            </option>
+                                        </NativeSelect>
+                                        <InputError message={errors.type} />
+                                    </FormField>
+                                </FormSection>
+
+                                <FormSection
+                                    title="Pravila ekipe"
+                                    description="Promjena važi samo za buduće prijave."
+                                >
+                                    <FormGrid cols={2}>
+                                        <FormField>
+                                            <Label htmlFor="members_count">
+                                                Broj članova
+                                            </Label>
+                                            <Input
+                                                id="members_count"
+                                                name="members_count"
+                                                type="number"
+                                                min={1}
+                                                max={30}
+                                                defaultValue={
+                                                    sport.members_count
+                                                }
+                                                required
+                                            />
+                                            <FormHint>
+                                                Aktivni igrači prijavljeni za
+                                                takmičenje
+                                            </FormHint>
+                                            <InputError
+                                                message={errors.members_count}
+                                            />
+                                        </FormField>
+                                        <FormField>
+                                            <Label htmlFor="substitutes_count">
+                                                Broj rezervi
+                                            </Label>
+                                            <Input
+                                                id="substitutes_count"
+                                                name="substitutes_count"
+                                                type="number"
+                                                min={0}
+                                                max={30}
+                                                defaultValue={
+                                                    sport.substitutes_count
+                                                }
+                                                required
+                                            />
+                                            <FormHint>
+                                                0 ako sport nema rezerve
+                                            </FormHint>
+                                            <InputError
+                                                message={
+                                                    errors.substitutes_count
+                                                }
+                                            />
+                                        </FormField>
+                                    </FormGrid>
+                                </FormSection>
+
+                                <FormSection
+                                    title="Pravila i napomene"
+                                    description="Slobodan tekst prikazan profesorima pri prijavi."
+                                >
+                                    <FormField>
+                                        <Label htmlFor="rules_description">
+                                            Pravila (opciono)
+                                        </Label>
+                                        <Textarea
+                                            id="rules_description"
+                                            name="rules_description"
+                                            rows={5}
+                                            defaultValue={
+                                                sport.rules_description ?? ''
+                                            }
+                                            placeholder="npr. Trajanje 2 × 20 min…"
+                                        />
+                                        <InputError
+                                            message={errors.rules_description}
+                                        />
+                                    </FormField>
+                                </FormSection>
+                            </FormCardBody>
+
+                            <FormCardFooter>
+                                <Button
+                                    asChild
+                                    variant="ghost"
+                                    type="button"
+                                >
+                                    <Link href="/admin/sports">Otkaži</Link>
+                                </Button>
+                                <Button type="submit" disabled={processing}>
+                                    {processing ? 'Čuvanje…' : 'Sačuvaj izmjene'}
+                                </Button>
+                            </FormCardFooter>
                         </>
                     )}
                 </Form>
-            </div>
+            </FormCard>
         </AppLayout>
     );
 }

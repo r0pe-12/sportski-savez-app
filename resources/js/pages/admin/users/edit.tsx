@@ -1,10 +1,23 @@
-import { Form, Head } from '@inertiajs/react';
+import { Form, Head, Link } from '@inertiajs/react';
+import { UserCog } from 'lucide-react';
 import { useState } from 'react';
 import InputError from '@/components/input-error';
-import AppLayout from '@/layouts/app-layout';
+import {
+    FormCard,
+    FormCardBody,
+    FormCardFooter,
+} from '@/components/forms/form-card';
+import {
+    FormField,
+    FormGrid,
+    FormHint,
+    FormSection,
+} from '@/components/forms/form-section';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { NativeSelect } from '@/components/ui/native-select';
+import AppLayout from '@/layouts/app-layout';
 import type { SchoolSummary } from '@/types/auth';
 
 type School = { id: number; name: string; code: string };
@@ -35,122 +48,238 @@ export default function UsersEdit({
         <AppLayout
             breadcrumbs={[
                 { title: 'Korisnici', href: '/admin/users' },
-                { title: 'Uredi', href: `/admin/users/${user.id}/edit` },
+                { title: user.name, href: `/admin/users/${user.id}/edit` },
             ]}
         >
-            <Head title="Uredi korisnika" />
-            <div className="max-w-xl space-y-4 p-6">
-                <h1 className="text-2xl font-semibold">Uredi korisnika</h1>
+            <Head title={`Uredi: ${user.name}`} />
+            <FormCard
+                title={`Uredi korisnika — ${user.name}`}
+                description="Izmjeni ulogu, identitet i (za učenike) eDnevnik podatke."
+                icon={UserCog}
+                backHref="/admin/users"
+                backLabel="Nazad na listu korisnika"
+                sidebar={
+                    <div className="bg-muted/30 rounded-xl border p-4 text-sm">
+                        <h3 className="mb-2 font-medium">Trenutni podaci</h3>
+                        <dl className="text-muted-foreground space-y-1 text-xs">
+                            <div className="flex justify-between gap-2">
+                                <dt>ID</dt>
+                                <dd className="font-mono">#{user.id}</dd>
+                            </div>
+                            <div className="flex justify-between gap-2">
+                                <dt>Email</dt>
+                                <dd className="truncate font-mono">
+                                    {user.email}
+                                </dd>
+                            </div>
+                            <div className="flex justify-between gap-2">
+                                <dt>Uloga</dt>
+                                <dd className="font-medium">
+                                    {roles.find((r) => r.value === user.role)
+                                        ?.label ?? user.role}
+                                </dd>
+                            </div>
+                            {user.school && (
+                                <div className="flex justify-between gap-2">
+                                    <dt>Škola</dt>
+                                    <dd className="truncate text-right">
+                                        {user.school.name}
+                                    </dd>
+                                </div>
+                            )}
+                        </dl>
+                        <p className="text-muted-foreground mt-3 text-xs leading-relaxed">
+                            Promjena uloge može uticati na audit log i prava
+                            pristupa. Lozinka se mijenja zasebno kroz „Postavke
+                            sigurnosti".
+                        </p>
+                    </div>
+                }
+            >
                 <Form
                     action={`/admin/users/${user.id}`}
                     method="put"
-                    className="flex flex-col gap-4"
+                    className="contents"
                 >
-                    {({ errors }) => (
+                    {({ errors, processing }) => (
                         <>
-                            <div className="grid gap-2">
-                                <Label>Uloga</Label>
-                                <select
-                                    name="role"
-                                    value={role}
-                                    onChange={(e) => setRole(e.target.value)}
-                                    className="border-input bg-background h-9 rounded-md border px-3 text-sm"
+                            <FormCardBody>
+                                <FormSection
+                                    title="Tip naloga"
+                                    description="Pažljivo — promjena uloge mijenja sve pristupe."
                                 >
-                                    {roles.map((r) => (
-                                        <option key={r.value} value={r.value}>
-                                            {r.label}
-                                        </option>
-                                    ))}
-                                </select>
-                                <InputError message={errors.role} />
-                            </div>
-                            <div className="grid gap-2">
-                                <Label htmlFor="name">Ime</Label>
-                                <Input
-                                    id="name"
-                                    name="name"
-                                    defaultValue={user.name}
-                                    required
-                                />
-                                <InputError message={errors.name} />
-                            </div>
-                            <div className="grid gap-2">
-                                <Label htmlFor="email">Email</Label>
-                                <Input
-                                    id="email"
-                                    name="email"
-                                    type="email"
-                                    defaultValue={user.email}
-                                    required
-                                />
-                                <InputError message={errors.email} />
-                            </div>
-                            {role !== 'admin' && (
-                                <div className="grid gap-2">
-                                    <Label htmlFor="school_id">Škola</Label>
-                                    <select
-                                        id="school_id"
-                                        name="school_id"
-                                        defaultValue={user.school?.id ?? ''}
-                                        className="border-input bg-background h-9 rounded-md border px-3 text-sm"
-                                        required
-                                    >
-                                        <option value="">— odaberi —</option>
-                                        {schools.map((s) => (
-                                            <option key={s.id} value={s.id}>
-                                                {s.name}
-                                            </option>
-                                        ))}
-                                    </select>
-                                    <InputError message={errors.school_id} />
-                                </div>
-                            )}
-                            {role === 'student' && (
-                                <>
-                                    <div className="grid gap-2">
-                                        <Label htmlFor="jmb">JMB</Label>
-                                        <Input
-                                            id="jmb"
-                                            name="jmb"
-                                            defaultValue={user.jmb ?? ''}
-                                            pattern="\d{13}"
-                                            maxLength={13}
-                                        />
-                                        <InputError message={errors.jmb} />
-                                    </div>
-                                    <div className="grid gap-2">
-                                        <Label htmlFor="grade">Razred</Label>
-                                        <Input
-                                            id="grade"
-                                            name="grade"
-                                            defaultValue={user.grade ?? ''}
-                                        />
-                                        <InputError message={errors.grade} />
-                                    </div>
-                                    <div className="grid gap-2">
-                                        <Label htmlFor="birth_date">
-                                            Datum rođenja
-                                        </Label>
-                                        <Input
-                                            id="birth_date"
-                                            name="birth_date"
-                                            type="date"
-                                            defaultValue={
-                                                user.birth_date?.slice(0, 10) ??
-                                                ''
+                                    <FormField>
+                                        <Label htmlFor="role">Uloga</Label>
+                                        <NativeSelect
+                                            id="role"
+                                            name="role"
+                                            value={role}
+                                            onChange={(e) =>
+                                                setRole(e.target.value)
                                             }
-                                        />
-                                        <InputError
-                                            message={errors.birth_date}
-                                        />
-                                    </div>
-                                </>
-                            )}
-                            <Button type="submit">Sačuvaj</Button>
+                                        >
+                                            {roles.map((r) => (
+                                                <option
+                                                    key={r.value}
+                                                    value={r.value}
+                                                >
+                                                    {r.label}
+                                                </option>
+                                            ))}
+                                        </NativeSelect>
+                                        <InputError message={errors.role} />
+                                    </FormField>
+                                </FormSection>
+
+                                <FormSection
+                                    title="Identitet"
+                                    description="Ime se prikazuje u svim listama. Email mora biti jedinstven."
+                                >
+                                    <FormGrid cols={2}>
+                                        <FormField>
+                                            <Label htmlFor="name">
+                                                Ime i prezime
+                                            </Label>
+                                            <Input
+                                                id="name"
+                                                name="name"
+                                                defaultValue={user.name}
+                                                required
+                                            />
+                                            <InputError message={errors.name} />
+                                        </FormField>
+                                        <FormField>
+                                            <Label htmlFor="email">Email</Label>
+                                            <Input
+                                                id="email"
+                                                name="email"
+                                                type="email"
+                                                defaultValue={user.email}
+                                                required
+                                            />
+                                            <InputError
+                                                message={errors.email}
+                                            />
+                                        </FormField>
+                                    </FormGrid>
+                                </FormSection>
+
+                                {role !== 'admin' && (
+                                    <FormSection
+                                        title="Škola"
+                                        description="Profesori vide samo učenike iz svoje škole."
+                                    >
+                                        <FormField>
+                                            <Label htmlFor="school_id">
+                                                Škola
+                                            </Label>
+                                            <NativeSelect
+                                                id="school_id"
+                                                name="school_id"
+                                                defaultValue={
+                                                    user.school?.id ?? ''
+                                                }
+                                                required
+                                            >
+                                                <option value="" disabled>
+                                                    — odaberi —
+                                                </option>
+                                                {schools.map((s) => (
+                                                    <option
+                                                        key={s.id}
+                                                        value={s.id}
+                                                    >
+                                                        {s.name} ({s.code})
+                                                    </option>
+                                                ))}
+                                            </NativeSelect>
+                                            <InputError
+                                                message={errors.school_id}
+                                            />
+                                        </FormField>
+                                    </FormSection>
+                                )}
+
+                                {role === 'student' && (
+                                    <FormSection
+                                        title="Učenički podaci"
+                                        description="Promjena JMB-a resetuje eDnevnik verifikaciju."
+                                    >
+                                        <FormGrid cols={2}>
+                                            <FormField>
+                                                <Label htmlFor="jmb">JMB</Label>
+                                                <Input
+                                                    id="jmb"
+                                                    name="jmb"
+                                                    defaultValue={
+                                                        user.jmb ?? ''
+                                                    }
+                                                    pattern="\d{13}"
+                                                    maxLength={13}
+                                                />
+                                                <FormHint>13 cifara</FormHint>
+                                                <InputError
+                                                    message={errors.jmb}
+                                                />
+                                            </FormField>
+                                            <FormField>
+                                                <Label htmlFor="grade">
+                                                    Razred
+                                                </Label>
+                                                <Input
+                                                    id="grade"
+                                                    name="grade"
+                                                    defaultValue={
+                                                        user.grade ?? ''
+                                                    }
+                                                />
+                                                <FormHint>npr. 8-2</FormHint>
+                                                <InputError
+                                                    message={errors.grade}
+                                                />
+                                            </FormField>
+                                        </FormGrid>
+                                        <FormField>
+                                            <Label htmlFor="birth_date">
+                                                Datum rođenja
+                                            </Label>
+                                            <Input
+                                                id="birth_date"
+                                                name="birth_date"
+                                                type="date"
+                                                defaultValue={
+                                                    user.birth_date?.slice(
+                                                        0,
+                                                        10,
+                                                    ) ?? ''
+                                                }
+                                            />
+                                            <InputError
+                                                message={errors.birth_date}
+                                            />
+                                        </FormField>
+                                    </FormSection>
+                                )}
+                            </FormCardBody>
+
+                            <FormCardFooter>
+                                <Button
+                                    asChild
+                                    variant="ghost"
+                                    type="button"
+                                >
+                                    <Link href="/admin/users">Otkaži</Link>
+                                </Button>
+                                <Button type="submit" disabled={processing}>
+                                    {processing
+                                        ? 'Čuvanje…'
+                                        : 'Sačuvaj izmjene'}
+                                </Button>
+                            </FormCardFooter>
                         </>
                     )}
                 </Form>
-            </div>
+            </FormCard>
         </AppLayout>
     );
 }
