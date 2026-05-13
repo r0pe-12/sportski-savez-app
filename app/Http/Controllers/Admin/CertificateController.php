@@ -44,6 +44,7 @@ class CertificateController extends Controller
                 fn ($q2) => $q2->where('school_id', $v),
             ))
             ->orderByDesc('created_at')
+            ->orderByDesc('id')
             ->paginate(25)
             ->withQueryString();
 
