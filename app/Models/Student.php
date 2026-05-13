@@ -7,6 +7,7 @@ use App\Enums\UserRole;
 use Database\Factories\StudentFactory;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Student extends User
 {
@@ -27,5 +28,11 @@ class Student extends User
             $student->role = UserRole::Student;
             $student->verification_status ??= StudentVerificationStatus::Unverified;
         });
+    }
+
+    /** @return HasMany<TeamMember, $this> */
+    public function teamMemberships(): HasMany
+    {
+        return $this->hasMany(TeamMember::class, 'student_id');
     }
 }
