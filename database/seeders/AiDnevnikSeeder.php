@@ -949,6 +949,48 @@ Planirani redoslijed izvršavanja u ovoj sesiji:
 - **80/80 Pest testova PASS, 246 assertion-a**
 - Sva 11 modela iz spec sekcije 7 postoje
 - `ai_dnevnik_sesije` netaknut (17 sesija ostalo)
+
+### Prompt 3 — Phase 1 paralelno završeno
+
+**Tri implementer subagent-a paralelno** (background dispatch) u zasebnim worktree-ima:
+
+**T1.1 — Auth + Korisnici + UI shell** (worktree `../sportski-savez-app-t1.1`, branch `feature/t1.1-auth-korisnici-ui-shell`):
+- 13 commitova (`16a3112..19efed4`)
+- UC1 (registracija profesor+učenik), UC2 (login role-redirect), UC7 (admin user+school CRUD)
+- `EnsureUserHasRole` middleware, `LoginResponse` (role-based redirect), `CreateNewUser` (role-aware sa school+JMB+parental_consent)
+- `UserPolicy`+`SchoolPolicy` per spec 13.4 matrix
+- Inertia share `auth.user.role/school` + `notifications.unread_count`
+- Admin sidebar / professor+student header layouts
+- 34 nova testa
+
+**T1.2 — Sportovi + raspored** (worktree `../sportski-savez-app-t1.2`):
+- 7 commitova (`ab6f8f8..fe34453`)
+- UC9 admin CRUD nad sportovima + takmičenjima (`role:admin` middleware)
+- Cache layer (`sports.active`, `competitions.upcoming` — 1h TTL, observer invalidira)
+- `SportPolicy` + `CompetitionPolicy`
+- 17 novih testova
+
+**T1.3 — Cross-cutting infra** (worktree `../sportski-savez-app-t1.3`):
+- 6 commitova (`e78d5b4..9a3325a`)
+- `AuditLogger` service (real, sinhrono u `audit_log`)
+- `OcrAdapter` contract + `FakeOcrAdapter` (filename konvencija)
+- `EDnevnikAdapter` contract + `FakeEDnevnikAdapter` (deterministic by JMB)
+- `PrivateFileStorage` (UUID paths, signed URL-ovi)
+- Notification infra (mark-as-read route, `NotificationBell`, Inertia share)
+- `AuditLogEntryPolicy` (append-only — admin read, niko UPDATE/DELETE)
+- 21 novih testova
+
+**Merge na main** (sekvencijalno radi rješavanja stub-zamjena):
+1. T1.1 prvi (clean merge, 114/114 testova)
+2. T1.3 drugi — 3 konflikta: `AuditLogger.php` (T1.1 stub vs T1.3 real → uzeo T1.3), `HandleInertiaRequests.php` (kombinacija — auth.user detail + notifications), `AppServiceProvider.php` (use kombinovan)
+3. T1.2 treći — 4 konflikta: `AuditLogger.php`+`EnsureUserHasRole.php` (oba main verzija jer T1.2 imao samo stubove), `AppServiceProvider.php` (dodao `configureObservers()` Sport+Competition), `app-sidebar.tsx` (lucide icons + nav items kombinovan)
+
+**Finalni status na `main`:**
+- 26 commitova ukupno (5 F1 + 14 F2 + 13 T1.1 + 6 T1.3 + 7 T1.2 + 3 merge + pint cleanup)
+- **152/152 Pest testova PASS, 433 assertion-a**
+- `npm run build` clean (Wayfinder regenerated svih kontrolera)
+- Pint clean (sa final cleanup commit `0e4d2bc`)
+- Sva 3 worktree-a obrisana, sva 3 feature branch obrisana
 OUTPUT_18,
                 'odluke' => <<<'ODLUKE_18'
 ### Prompt 1
@@ -965,6 +1007,14 @@ OUTPUT_18,
 - Spec compliance verifikovan post-hoc (git log + model file count + test green) umjesto formal reviewer subagenta — F2 plan je već bio mostly implemented u prethodnim sesijama (Tasks 1-12), ova sesija je samo dovršila Task 13 (DatabaseSeeder orchestration) i Task 14 (DomainModelTest)
 - TeamSeeder deviation: `Str::uuid5` zamijenjeno deterministic md5-based UUID (Laravel verzija signature mismatch), isti intent — idempotent
 - **Phase 1 počinje:** 3 paralelna worktree-a za T1.1, T1.2, T1.3
+
+### Prompt 3
+- **Worktree setup:** kopiran `database/database.sqlite` + `.env` u svaki, paralelno `composer install` + `npm install` + `npm run build`
+- **Subagent ograničenja:** svaki subagent imao striktan CRITICAL RULES set (nikad migrate:fresh, nikad pisati u ai_dnevnik_sesije, ne dirati `app/Models/*`, ne dirati tuđe route fajlove, naming engleski tehnički)
+- **Stub coordination:** T1.1 i T1.2 oba kreirali `EnsureUserHasRole` i `AuditLogger` stubove (jer T1.3 nije bio mergovan). T1.3 merge ih je zamijenio. Plan je predvideo (T1.1 Task 1.5, T1.2 Task 0).
+- **Test caching gotcha:** posle T1.1 merge-a `php artisan test` je dao 11 fails (admin.users.* 404). Razlog: route cache. `php artisan route:clear` riješio.
+- **Vite manifest gotcha:** posle T1.2 merge 3 fail (admin/competitions/index.tsx). Razlog: nove TSX stranice. `npm run build` riješio.
+- **Subagent deviation tracking:** sva 3 reportovali deviations razumno (T1.3 — restoreDiacritics helper za FakeOcrAdapter, private disk URL config; T1.1 — STI policy Gate registration, parental_consent validation rule; T1.2 — controller+UI combined commits radi Vite test stability).
 ODLUKE_18,
                 'ishod' => <<<'ISHOD_18'
 ### Prompt 1
@@ -972,6 +1022,11 @@ U toku — sesija upravo započinje. Sledeći koraci: aktivacija skills + start 
 
 ### Prompt 2
 Phase 0 (F1 + F2) potpuno završen. 14 F2 commitova + 5 F1 commitova na `main`. 80/80 testova PASS. Spremno za Phase 1 paralelne track-ove.
+
+### Prompt 3
+**Phase 1 100% završen.** Sve od plana implementirano + verifikovano + mergovano u main. 152/152 testova prolaze. Spremno za Phase 2 (7 paralelnih track-ova).
+
+Sljedeći korak: Phase 2 worktree-i i subagent dispatch za T2.1a (Team form), T2.1b (OCR pipeline), T2.1c (Submit), T2.2 (eDnevnik), T2.3 (Rezultati), T2.4 (Profil), T2.5 (Public raspored).
 ISHOD_18,
             ],
         ];
