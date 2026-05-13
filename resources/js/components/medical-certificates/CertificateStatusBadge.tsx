@@ -1,4 +1,5 @@
-import { AlertTriangle, Archive, Check, Clock, Eye, X, type LucideIcon } from 'lucide-react';
+import { AlertTriangle, Archive, Check, Clock, Eye, X  } from 'lucide-react';
+import type {LucideIcon} from 'lucide-react';
 
 type StatusKey = 'pending' | 'valid' | 'expired' | 'invalid' | 'manual_review' | 'superseded';
 

@@ -1,7 +1,6 @@
 import { Form, Head, Link } from '@inertiajs/react';
 import { UserPlus } from 'lucide-react';
 import { useState } from 'react';
-import InputError from '@/components/input-error';
 import {
     FormCard,
     FormCardBody,
@@ -13,6 +12,7 @@ import {
     FormHint,
     FormSection,
 } from '@/components/forms/form-section';
+import InputError from '@/components/input-error';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';

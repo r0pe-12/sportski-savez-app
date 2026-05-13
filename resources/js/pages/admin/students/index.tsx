@@ -1,9 +1,9 @@
+import { Head, Link, router } from '@inertiajs/react';
+import { useEffect, useRef, useState } from 'react';
 import { VerificationStatusBadge } from '@/components/students/verification-status-badge';
 import { Input } from '@/components/ui/input';
 import { NativeSelect } from '@/components/ui/native-select';
 import AppLayout from '@/layouts/app-layout';
-import { Head, Link, router } from '@inertiajs/react';
-import { useEffect, useRef, useState } from 'react';
 
 type Student = {
     id: number;
@@ -54,9 +54,11 @@ function applyFilters(next: Partial<Filters>, current: Filters) {
     if (q) {
         params.q = q;
     }
+
     if (schoolId) {
         params.school_id = schoolId;
     }
+
     if (status) {
         params.status = status;
     }
@@ -76,14 +78,17 @@ export default function StudentsAdminIndex({ students, schools, filters }: Props
     useEffect(() => {
         if (firstRender.current) {
             firstRender.current = false;
+
             return;
         }
 
         const handle = setTimeout(() => {
             const trimmed = searchValue.trim();
+
             if (trimmed === lastApplied.current) {
                 return;
             }
+
             lastApplied.current = trimmed;
             applyFilters({ q: trimmed || null }, filters);
         }, 300);

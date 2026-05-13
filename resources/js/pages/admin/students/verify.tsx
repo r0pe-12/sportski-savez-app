@@ -1,8 +1,8 @@
+import { Head, router } from '@inertiajs/react';
 import { MismatchTable } from '@/components/students/mismatch-table';
 import { VerificationStatusBadge } from '@/components/students/verification-status-badge';
 import { Button } from '@/components/ui/button';
 import AppLayout from '@/layouts/app-layout';
-import { Head, router } from '@inertiajs/react';
 
 type Student = {
     id: number;

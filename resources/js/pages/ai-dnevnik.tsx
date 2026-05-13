@@ -1,7 +1,8 @@
 import { Head } from '@inertiajs/react';
-import { Fragment, useEffect, useState, type ReactNode } from 'react';
-import { Card, CardContent, CardHeader } from '@/components/ui/card';
+import { Fragment, useEffect, useState  } from 'react';
+import type {ReactNode} from 'react';
 import { Badge } from '@/components/ui/badge';
+import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 interface Sesija {
@@ -61,15 +62,18 @@ type VrstaId = (typeof VRSTE)[number]['id'];
 
 function formatDatum(iso: string): string {
     const d = new Date(iso);
+
     return d.toLocaleDateString('sr-Latn-ME', { day: '2-digit', month: '2-digit', year: 'numeric' });
 }
 
 function renderInline(text: string): ReactNode[] {
     const tokens = text.split(/(\*\*[^*]+\*\*|`[^`]+`)/g);
+
     return tokens.map((token, idx) => {
         if (token.startsWith('**') && token.endsWith('**')) {
             return <strong key={idx} className="font-semibold text-foreground">{token.slice(2, -2)}</strong>;
         }
+
         if (token.startsWith('`') && token.endsWith('`')) {
             return (
                 <code key={idx} className="rounded bg-muted px-1.5 py-0.5 text-[0.85em] font-mono">
@@ -77,6 +81,7 @@ function renderInline(text: string): ReactNode[] {
                 </code>
             );
         }
+
         return <Fragment key={idx}>{token}</Fragment>;
     });
 }
@@ -88,7 +93,10 @@ function MarkdownText({ text }: { text: string }) {
     let list: string[] = [];
 
     const flushParagraph = () => {
-        if (paragraph.length === 0) return;
+        if (paragraph.length === 0) {
+return;
+}
+
         blocks.push(
             <p key={`p-${blocks.length}`} className="text-sm leading-relaxed">
                 {renderInline(paragraph.join(' '))}
@@ -98,7 +106,10 @@ function MarkdownText({ text }: { text: string }) {
     };
 
     const flushList = () => {
-        if (list.length === 0) return;
+        if (list.length === 0) {
+return;
+}
+
         blocks.push(
             <ul key={`ul-${blocks.length}`} className="list-disc space-y-1 pl-5 text-sm leading-relaxed">
                 {list.map((item, idx) => (
@@ -111,12 +122,15 @@ function MarkdownText({ text }: { text: string }) {
 
     for (const raw of lines) {
         const line = raw.trim();
+
         if (line === '') {
             flushParagraph();
             flushList();
             continue;
         }
+
         const heading = line.match(/^#{1,6}\s+(.*)$/);
+
         if (heading) {
             flushParagraph();
             flushList();
@@ -127,20 +141,26 @@ function MarkdownText({ text }: { text: string }) {
             );
             continue;
         }
+
         const listItem = line.match(/^[-*]\s+(.*)$/);
+
         if (listItem) {
             flushParagraph();
             list.push(listItem[1]);
             continue;
         }
+
         const numbered = line.match(/^\d+\.\s+(.*)$/);
+
         if (numbered) {
             flushParagraph();
             list.push(numbered[1]);
             continue;
         }
+
         paragraph.push(line);
     }
+
     flushParagraph();
     flushList();
 
@@ -149,14 +169,20 @@ function MarkdownText({ text }: { text: string }) {
 
 function slugFazu(faza: string): string {
     const broj = faza.match(/Faza (\d+)/)?.[1];
+
     return broj ? `faza-${broj}` : faza.toLowerCase().replace(/\s+/g, '-');
 }
 
 function parseHash(hash: string): { vrsta: VrstaId; faza?: string } {
     const clean = hash.replace(/^#/, '');
-    if (!clean) return { vrsta: 'uvod' };
+
+    if (!clean) {
+return { vrsta: 'uvod' };
+}
+
     const [vrstaPart, fazaPart] = clean.split('/');
     const vrsta = (VRSTE.find((v) => v.id === vrstaPart)?.id ?? 'uvod') as VrstaId;
+
     return { vrsta, faza: fazaPart };
 }
 
@@ -168,11 +194,14 @@ export default function AiDnevnik({ fazeSaSesijama }: { fazeSaSesijama: FazeSaSe
     const [aktivnaFaza, setAktivnaFaza] = useState<string>(fazaSlugovi[0]?.slug ?? 'faza-1');
 
     useEffect(() => {
-        if (typeof window === 'undefined') return;
+        if (typeof window === 'undefined') {
+return;
+}
 
         const sync = () => {
             const { vrsta, faza } = parseHash(window.location.hash);
             setAktivnaVrsta(vrsta);
+
             if (faza && fazaSlugovi.some((f) => f.slug === faza)) {
                 setAktivnaFaza(faza);
             }
@@ -180,12 +209,17 @@ export default function AiDnevnik({ fazeSaSesijama }: { fazeSaSesijama: FazeSaSe
 
         sync();
         window.addEventListener('hashchange', sync);
+
         return () => window.removeEventListener('hashchange', sync);
     }, [fazaSlugovi]);
 
     const updateHash = (vrsta: VrstaId, faza?: string) => {
-        if (typeof window === 'undefined') return;
+        if (typeof window === 'undefined') {
+return;
+}
+
         const newHash = vrsta === 'sesije' && faza ? `#sesije/${faza}` : `#${vrsta}`;
+
         if (window.location.hash !== newHash) {
             history.replaceState(null, '', newHash);
         }
@@ -302,6 +336,7 @@ export default function AiDnevnik({ fazeSaSesijama }: { fazeSaSesijama: FazeSaSe
                                 <TabsList className="h-auto p-1 w-full sm:w-auto grid grid-cols-1 sm:inline-flex sm:flex-wrap gap-1">
                                     {fazaSlugovi.map(({ kljuc, slug }) => {
                                         const broj = kljuc.match(/Faza (\d+)/)?.[1] ?? '?';
+
                                         return (
                                             <TabsTrigger
                                                 key={slug}

@@ -79,7 +79,10 @@ function MemberRow({ teamId, member, canEdit }: RowProps) {
 
     const handleFile = (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
-        if (!file) return;
+
+        if (!file) {
+return;
+}
 
         setUploading(true);
         router.post(
@@ -96,6 +99,7 @@ function MemberRow({ teamId, member, canEdit }: RowProps) {
                 },
                 onFinish: () => {
                     setUploading(false);
+
                     if (fileInputRef.current) {
                         fileInputRef.current.value = '';
                     }
@@ -105,14 +109,20 @@ function MemberRow({ teamId, member, canEdit }: RowProps) {
     };
 
     const handleRemoveMember = () => {
-        if (!confirm(`Ukloni ${member.student.name} iz ekipe?`)) return;
+        if (!confirm(`Ukloni ${member.student.name} iz ekipe?`)) {
+return;
+}
+
         router.delete(`/teams/${teamId}/members/${member.id}`, {
             preserveScroll: true,
         });
     };
 
     const handleRemoveCert = () => {
-        if (!confirm('Ukloni potvrdu? Učenik će biti bez potvrde.')) return;
+        if (!confirm('Ukloni potvrdu? Učenik će biti bez potvrde.')) {
+return;
+}
+
         router.delete(`/teams/${teamId}/members/${member.id}/certificate`, {
             preserveScroll: true,
         });

@@ -1,5 +1,5 @@
-import AppLayout from '@/layouts/app-layout';
 import { Head } from '@inertiajs/react';
+import AppLayout from '@/layouts/app-layout';
 
 type Team = {
     id: number;

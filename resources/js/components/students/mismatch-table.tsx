@@ -10,6 +10,7 @@ const labels: Record<string, string> = {
 
 export function MismatchTable({ mismatches }: { mismatches: Mismatches }) {
     const keys = Object.keys(mismatches);
+
     if (keys.length === 0) {
         return null;
     }

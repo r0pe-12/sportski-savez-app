@@ -127,6 +127,7 @@ function formatRelativeDate(iso: string | null): string {
     if (!iso) {
         return '—';
     }
+
     try {
         return new Date(iso).toLocaleString('sr-Latn-ME', {
             day: '2-digit',

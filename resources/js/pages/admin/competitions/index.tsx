@@ -1,11 +1,10 @@
+import { Head, Link, router } from '@inertiajs/react';
+import { Award, Pencil, Trash2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { NativeSelect } from '@/components/ui/native-select';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import AppLayout from '@/layouts/app-layout';
 import { cn } from '@/lib/utils';
-import { Head, Link, router } from '@inertiajs/react';
-import { Award, Pencil, Trash2 } from 'lucide-react';
-import { useEffect, useState } from 'react';
 
 type CompetitionRow = {
     id: number;
@@ -56,21 +55,27 @@ const STATUS_META: Record<string, { label: string; className: string }> = {
 function formatDateRange(start: string, end: string): string {
     const startDate = new Date(start);
     const endDate = new Date(end);
+
     if (Number.isNaN(startDate.getTime()) || Number.isNaN(endDate.getTime())) {
         return `${start} – ${end}`;
     }
+
     const opts: Intl.DateTimeFormatOptions = { day: '2-digit', month: '2-digit', year: 'numeric' };
     const startFmt = startDate.toLocaleDateString('sr-Latn', opts);
     const endFmt = endDate.toLocaleDateString('sr-Latn', opts);
+
     if (startDate.getFullYear() === endDate.getFullYear()) {
         const startShort = startDate.toLocaleDateString('sr-Latn', { day: '2-digit', month: '2-digit' });
+
         return `${startShort}. – ${endFmt}`;
     }
+
     return `${startFmt} – ${endFmt}`;
 }
 
 function StatusBadge({ status }: { status: string }) {
     const meta = STATUS_META[status] ?? { label: status, className: 'bg-muted text-muted-foreground' };
+
     return (
         <span
             className={cn(
@@ -95,16 +100,10 @@ export default function CompetitionsIndex({
     const currentYear = new Date().getFullYear();
     const yearOptions = [currentYear - 2, currentYear - 1, currentYear, currentYear + 1, currentYear + 2];
 
-    const [status, setStatus] = useState<string>(filters.status ?? '');
-    const [sportId, setSportId] = useState<string>(filters.sport_id ? String(filters.sport_id) : '');
-    const [year, setYear] = useState<string>(filters.year ? String(filters.year) : '');
-
-    // Sync local state when server filter props change (e.g. after navigation).
-    useEffect(() => {
-        setStatus(filters.status ?? '');
-        setSportId(filters.sport_id ? String(filters.sport_id) : '');
-        setYear(filters.year ? String(filters.year) : '');
-    }, [filters.status, filters.sport_id, filters.year]);
+    // Filter values are driven directly by the server props — no local mirror state.
+    const status = filters.status ?? '';
+    const sportId = filters.sport_id ? String(filters.sport_id) : '';
+    const year = filters.year ? String(filters.year) : '';
 
     const applyFilters = (next: { status?: string; sport_id?: string; year?: string }) => {
         const merged = {
@@ -124,9 +123,6 @@ export default function CompetitionsIndex({
     };
 
     const resetFilters = () => {
-        setStatus('');
-        setSportId('');
-        setYear('');
         router.get('/admin/competitions', {}, { preserveScroll: true });
     };
 
@@ -160,10 +156,7 @@ export default function CompetitionsIndex({
                             <label className="text-muted-foreground text-xs">Status</label>
                             <NativeSelect
                                 value={status}
-                                onChange={(e) => {
-                                    setStatus(e.target.value);
-                                    applyFilters({ status: e.target.value });
-                                }}
+                                onChange={(e) => applyFilters({ status: e.target.value })}
                                 className="min-w-44"
                             >
                                 <option value="">Svi statusi</option>
@@ -178,10 +171,7 @@ export default function CompetitionsIndex({
                             <label className="text-muted-foreground text-xs">Sport</label>
                             <NativeSelect
                                 value={sportId}
-                                onChange={(e) => {
-                                    setSportId(e.target.value);
-                                    applyFilters({ sport_id: e.target.value });
-                                }}
+                                onChange={(e) => applyFilters({ sport_id: e.target.value })}
                                 className="min-w-44"
                             >
                                 <option value="">Svi sportovi</option>
@@ -197,10 +187,7 @@ export default function CompetitionsIndex({
                             <label className="text-muted-foreground text-xs">Godina</label>
                             <NativeSelect
                                 value={year}
-                                onChange={(e) => {
-                                    setYear(e.target.value);
-                                    applyFilters({ year: e.target.value });
-                                }}
+                                onChange={(e) => applyFilters({ year: e.target.value })}
                                 className="min-w-32"
                             >
                                 <option value="">Sve godine</option>

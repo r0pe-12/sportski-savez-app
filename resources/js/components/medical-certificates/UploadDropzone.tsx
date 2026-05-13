@@ -15,6 +15,7 @@ export function UploadDropzone({ teamId, memberId, onUploaded }: Props) {
     const handleFile = (file: File) => {
         if (file.size > 10 * 1024 * 1024) {
             alert('Fajl ne smije biti veći od 10 MB.');
+
             return;
         }
 
@@ -48,6 +49,7 @@ export function UploadDropzone({ teamId, memberId, onUploaded }: Props) {
                 className="hidden"
                 onChange={(e) => {
                     const file = e.target.files?.[0];
+
                     if (file) {
                         handleFile(file);
                     }

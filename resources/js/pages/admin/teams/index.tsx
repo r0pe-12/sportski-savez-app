@@ -1,6 +1,6 @@
+import { Head, Link, router } from '@inertiajs/react';
 import { NativeSelect } from '@/components/ui/native-select';
 import AppLayout from '@/layouts/app-layout';
-import { Head, Link, router } from '@inertiajs/react';
 
 type TeamRow = {
     id: number;
@@ -51,10 +51,13 @@ function formatDate(value: string | null): string {
     if (!value) {
         return '—';
     }
+
     const d = new Date(value);
+
     if (Number.isNaN(d.getTime())) {
         return '—';
     }
+
     const dd = String(d.getDate()).padStart(2, '0');
     const mm = String(d.getMonth() + 1).padStart(2, '0');
     const yyyy = d.getFullYear();
@@ -72,9 +75,11 @@ function applyFilters(next: Partial<Filters>, current: Filters) {
     if (status) {
         merged.status = status;
     }
+
     if (competitionId) {
         merged.competition_id = competitionId;
     }
+
     if (schoolId) {
         merged.school_id = schoolId;
     }

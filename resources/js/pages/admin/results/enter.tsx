@@ -1,8 +1,8 @@
+import { Head, router } from '@inertiajs/react';
+import { useState } from 'react';
 import { ResultEntryRow } from '@/components/results/ResultEntryRow';
 import { Button } from '@/components/ui/button';
 import AppLayout from '@/layouts/app-layout';
-import { Head, router } from '@inertiajs/react';
-import { useState } from 'react';
 
 type Competition = { id: number; name: string; sport: { name: string; type: string } };
 

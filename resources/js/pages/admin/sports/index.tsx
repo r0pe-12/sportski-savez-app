@@ -1,7 +1,7 @@
+import { Head, Link, router } from '@inertiajs/react';
 import { SportTypeBadge } from '@/components/sports/SportTypeBadge';
 import { Button } from '@/components/ui/button';
 import AppLayout from '@/layouts/app-layout';
-import { Head, Link, router } from '@inertiajs/react';
 
 type SportRow = {
     id: number;

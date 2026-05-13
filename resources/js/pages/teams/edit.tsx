@@ -1,8 +1,8 @@
 import { Head, Link, router } from '@inertiajs/react';
-import AppLayout from '@/layouts/app-layout';
 import { StudentSelector } from '@/components/teams/StudentSelector';
 import { TeamMembersList } from '@/components/teams/TeamMembersList';
 import { Button } from '@/components/ui/button';
+import AppLayout from '@/layouts/app-layout';
 
 type TeamMember = {
     id: number;
@@ -37,6 +37,7 @@ export default function TeamsEdit({
         if (!confirm('Otkaži draft?')) {
             return;
         }
+
         router.delete(`/teams/${team.id}`);
     };
 

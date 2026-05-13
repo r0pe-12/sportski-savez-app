@@ -1,6 +1,6 @@
+import { Head } from '@inertiajs/react';
 import { SportCard } from '@/components/sports/SportCard';
 import AppLayout from '@/layouts/app-layout';
-import { Head } from '@inertiajs/react';
 
 type SportCardData = {
     id: number;

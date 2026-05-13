@@ -12,9 +12,9 @@ import {
     XCircle,
 } from 'lucide-react';
 import { useState } from 'react';
-import InputError from '@/components/input-error';
 import { FormCard, FormCardBody } from '@/components/forms/form-card';
 import { FormSection } from '@/components/forms/form-section';
+import InputError from '@/components/input-error';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
@@ -217,7 +217,10 @@ const verificationBadge: Record<
 };
 
 function formatDateTime(iso: string | null): string {
-    if (!iso) return '—';
+    if (!iso) {
+return '—';
+}
+
     try {
         return new Date(iso).toLocaleString('sr-Latn-ME', {
             day: '2-digit',
@@ -416,6 +419,7 @@ export default function AdminTeamsShow({
         ) {
             return;
         }
+
         router.post(`/admin/teams/${team.id}/approve`, undefined, {
             preserveScroll: true,
         });

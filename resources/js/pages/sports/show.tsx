@@ -1,6 +1,6 @@
+import { Head } from '@inertiajs/react';
 import { SportTypeBadge } from '@/components/sports/SportTypeBadge';
 import AppLayout from '@/layouts/app-layout';
-import { Head } from '@inertiajs/react';
 
 type Sport = {
     id: number;

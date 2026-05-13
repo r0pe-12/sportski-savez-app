@@ -1,10 +1,10 @@
 import { Form, Head } from '@inertiajs/react';
 import { useState } from 'react';
-import AppLayout from '@/layouts/app-layout';
 import InputError from '@/components/input-error';
 import { SportTypeBadge } from '@/components/sports/SportTypeBadge';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
+import AppLayout from '@/layouts/app-layout';
 
 type Competition = {
     id: number;

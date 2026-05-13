@@ -63,10 +63,13 @@ function formatDate(iso: string | null): string {
     if (!iso) {
         return '—';
     }
+
     const d = new Date(iso);
+
     if (Number.isNaN(d.getTime())) {
         return '—';
     }
+
     return d.toLocaleDateString('sr-Latn-ME', {
         year: 'numeric',
         month: '2-digit',
@@ -99,6 +102,7 @@ export default function AdminCertificatesIndex({
         if (!window.confirm('Odobriti sertifikat manuelno?')) {
             return;
         }
+
         router.post(
             `/admin/certificates/${id}/manual-approve`,
             {},
@@ -110,6 +114,7 @@ export default function AdminCertificatesIndex({
         if (!window.confirm('Označiti sertifikat kao nevalidan? Akcija se ne može poništiti.')) {
             return;
         }
+
         router.post(
             `/admin/certificates/${id}/reject`,
             {},
