@@ -1,0 +1,56 @@
+@startuml deployment-dijagram
+!theme plain
+title Deployment dijagram — dev (lokalno) vs prod (Laravel Cloud)
+
+node "Developer Workstation" as Dev <<dev>> {
+  artifact "PHP 8.3 CLI" as Php
+  artifact "Vite dev server (:5173)" as Vite
+  artifact "artisan serve (:8000)" as Serve
+  database "SQLite (database.sqlite)" as Sqlite
+  folder "storage/app/private" as DevStorage
+  folder "storage/logs/laravel.log (mail log)" as DevMail
+  artifact "queue:work (database driver)" as DevQ
+  artifact "FakeOcrAdapter (file-name)" as DevOcr
+  artifact "FakeEDnevnikAdapter (deterministic)" as DevEdn
+}
+
+cloud "Production — Laravel Cloud" as Prod <<prod>> {
+  node "Web tier (autoscaled)" {
+    artifact "Laravel app (PHP 8.3 FPM)" as Web
+    artifact "Inertia React (Vite build)" as Frontend
+  }
+  node "Worker tier (autoscaled)" {
+    artifact "queue:work (Redis driver)" as ProdQ
+  }
+  database "PostgreSQL managed + read replika" as Pg
+  database "Redis (cache + queue + sessions)" as Redis
+  artifact "Laravel Pulse + Sentry" as Monitor
+}
+
+cloud "Eksterni servisi (prod)" {
+  artifact "AWS S3 + versioning + 30day lifecycle" as S3
+  artifact "AWS SES" as SES
+  artifact "Google Vision API (rate-limited)" as Vision
+  artifact "eDnevnik HTTP API\n(Ministarstvo prosvjete)" as eDnevnik
+}
+
+actor "Profesor / Admin" as User
+
+User --> Dev : http://localhost:8000
+User --> Web : https://app.skolskisportcg.me
+Php --> Sqlite
+Php --> DevStorage
+Php --> DevMail
+DevQ --> DevOcr
+DevQ --> DevEdn
+
+Web --> Pg
+Web --> Redis
+Web --> S3
+Web --> SES
+ProdQ --> Redis
+ProdQ --> Vision : iza feature flag
+ProdQ --> eDnevnik : iza feature flag
+Monitor ..> Web
+
+@enduml
