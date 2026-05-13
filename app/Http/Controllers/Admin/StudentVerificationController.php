@@ -6,10 +6,12 @@ use App\Enums\StudentVerificationStatus;
 use App\Http\Controllers\Controller;
 use App\Jobs\VerifyStudentWithEDnevnikJob;
 use App\Models\AuditLogEntry;
+use App\Models\School;
 use App\Models\Student;
 use App\Services\AuditLogger;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -19,15 +21,43 @@ class StudentVerificationController extends Controller
 
     public function __construct(private AuditLogger $audit) {}
 
-    public function index(): Response
+    public function index(Request $request): Response
     {
         $this->authorize('viewAny', Student::class);
 
+        $q = trim($request->string('q')->toString());
+        $schoolId = $request->integer('school_id') ?: null;
+        $status = $request->string('status')->toString() ?: null;
+
+        $query = Student::with('school')
+            ->orderBy('verification_status')
+            ->orderBy('name');
+
+        if ($q !== '') {
+            $query->where(function ($w) use ($q): void {
+                $w->where('name', 'like', "%{$q}%")
+                    ->orWhere('jmb', 'like', "%{$q}%");
+            });
+        }
+
+        if ($schoolId !== null) {
+            $query->where('school_id', $schoolId);
+        }
+
+        if ($status !== null && StudentVerificationStatus::tryFrom($status) !== null) {
+            $query->where('verification_status', $status);
+        }
+
+        $students = $query->paginate(25)->withQueryString();
+
         return Inertia::render('admin/students/index', [
-            'students' => Student::with('school')
-                ->orderBy('verification_status')
-                ->orderBy('name')
-                ->paginate(50),
+            'students' => $students,
+            'schools' => School::orderBy('name')->get(['id', 'name']),
+            'filters' => [
+                'q' => $q !== '' ? $q : null,
+                'school_id' => $schoolId,
+                'status' => $status,
+            ],
         ]);
     }
 
