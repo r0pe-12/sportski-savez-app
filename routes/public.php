@@ -9,6 +9,7 @@
 
 use App\Http\Controllers\AiDnevnikController;
 use App\Http\Controllers\NotificationController;
+use App\Http\Controllers\ScheduleController;
 use Illuminate\Support\Facades\Route;
 use Laravel\Fortify\Features;
 
@@ -20,4 +21,9 @@ Route::get('/ai-dnevnik', [AiDnevnikController::class, 'show'])->name('ai-dnevni
 
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::post('/notifications/{id}/read', [NotificationController::class, 'markAsRead'])->name('notifications.read');
+});
+
+// T2.5 public schedule routes
+Route::middleware(['auth', 'verified'])->group(function () {
+    Route::get('schedule', [ScheduleController::class, 'index'])->name('schedule.index');
 });
