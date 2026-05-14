@@ -68,15 +68,21 @@ function parseInput(input: DateInput): Date | null {
 }
 
 function formatWithFallback(date: Date, opts: Intl.DateTimeFormatOptions): string {
-    for (const locale of DATE_LOCALES) {
+    // Provjeri da li bilo koji od željenih locale-ova zaista postoji u runtime-u.
+    // Intl.DateTimeFormat NE baca grešku za nepodržan locale — silently se
+    // prebaci na default (obično en-US sa formatom MM/DD/YYYY), pa moramo
+    // koristiti supportedLocalesOf prije nego ga koristimo.
+    const supported = Intl.DateTimeFormat.supportedLocalesOf(DATE_LOCALES as string[]);
+
+    if (supported.length > 0) {
         try {
-            return new Intl.DateTimeFormat(locale, opts).format(date);
+            return new Intl.DateTimeFormat(supported[0], opts).format(date);
         } catch {
-            // Probaj sljedeći locale.
+            // Padaj na ručno sastavljanje.
         }
     }
 
-    // Posljednji fallback — ručno sastavljanje.
+    // Ručno sastavljanje (CG/SR konvencija: DD.MM.YYYY. sa tačkom poslije godine).
     const dd = String(date.getDate()).padStart(2, '0');
     const mm = String(date.getMonth() + 1).padStart(2, '0');
     const yyyy = date.getFullYear();
@@ -88,7 +94,7 @@ function formatWithFallback(date: Date, opts: Intl.DateTimeFormatOptions): strin
         return `${dd}.${mm}.${yyyy}. ${hh}:${min}`;
     }
 
-    return `${dd}.${mm}.${yyyy}`;
+    return `${dd}.${mm}.${yyyy}.`;
 }
 
 /**
