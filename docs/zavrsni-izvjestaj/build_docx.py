@@ -94,26 +94,106 @@ def downshift_headings(md: str, by: int = 1) -> str:
     )
 
 
-def add_uml_embeds(md: str) -> str:
-    """U 02-projekat.md sekcija 8 (UML), embed-uj sve PNG-ove poslije reference tabele."""
-    # Naci sekciju "## 8. UML dijagrami" i ubaciti slike posle tabele
-    marker = "## 8. UML dijagrami"
+def replace_puml_with_image(md: str) -> str:
+    """
+    Zamijeni sve markdown linkove ka .puml fajlovima sa inline PNG image embed-om.
+
+    Pattern 1: [`uml/XX-name.puml`](uml/XX-name.puml)  → ![caption](uml/render/XX-name.png)
+    Pattern 2: [Anything](uml/XX-name.puml)            → ![caption](uml/render/XX-name.png)
+    Pattern 3: U tabelama (line items), ostavi NAZIV kao plain tekst i ubaci sliku ispod tabele.
+
+    Captions su iz UML_EMBEDS dict-a.
+    """
     new_md = md
-    if marker in md:
-        embeds = "\n\n"
-        for key, (caption, path) in UML_EMBEDS.items():
-            embeds += f"\n\n![{caption}]({path})\n\n*{caption}*\n"
-        # Insert AFTER the marker section's table (insert at the end of "## 8" section, before "## Diff" if exists)
-        # Just append all images right after the table block.
-        # Strategy: find marker, then find next "## " heading, insert before it
-        idx = md.find(marker)
-        next_h2 = md.find("\n## ", idx + len(marker))
-        if next_h2 == -1:
-            # Add at end
-            new_md = md + embeds
+
+    # Step 1: linkovi unutar tabela — zamijeni samo tekst, slike ćemo dodati posle tabele
+    # Match: [Label](uml/XX-name.puml) gdje god se desi
+    def table_link_replacer(m):
+        label = m.group(1)
+        return f"**{label}**"
+
+    # Detect table rows and strip links inside them
+    lines = new_md.split("\n")
+    out_lines = []
+    in_table = False
+    table_uml_keys: list[str] = []
+    for line in lines:
+        is_table_row = line.lstrip().startswith("|") and "|" in line.lstrip()[1:]
+        if is_table_row and not in_table:
+            in_table = True
+            table_uml_keys = []
+        if in_table:
+            # Find all puml links in this row
+            for m in re.finditer(r"\[([^\]]+)\]\(uml/([\w-]+)\.puml\)", line):
+                key = m.group(2)
+                if key in UML_EMBEDS and key not in table_uml_keys:
+                    table_uml_keys.append(key)
+            # Strip puml links to plain bold text
+            line = re.sub(r"\[([^\]]+)\]\(uml/[\w-]+\.puml\)", table_link_replacer, line)
+            out_lines.append(line)
+            continue
         else:
-            new_md = md[:next_h2] + embeds + md[next_h2:]
+            if in_table:
+                in_table = False
+                # Dump collected images after table
+                for key in table_uml_keys:
+                    caption, path = UML_EMBEDS[key]
+                    out_lines.append("")
+                    out_lines.append(f"![{caption}]({path})")
+                    out_lines.append("")
+                    out_lines.append(f"*{caption}*")
+                    out_lines.append("")
+                table_uml_keys = []
+        out_lines.append(line)
+
+    # Handle case where table is at end of file
+    if in_table and table_uml_keys:
+        for key in table_uml_keys:
+            caption, path = UML_EMBEDS[key]
+            out_lines.append("")
+            out_lines.append(f"![{caption}]({path})")
+            out_lines.append("")
+            out_lines.append(f"*{caption}*")
+            out_lines.append("")
+
+    new_md = "\n".join(out_lines)
+
+    # Step 2: in-prose .puml references — replace with inline image
+    # Match: [`uml/XX-name.puml`](uml/XX-name.puml)  (the code-styled label)
+    def code_link_replacer(m):
+        key = m.group(1)
+        if key in UML_EMBEDS:
+            caption, path = UML_EMBEDS[key]
+            return f"\n\n![{caption}]({path})\n\n*{caption}*\n"
+        return m.group(0)
+
+    new_md = re.sub(
+        r"\[`uml/([\w-]+)\.puml`\]\(uml/[\w-]+\.puml\)",
+        code_link_replacer,
+        new_md,
+    )
+
+    # Match remaining: [Label](uml/XX-name.puml)
+    def remaining_link_replacer(m):
+        label = m.group(1)
+        key = m.group(2)
+        if key in UML_EMBEDS:
+            caption, path = UML_EMBEDS[key]
+            return f"\n\n![{caption}]({path})\n\n*{caption}*\n"
+        return f"**{label}**"
+
+    new_md = re.sub(
+        r"\[([^\]]+)\]\(uml/([\w-]+)\.puml\)",
+        remaining_link_replacer,
+        new_md,
+    )
+
     return new_md
+
+
+def add_uml_embeds(md: str) -> str:
+    """Wrapper koji koristi replace_puml_with_image — zamijena umjesto append-a."""
+    return replace_puml_with_image(md)
 
 
 def add_demo_embeds(md: str) -> str:
@@ -145,25 +225,28 @@ def main():
     # Iz README izvuci samo prve dvije sekcije ("# Sistem..." i "## Executive summary")
     parts.append(section("Sažetak", "\n\n".join(readme.split("\n\n")[:6])))
 
-    # 1. Vizija i analiza
+    # 1. Vizija i analiza (sa UML embeds umjesto puml linkova)
     md = strip_blockquote_meta(read(HERE / "01-vizija-i-analiza.md"))
+    md = replace_puml_with_image(md)
     md = downshift_headings(md, 1)  # # → ##, ## → ###
     parts.append(section("Vizija i analiza", md))
 
-    # 2. Projekat (sa UML embeds)
+    # 2. Projekat (sa UML embeds umjesto puml linkova)
     md = strip_blockquote_meta(read(HERE / "02-projekat.md"))
     md = add_uml_embeds(md)
     md = downshift_headings(md, 1)
     parts.append(section("Projekat — arhitektura, tehnologije, UML", md))
 
-    # 3. Implementacija i demonstracija (sa demo screenshots)
+    # 3. Implementacija i demonstracija (sa demo screenshots + UML embeds)
     md = strip_blockquote_meta(read(HERE / "03-implementacija-demonstracija.md"))
+    md = replace_puml_with_image(md)
     md = add_demo_embeds(md)
     md = downshift_headings(md, 1)
     parts.append(section("Implementacija i demonstracija", md))
 
-    # 4. V&V + AI u SDLC
+    # 4. V&V + AI u SDLC (sa UML embeds umjesto puml linkova)
     md = strip_blockquote_meta(read(HERE / "04-vv-i-ai-u-sdlc.md"))
+    md = replace_puml_with_image(md)
     md = downshift_headings(md, 1)
     parts.append(section("Verifikacija, validacija i AI u SDLC", md))
 

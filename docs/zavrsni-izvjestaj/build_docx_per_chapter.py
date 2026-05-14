@@ -38,21 +38,109 @@ DEMO_EMBEDS = [
 ]
 
 
+# Mapping puml file name → (caption, PNG path)
+PUML_TO_IMAGE = {
+    "01-klasni-dijagram": ("Slika 1: Klasni dijagram — domain model", "uml/render/01-klasni-dijagram.png"),
+    "02-sequence-uc5": ("Slika 2: Sequence dijagram UC5 — async OCR upload + sync submit", "uml/render/02-sequence-uc5.png"),
+    "03-sequence-uc8": ("Slika 3: Sequence dijagram UC8 — eDnevnik verifikacija (3 grane)", "uml/render/03-sequence-uc8.png"),
+    "04-component-dijagram": ("Slika 4: Component dijagram — slojevita arhitektura", "uml/render/04-component-dijagram.png"),
+    "05-package-dijagram": ("Slika 5: Package dijagram — Laravel struktura", "uml/render/05-package-dijagram.png"),
+    "06-deployment-dijagram": ("Slika 6: Deployment dijagram — dev vs prod", "uml/render/06-deployment-dijagram.png"),
+}
+
+
+def replace_puml_with_image_inline(md: str) -> str:
+    """
+    Zamijeni linkove ka .puml fajlovima sa inline PNG image embed-om.
+    Linkove unutar tabela (| ... |) zamijeni samo bold tekstom da ne lomimo table layout.
+    """
+    lines = md.split("\n")
+    out_lines = []
+    in_table = False
+    table_uml_keys: list[str] = []
+
+    for line in lines:
+        is_table_row = line.lstrip().startswith("|") and "|" in line.lstrip()[1:]
+        if is_table_row:
+            if not in_table:
+                in_table = True
+                table_uml_keys = []
+            # Find all puml links in this row, collect for after-table embedding
+            for m in re.finditer(r"\[([^\]]+)\]\(uml/([\w-]+)\.puml\)", line):
+                key = m.group(2)
+                if key in PUML_TO_IMAGE and key not in table_uml_keys:
+                    table_uml_keys.append(key)
+            # Strip puml links to plain bold text
+            line = re.sub(
+                r"\[([^\]]+)\]\(uml/[\w-]+\.puml\)",
+                lambda m: f"**{m.group(1)}**",
+                line,
+            )
+            out_lines.append(line)
+        else:
+            if in_table:
+                # End of table — dump collected images
+                in_table = False
+                for key in table_uml_keys:
+                    caption, path = PUML_TO_IMAGE[key]
+                    out_lines.append("")
+                    out_lines.append(f"![{caption}]({path})")
+                    out_lines.append("")
+                    out_lines.append(f"*{caption}*")
+                    out_lines.append("")
+                table_uml_keys = []
+
+            # Out-of-table line: replace puml refs with images inline
+            def code_repl(m):
+                key = m.group(1)
+                if key in PUML_TO_IMAGE:
+                    caption, path = PUML_TO_IMAGE[key]
+                    return f"\n\n![{caption}]({path})\n\n*{caption}*\n"
+                return m.group(0)
+
+            line = re.sub(r"\[`uml/([\w-]+)\.puml`\]\(uml/[\w-]+\.puml\)", code_repl, line)
+
+            def gen_repl(m):
+                label = m.group(1)
+                key = m.group(2)
+                if key in PUML_TO_IMAGE:
+                    caption, path = PUML_TO_IMAGE[key]
+                    return f"\n\n![{caption}]({path})\n\n*{caption}*\n"
+                return f"**{label}**"
+
+            line = re.sub(r"\[([^\]]+)\]\(uml/([\w-]+)\.puml\)", gen_repl, line)
+            out_lines.append(line)
+
+    # Table at end of file
+    if in_table and table_uml_keys:
+        for key in table_uml_keys:
+            caption, path = PUML_TO_IMAGE[key]
+            out_lines.append("")
+            out_lines.append(f"![{caption}]({path})")
+            out_lines.append("")
+            out_lines.append(f"*{caption}*")
+            out_lines.append("")
+
+    return "\n".join(out_lines)
+
+
 def strip_cross_refs(md: str) -> str:
-    """Ukloni linkove ka relativnim .md / .puml fajlovima — ostavi samo tekst."""
-    # [text](relativni/path.md) ili [text](path.puml) → "text"
-    # Keep external URLs (http/https) and image embeds (start sa !)
+    """
+    Ukloni linkove ka relativnim .md / .puml fajlovima.
+    PUML linkovi → inline PNG image embed.
+    Ostali relativni → samo tekst.
+    """
+    # Step 1: replace puml links with image embeds inline
+    md = replace_puml_with_image_inline(md)
+
+    # Step 2: ostatak relativnih linkova → plain tekst
     def replace(m):
         text = m.group(1)
         target = m.group(2)
-        # Eksterni URL → keep ko link
         if target.startswith(('http://', 'https://')):
             return m.group(0)
-        # Relativni path → samo tekst
         return text
 
-    # Match [text](target) but NOT ![alt](img)
-    # Negative lookbehind za '!' da preskočimo image embed-ove
     md = re.sub(r'(?<!\!)\[([^\]]+)\]\(([^)]+)\)', replace, md)
     return md
 
@@ -142,8 +230,9 @@ def main():
     convert(HERE / "01-vizija-i-analiza.md", HERE / "01-vizija-i-analiza.docx",
             resource_path=HERE)
 
+    # 02-projekat: UML images su sad embed-ovani inline preko replace_puml_with_image_inline
+    # u strip_cross_refs, pa ne treba dodatni add_image_section.
     convert(HERE / "02-projekat.md", HERE / "02-projekat.docx",
-            transform=lambda md: add_image_section(md, "## 8. UML dijagrami", UML_EMBEDS),
             resource_path=HERE)
 
     convert(HERE / "03-implementacija-demonstracija.md", HERE / "03-implementacija-demonstracija.docx",
