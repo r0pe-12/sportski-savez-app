@@ -18,6 +18,9 @@ class ScheduleController extends Controller
 
         $key = 'schedule.public.'.md5(serialize([$sportId, $status]));
 
+        // VAŽNO: cache ne smije čuvati Eloquent Collection objekat (serialize/deserialize
+        // problem sa __PHP_Incomplete_Class kad se klase ne učitaju u određenim
+        // request-ima). Konvertuj u plain array prije caching-a.
         $competitions = Cache::remember($key, now()->addMinutes(5), function () use ($sportId, $status) {
             $q = Competition::with('sport')
                 ->withCount('teams')
@@ -30,7 +33,22 @@ class ScheduleController extends Controller
                 $q->where('status', $status);
             }
 
-            return $q->get();
+            return $q->get()->map(fn (Competition $c): array => [
+                'id' => $c->id,
+                'slug' => $c->slug,
+                'name' => $c->name,
+                'start_date' => $c->start_date?->toIso8601String(),
+                'end_date' => $c->end_date?->toIso8601String(),
+                'location' => $c->location,
+                'status' => $c->status->value,
+                'year' => $c->year,
+                'teams_count' => $c->teams_count,
+                'sport' => $c->sport ? [
+                    'id' => $c->sport->id,
+                    'name' => $c->sport->name,
+                    'type' => $c->sport->type->value,
+                ] : null,
+            ])->all();
         });
 
         return Inertia::render('schedule/index', [
