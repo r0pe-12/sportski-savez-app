@@ -54,10 +54,11 @@ export default function TeamsReview({ team }: { team: Team }) {
     const { auth } = usePage<SharedData>().props;
     const userName = auth?.user?.name ?? '';
 
-    const allValid = team.members.every((m) => m.medical_certificate?.status === 'valid');
+    const safeMembers = team.members ?? [];
+    const allValid = safeMembers.every((m) => m.medical_certificate?.status === 'valid');
     const minMembers = team.competition.sport.members_count;
     const maxMembers = minMembers + team.competition.sport.substitutes_count;
-    const inRange = team.members.length >= minMembers && team.members.length <= maxMembers;
+    const inRange = safeMembers.length >= minMembers && safeMembers.length <= maxMembers;
     const canSubmit = allValid && inRange && team.status === 'draft';
 
     return (
@@ -80,9 +81,9 @@ export default function TeamsReview({ team }: { team: Team }) {
                 </section>
 
                 <section>
-                    <h3 className="mb-2 text-sm font-medium">Članovi ({team.members.length})</h3>
+                    <h3 className="mb-2 text-sm font-medium">Članovi ({safeMembers.length})</h3>
                     <ul className="space-y-2">
-                        {team.members.map((m) => (
+                        {safeMembers.map((m) => (
                             <li
                                 key={m.id}
                                 className="flex items-center justify-between rounded border p-3"
@@ -108,7 +109,7 @@ export default function TeamsReview({ team }: { team: Team }) {
                             {!allValid && <li>Svi članovi moraju imati validnu ljekarsku potvrdu.</li>}
                             {!inRange && (
                                 <li>
-                                    Broj članova ({team.members.length}) mora biti između {minMembers} i {maxMembers}.
+                                    Broj članova ({safeMembers.length}) mora biti između {minMembers} i {maxMembers}.
                                 </li>
                             )}
                             {team.status !== 'draft' && (

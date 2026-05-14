@@ -69,7 +69,7 @@ export default function ScheduleIndex({
         setStatus('');
     };
 
-    const sportOptions: SelectFieldOption[] = sports.map((s) => ({
+    const sportOptions: SelectFieldOption[] = (sports ?? []).map((s) => ({
         value: String(s.id),
         label: s.name,
     }));
@@ -107,11 +107,11 @@ export default function ScheduleIndex({
                 </FilterBar>
 
                 <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-                    {competitions.map((c) => (
+                    {(competitions ?? []).map((c) => (
                         <CompetitionCard key={c.id} competition={c} />
                     ))}
                 </div>
-                {competitions.length === 0 && (
+                {(competitions ?? []).length === 0 && (
                     <p className="text-muted-foreground">
                         {hasActiveFilters
                             ? 'Nema rezultata sa primijenjenim filterima.'

@@ -58,7 +58,7 @@ export default function CompetitionsEdit({
     const [sportId, setSportId] = useState(String(competition.sport_id));
     const [status, setStatus] = useState(competition.status);
 
-    const sportOptions: SelectFieldOption[] = sports.map((s) => ({
+    const sportOptions: SelectFieldOption[] = (sports ?? []).map((s) => ({
         value: String(s.id),
         label: s.name,
     }));
@@ -99,7 +99,7 @@ export default function CompetitionsEdit({
                                 <dt>Sport</dt>
                                 <dd>
                                     {
-                                        sports.find(
+                                        (sports ?? []).find(
                                             (s) => s.id === competition.sport_id,
                                         )?.name
                                     }

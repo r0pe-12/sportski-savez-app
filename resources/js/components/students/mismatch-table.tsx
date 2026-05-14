@@ -9,7 +9,8 @@ const labels: Record<string, string> = {
 };
 
 export function MismatchTable({ mismatches }: { mismatches: Mismatches }) {
-    const keys = Object.keys(mismatches);
+    const safeMismatches = mismatches ?? {};
+    const keys = Object.keys(safeMismatches);
 
     if (keys.length === 0) {
         return null;
@@ -29,8 +30,8 @@ export function MismatchTable({ mismatches }: { mismatches: Mismatches }) {
                     {keys.map((key) => (
                         <tr key={key} className="border-t">
                             <td className="p-2 font-medium">{labels[key] ?? key}</td>
-                            <td className="p-2">{mismatches[key].local}</td>
-                            <td className="p-2 text-amber-700">{mismatches[key].remote}</td>
+                            <td className="p-2">{safeMismatches[key].local}</td>
+                            <td className="p-2 text-amber-700">{safeMismatches[key].remote}</td>
                         </tr>
                     ))}
                 </tbody>

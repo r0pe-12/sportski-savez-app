@@ -114,8 +114,8 @@ export default function TwoFactorRecoveryCodes({
                                     role="list"
                                     aria-label="Recovery codes"
                                 >
-                                    {recoveryCodesList.length ? (
-                                        recoveryCodesList.map((code, index) => (
+                                    {(recoveryCodesList ?? []).length ? (
+                                        (recoveryCodesList ?? []).map((code, index) => (
                                             <div
                                                 key={index}
                                                 role="listitem"

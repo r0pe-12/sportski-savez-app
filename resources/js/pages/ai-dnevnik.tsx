@@ -182,7 +182,8 @@ return { vrsta: 'uvod' };
 }
 
 export default function AiDnevnik({ fazeSaSesijama }: { fazeSaSesijama: FazeSaSesijama }) {
-    const fazeKljucevi = Object.keys(fazeSaSesijama);
+    const safeFazeSaSesijama = fazeSaSesijama ?? {};
+    const fazeKljucevi = Object.keys(safeFazeSaSesijama);
     const fazaSlugovi = fazeKljucevi.map((f) => ({ kljuc: f, slug: slugFazu(f) }));
 
     const [aktivnaVrsta, setAktivnaVrsta] = useState<VrstaId>('uvod');
@@ -231,7 +232,7 @@ return;
         updateHash('sesije', faza);
     };
 
-    const ukupanBrojSesija = fazeKljucevi.reduce((sum, faza) => sum + fazeSaSesijama[faza].length, 0);
+    const ukupanBrojSesija = fazeKljucevi.reduce((sum, faza) => sum + (safeFazeSaSesijama[faza] ?? []).length, 0);
 
     return (
         <>
@@ -340,7 +341,7 @@ return;
                                             >
                                                 <span className="font-semibold">Faza {broj}</span>
                                                 <Badge variant="secondary" className="text-[10px] px-1.5 py-0 h-4">
-                                                    {fazeSaSesijama[kljuc].length}
+                                                    {(safeFazeSaSesijama[kljuc] ?? []).length}
                                                 </Badge>
                                             </TabsTrigger>
                                         );
@@ -352,7 +353,7 @@ return;
                                         <div className="rounded-lg border-l-4 border-primary bg-muted/30 px-4 py-2">
                                             <h3 className="text-base font-semibold">{kljuc}</h3>
                                         </div>
-                                        {fazeSaSesijama[kljuc].map((sesija) => (
+                                        {(safeFazeSaSesijama[kljuc] ?? []).map((sesija) => (
                                             <Card key={sesija.id} className="overflow-hidden">
                                                 <CardHeader>
                                                     <div className="flex flex-wrap items-center gap-3">

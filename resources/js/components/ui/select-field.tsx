@@ -98,10 +98,10 @@ export function SelectField({
 
     const renderItems = () => {
         if (groups) {
-            return groups.map((group, idx) => (
+            return (groups ?? []).map((group, idx) => (
                 <SelectGroup key={`group-${idx}-${group.label ?? 'unnamed'}`}>
                     {group.label && <SelectLabel>{group.label}</SelectLabel>}
-                    {group.options.map((opt) => (
+                    {(group.options ?? []).map((opt) => (
                         <SelectItem
                             key={opt.value}
                             value={opt.value}

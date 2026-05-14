@@ -35,7 +35,7 @@ export default function TeamsIndex({ teams }: { teams: Page }) {
                 </div>
 
                 <div className="grid gap-3 sm:grid-cols-2">
-                    {teams.data.map((t) => (
+                    {(teams?.data ?? []).map((t) => (
                         <Link
                             key={t.id}
                             href={`/teams/${t.id}/edit`}
@@ -53,7 +53,7 @@ export default function TeamsIndex({ teams }: { teams: Page }) {
                         </Link>
                     ))}
                 </div>
-                {teams.data.length === 0 && (
+                {(teams?.data ?? []).length === 0 && (
                     <p className="text-muted-foreground">Još nema prijavljenih ekipa.</p>
                 )}
             </div>

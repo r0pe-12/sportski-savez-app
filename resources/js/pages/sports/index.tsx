@@ -18,7 +18,7 @@ export default function SportsPublic({ sports }: { sports: SportCardData[] }) {
             <div className="space-y-4 p-6">
                 <h1 className="text-2xl font-semibold">Katalog sportova</h1>
                 <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-                    {sports.map((s) => (
+                    {(sports ?? []).map((s) => (
                         <SportCard key={s.id} sport={s} />
                     ))}
                 </div>

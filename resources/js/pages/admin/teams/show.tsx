@@ -350,7 +350,9 @@ function MemberRow({ member }: { member: Member }) {
 }
 
 function AuditHistoryList({ entries }: { entries: AuditEntry[] }) {
-    if (entries.length === 0) {
+    const safeEntries = entries ?? [];
+
+    if (safeEntries.length === 0) {
         return (
             <div className="text-muted-foreground rounded-lg border border-dashed p-4 text-center text-sm">
                 Nema audit zapisa za ovu ekipu.
@@ -360,7 +362,7 @@ function AuditHistoryList({ entries }: { entries: AuditEntry[] }) {
 
     return (
         <ul className="space-y-2">
-            {entries.map((entry) => (
+            {safeEntries.map((entry) => (
                 <li
                     key={entry.id}
                     className="flex flex-col gap-1 rounded-lg border p-3 text-sm sm:flex-row sm:items-center sm:justify-between"
@@ -457,16 +459,16 @@ export default function AdminTeamsShow({
                     )}
 
                     <FormSection
-                        title={`Članovi (${team.members.length})`}
+                        title={`Članovi (${(team.members ?? []).length})`}
                         description="Per-učenik status medicinske potvrde i eDnevnik provjere."
                     >
-                        {team.members.length === 0 ? (
+                        {(team.members ?? []).length === 0 ? (
                             <div className="text-muted-foreground rounded-lg border border-dashed p-6 text-center text-sm">
                                 Ekipa nema članova.
                             </div>
                         ) : (
                             <div className="space-y-2">
-                                {team.members.map((m) => (
+                                {(team.members ?? []).map((m) => (
                                     <MemberRow key={m.id} member={m} />
                                 ))}
                             </div>

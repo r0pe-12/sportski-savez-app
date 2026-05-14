@@ -24,9 +24,10 @@ type Competition = {
 
 export default function TeamsCreate({ competitions }: { competitions: Competition[] }) {
     const [selectedId, setSelectedId] = useState<string>('');
-    const selected = competitions.find((c) => String(c.id) === selectedId);
+    const safeCompetitions = competitions ?? [];
+    const selected = safeCompetitions.find((c) => String(c.id) === selectedId);
 
-    const competitionOptions: SelectFieldOption[] = competitions.map((c) => ({
+    const competitionOptions: SelectFieldOption[] = safeCompetitions.map((c) => ({
         value: String(c.id),
         label: c.name,
         description: `${c.sport.name} · ${formatDate(c.start_date) || c.start_date}`,

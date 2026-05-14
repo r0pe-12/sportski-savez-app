@@ -111,7 +111,9 @@ export default function AdminCertificatesIndex({
         );
     };
 
-    const isEmpty = certificates.data.length === 0;
+    const safeData = certificates?.data ?? [];
+    const safeLinks = certificates?.links ?? [];
+    const isEmpty = safeData.length === 0;
 
     return (
         <AppLayout
@@ -146,7 +148,7 @@ export default function AdminCertificatesIndex({
                         value={local.status === 'all' ? '' : local.status}
                         onChange={(v) => apply({ status: v || 'all' })}
                         options={
-                            statuses.map((s) => ({
+                            (statuses ?? []).map((s) => ({
                                 value: s.value,
                                 label: statusLabelMap[s.value] ?? s.label,
                             })) as SelectFieldOption[]
@@ -160,7 +162,7 @@ export default function AdminCertificatesIndex({
                         onChange={(v) =>
                             apply({ school_id: v === '' ? '' : Number(v) })
                         }
-                        options={schools.map((s) => ({
+                        options={(schools ?? []).map((s) => ({
                             value: String(s.id),
                             label: s.name,
                         }))}
@@ -194,7 +196,7 @@ export default function AdminCertificatesIndex({
                                 </tr>
                             </thead>
                             <tbody>
-                                {certificates.data.map((c) => {
+                                {safeData.map((c) => {
                                     const member = c.team_member;
                                     const student = member?.student;
                                     const team = member?.team;
@@ -276,7 +278,7 @@ export default function AdminCertificatesIndex({
 
                 {!isEmpty && (
                     <div className="flex flex-wrap items-center gap-2 text-sm">
-                        {certificates.links.map((l, i) =>
+                        {safeLinks.map((l, i) =>
                             l.url ? (
                                 <Link
                                     key={i}

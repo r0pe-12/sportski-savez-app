@@ -78,7 +78,7 @@ export default function UsersEdit({
                             <div className="flex justify-between gap-2">
                                 <dt>Uloga</dt>
                                 <dd className="font-medium">
-                                    {roles.find((r) => r.value === user.role)
+                                    {(roles ?? []).find((r) => r.value === user.role)
                                         ?.label ?? user.role}
                                 </dd>
                             </div>
@@ -118,7 +118,7 @@ export default function UsersEdit({
                                             label="Uloga"
                                             value={role}
                                             onChange={setRole}
-                                            options={roles.map((r) => ({
+                                            options={(roles ?? []).map((r) => ({
                                                 value: r.value,
                                                 label: r.label,
                                             }))}
@@ -175,7 +175,7 @@ export default function UsersEdit({
                                                 placeholder="Odaberi školu…"
                                                 value={schoolId}
                                                 onChange={setSchoolId}
-                                                options={schools.map((s) => ({
+                                                options={(schools ?? []).map((s) => ({
                                                     value: String(s.id),
                                                     label: s.name,
                                                     description: s.code,

@@ -60,14 +60,14 @@ export default function AuditLogIndex({ entries, filters, users }: Props) {
                             </tr>
                         </thead>
                         <tbody>
-                            {entries.data.length === 0 && (
+                            {(entries?.data ?? []).length === 0 && (
                                 <tr>
                                     <td colSpan={6} className="p-4 text-center text-sm text-muted-foreground">
                                         Nema zapisa za odabrane filtere.
                                     </td>
                                 </tr>
                             )}
-                            {entries.data.map((e) => (
+                            {(entries?.data ?? []).map((e) => (
                                 <tr key={e.id} className="border-t">
                                     <td className="p-2 text-xs">{formatDateTime(e.created_at)}</td>
                                     <td className="p-2">
@@ -90,7 +90,7 @@ export default function AuditLogIndex({ entries, filters, users }: Props) {
                 </div>
 
                 <div className="flex flex-wrap items-center gap-2 text-sm">
-                    {entries.links.map((l, i) =>
+                    {(entries?.links ?? []).map((l, i) =>
                         l.url ? (
                             <Link
                                 key={i}

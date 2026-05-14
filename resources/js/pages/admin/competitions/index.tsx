@@ -125,7 +125,8 @@ export default function CompetitionsIndex({
         }
     };
 
-    const total = competitions.total ?? competitions.data.length;
+    const safeData = competitions?.data ?? [];
+    const total = competitions?.total ?? safeData.length;
     const hasActiveFilters = Boolean(status || sportId || year);
 
     const STATUS_OPTIONS: SelectFieldOption[] = [
@@ -135,12 +136,12 @@ export default function CompetitionsIndex({
         { value: 'completed', label: 'Završeno' },
     ];
 
-    const sportOptions: SelectFieldOption[] = sports.map((s) => ({
+    const sportOptions: SelectFieldOption[] = (sports ?? []).map((s) => ({
         value: String(s.id),
         label: s.name,
     }));
 
-    const yearOptionsList: SelectFieldOption[] = yearOptions.map((y) => ({
+    const yearOptionsList: SelectFieldOption[] = (yearOptions ?? []).map((y) => ({
         value: String(y),
         label: String(y),
     }));
@@ -202,7 +203,7 @@ export default function CompetitionsIndex({
                                 </tr>
                             </thead>
                             <tbody>
-                                {competitions.data.length === 0 ? (
+                                {safeData.length === 0 ? (
                                     <tr>
                                         <td colSpan={6} className="text-muted-foreground p-6 text-center">
                                             {hasActiveFilters
@@ -211,7 +212,7 @@ export default function CompetitionsIndex({
                                         </td>
                                     </tr>
                                 ) : (
-                                    competitions.data.map((c) => (
+                                    safeData.map((c) => (
                                         <tr key={c.id} className="border-t">
                                             <td className="p-2 font-medium">{c.name}</td>
                                             <td className="p-2">{c.sport.name}</td>

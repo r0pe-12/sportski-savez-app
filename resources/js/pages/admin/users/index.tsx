@@ -50,7 +50,7 @@ export default function UsersIndex({ users }: { users: Page }) {
                             </tr>
                         </thead>
                         <tbody>
-                            {users.data.map((u) => (
+                            {(users?.data ?? []).map((u) => (
                                 <tr key={u.id} className="border-t">
                                     <td className="p-2">{u.name}</td>
                                     <td className="p-2">{u.email}</td>

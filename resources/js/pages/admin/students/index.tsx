@@ -108,7 +108,7 @@ export default function StudentsAdminIndex({ students, schools, filters }: Props
         router.get(window.location.pathname, {}, { preserveScroll: true, replace: true });
     };
 
-    const schoolOptions: SelectFieldOption[] = schools.map((s) => ({
+    const schoolOptions: SelectFieldOption[] = (schools ?? []).map((s) => ({
         value: String(s.id),
         label: s.name,
     }));
@@ -195,7 +195,7 @@ export default function StudentsAdminIndex({ students, schools, filters }: Props
                             </tr>
                         </thead>
                         <tbody>
-                            {students.data.map((s) => (
+                            {(students?.data ?? []).map((s) => (
                                 <tr key={s.id} className="border-t">
                                     <td className="p-2">{s.name}</td>
                                     <td className="p-2 font-mono text-xs">{s.jmb}</td>
@@ -214,7 +214,7 @@ export default function StudentsAdminIndex({ students, schools, filters }: Props
                                     </td>
                                 </tr>
                             ))}
-                            {students.data.length === 0 && (
+                            {(students?.data ?? []).length === 0 && (
                                 <tr>
                                     <td
                                         colSpan={6}
@@ -230,9 +230,9 @@ export default function StudentsAdminIndex({ students, schools, filters }: Props
                     </table>
                 </div>
 
-                {students.last_page > 1 && (
+                {(students?.last_page ?? 0) > 1 && (
                     <div className="flex items-center gap-2">
-                        {students.links.map((link, idx) => (
+                        {(students?.links ?? []).map((link, idx) => (
                             <button
                                 key={`${link.label}-${idx}`}
                                 type="button"

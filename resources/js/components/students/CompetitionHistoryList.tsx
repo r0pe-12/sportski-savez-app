@@ -34,7 +34,9 @@ export function CompetitionHistoryList({
 }: {
     history: HistoryEntry[];
 }) {
-    if (history.length === 0) {
+    const safeHistory = history ?? [];
+
+    if (safeHistory.length === 0) {
         return (
             <p className="text-sm text-muted-foreground">Još nema učešća.</p>
         );
@@ -42,7 +44,7 @@ export function CompetitionHistoryList({
 
     return (
         <ul className="space-y-2">
-            {history.map((h) => (
+            {safeHistory.map((h) => (
                 <li
                     key={h.team_id}
                     className="flex items-center justify-between gap-3 rounded border p-3"

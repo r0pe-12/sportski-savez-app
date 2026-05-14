@@ -80,25 +80,27 @@ export function MultiSelect({
     const wrapperRef = useRef<HTMLDivElement>(null);
     const inputRef = useRef<HTMLInputElement>(null);
 
-    const valueSet = useMemo(() => new Set(value), [value]);
+    const safeOptions = options ?? [];
+    const safeValue = value ?? [];
+    const valueSet = useMemo(() => new Set(safeValue), [safeValue]);
     const selectedOptions = useMemo(
-        () => options.filter((o) => valueSet.has(o.value)),
-        [options, valueSet],
+        () => safeOptions.filter((o) => valueSet.has(o.value)),
+        [safeOptions, valueSet],
     );
 
     const normalizedQuery = query.trim().toLowerCase();
     const filteredOptions = useMemo(() => {
         if (!normalizedQuery) {
-            return options;
+            return safeOptions;
         }
 
-        return options.filter((o) => {
+        return safeOptions.filter((o) => {
             const haystack = (o.searchText ?? o.label).toLowerCase();
             const descMatch = o.description?.toLowerCase().includes(normalizedQuery);
 
             return haystack.includes(normalizedQuery) || Boolean(descMatch);
         });
-    }, [options, normalizedQuery]);
+    }, [safeOptions, normalizedQuery]);
 
     useEffect(() => {
         if (!open) {
@@ -142,27 +144,27 @@ export function MultiSelect({
 
     const toggle = (val: string) => {
         if (valueSet.has(val)) {
-            onChange(value.filter((v) => v !== val));
+            onChange(safeValue.filter((v) => v !== val));
 
             return;
         }
 
-        if (typeof max === 'number' && value.length >= max) {
+        if (typeof max === 'number' && safeValue.length >= max) {
             return;
         }
 
-        onChange([...value, val]);
+        onChange([...safeValue, val]);
     };
 
     const handleRemoveChip = (val: string, e: React.MouseEvent) => {
         e.stopPropagation();
-        onChange(value.filter((v) => v !== val));
+        onChange(safeValue.filter((v) => v !== val));
     };
 
     const handleSearchKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-        if (e.key === 'Backspace' && query === '' && value.length > 0) {
+        if (e.key === 'Backspace' && query === '' && safeValue.length > 0) {
             // Remove last chip.
-            onChange(value.slice(0, -1));
+            onChange(safeValue.slice(0, -1));
         }
     };
 
@@ -171,7 +173,7 @@ export function MultiSelect({
         onChange([]);
     };
 
-    const limitReached = typeof max === 'number' && value.length >= max;
+    const limitReached = typeof max === 'number' && safeValue.length >= max;
 
     return (
         <div ref={wrapperRef} className={cn('relative', className)}>
@@ -193,11 +195,11 @@ export function MultiSelect({
                 )}
             >
                 <div className="flex flex-1 flex-wrap items-center gap-1">
-                    {value.length === 0 && (
+                    {safeValue.length === 0 && (
                         <span className="text-muted-foreground">{placeholder}</span>
                     )}
                     {showChips &&
-                        selectedOptions.map((opt) => (
+                        (selectedOptions ?? []).map((opt) => (
                             <span
                                 key={opt.value}
                                 className="bg-accent text-accent-foreground inline-flex max-w-[160px] items-center gap-1 rounded-md px-2 py-0.5 text-xs"
@@ -214,14 +216,14 @@ export function MultiSelect({
                                 </button>
                             </span>
                         ))}
-                    {!showChips && value.length > 0 && (
+                    {!showChips && safeValue.length > 0 && (
                         <span>
-                            {value.length} odabrano{value.length === 1 ? '' : 'h'}
+                            {safeValue.length} odabrano{safeValue.length === 1 ? '' : 'h'}
                         </span>
                     )}
                 </div>
                 <div className="flex shrink-0 items-center gap-1">
-                    {value.length > 0 && !disabled && (
+                    {safeValue.length > 0 && !disabled && (
                         <span
                             role="button"
                             tabIndex={-1}
@@ -264,12 +266,12 @@ export function MultiSelect({
                         </div>
                     </div>
                     <div className="max-h-64 overflow-y-auto p-1">
-                        {filteredOptions.length === 0 ? (
+                        {(filteredOptions ?? []).length === 0 ? (
                             <p className="text-muted-foreground p-3 text-center text-xs">
                                 {emptyText}
                             </p>
                         ) : (
-                            filteredOptions.map((opt) => {
+                            (filteredOptions ?? []).map((opt) => {
                                 const isSelected = valueSet.has(opt.value);
                                 const isDisabled =
                                     opt.disabled || (limitReached && !isSelected);
@@ -313,7 +315,7 @@ export function MultiSelect({
                     </div>
                     {typeof max === 'number' && (
                         <div className="text-muted-foreground border-t px-3 py-1.5 text-xs">
-                            {value.length} / {max} odabrano
+                            {safeValue.length} / {max} odabrano
                         </div>
                     )}
                 </div>

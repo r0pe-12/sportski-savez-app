@@ -36,7 +36,7 @@ type Props = {
 };
 
 export default function ResultsEnter({ competition, subjects, existing, subjectType }: Props) {
-    const initial: Row[] = subjects.map((s) => {
+    const initial: Row[] = (subjects ?? []).map((s) => {
         const key = `${subjectType === 'Team' ? 'App\\Models\\Team' : 'App\\Models\\TeamMember'}:${s.id}`;
         const ex = existing[key];
         const label = subjectType === 'Team'

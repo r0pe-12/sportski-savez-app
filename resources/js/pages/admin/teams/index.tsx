@@ -93,12 +93,12 @@ export default function AdminTeamsIndex({ teams, competitions, schools, filters 
         router.get(window.location.pathname, {}, { preserveScroll: true, replace: true });
     };
 
-    const competitionOptions: SelectFieldOption[] = competitions.map((c) => ({
+    const competitionOptions: SelectFieldOption[] = (competitions ?? []).map((c) => ({
         value: String(c.id),
         label: c.name,
     }));
 
-    const schoolOptions: SelectFieldOption[] = schools.map((s) => ({
+    const schoolOptions: SelectFieldOption[] = (schools ?? []).map((s) => ({
         value: String(s.id),
         label: s.name,
     }));
@@ -177,7 +177,7 @@ export default function AdminTeamsIndex({ teams, competitions, schools, filters 
                             </tr>
                         </thead>
                         <tbody>
-                            {teams.data.map((t) => {
+                            {(teams?.data ?? []).map((t) => {
                                 const meta = statusLabels[t.status] ?? {
                                     label: t.status,
                                     className: 'bg-zinc-100 text-zinc-800',
@@ -207,7 +207,7 @@ export default function AdminTeamsIndex({ teams, competitions, schools, filters 
                                     </tr>
                                 );
                             })}
-                            {teams.data.length === 0 && (
+                            {(teams?.data ?? []).length === 0 && (
                                 <tr>
                                     <td
                                         colSpan={6}
@@ -223,9 +223,9 @@ export default function AdminTeamsIndex({ teams, competitions, schools, filters 
                     </table>
                 </div>
 
-                {teams.last_page > 1 && (
+                {(teams?.last_page ?? 0) > 1 && (
                     <div className="flex items-center gap-2">
-                        {teams.links.map((link, idx) => (
+                        {(teams?.links ?? []).map((link, idx) => (
                             <button
                                 key={`${link.label}-${idx}`}
                                 type="button"

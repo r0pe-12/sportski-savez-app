@@ -231,7 +231,9 @@ export function TeamMembersList({
     members: Member[];
     canEdit: boolean;
 }) {
-    if (members.length === 0) {
+    const safeMembers = members ?? [];
+
+    if (safeMembers.length === 0) {
         return (
             <div className="text-muted-foreground rounded-lg border border-dashed p-6 text-center text-sm">
                 Nema članova. Dodaj učenika ispod.
@@ -241,7 +243,7 @@ export function TeamMembersList({
 
     return (
         <div className="space-y-2">
-            {members.map((m) => (
+            {safeMembers.map((m) => (
                 <MemberRow
                     key={m.id}
                     teamId={teamId}

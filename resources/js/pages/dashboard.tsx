@@ -217,14 +217,14 @@ function AdminDashboard({
                         </CardTitle>
                     </CardHeader>
                     <CardContent>
-                        {pending.submittedTeams.length === 0 ? (
+                        {(pending.submittedTeams ?? []).length === 0 ? (
                             <EmptyState
                                 icon={ClipboardList}
                                 text="Nema ekipa koje čekaju odobrenje."
                             />
                         ) : (
                             <ul className="divide-y">
-                                {pending.submittedTeams.map((team) => (
+                                {(pending.submittedTeams ?? []).map((team) => (
                                     <li
                                         key={team.id}
                                         className="flex items-center justify-between py-2 text-sm"
@@ -263,14 +263,14 @@ function AdminDashboard({
                         </CardTitle>
                     </CardHeader>
                     <CardContent>
-                        {pending.manualCertificates.length === 0 ? (
+                        {(pending.manualCertificates ?? []).length === 0 ? (
                             <EmptyState
                                 icon={FileCheck2}
                                 text="Nema potvrda za ručnu provjeru."
                             />
                         ) : (
                             <ul className="divide-y">
-                                {pending.manualCertificates.map((cert) => (
+                                {(pending.manualCertificates ?? []).map((cert) => (
                                     <li
                                         key={cert.id}
                                         className="flex items-center justify-between py-2 text-sm"
@@ -308,14 +308,14 @@ function AdminDashboard({
                     </CardTitle>
                 </CardHeader>
                 <CardContent>
-                    {pending.mismatchedStudents.length === 0 ? (
+                    {(pending.mismatchedStudents ?? []).length === 0 ? (
                         <EmptyState
                             icon={GraduationCap}
                             text="Nema neusklađenih učenika."
                         />
                     ) : (
                         <ul className="divide-y">
-                            {pending.mismatchedStudents.map((student) => (
+                            {(pending.mismatchedStudents ?? []).map((student) => (
                                 <li
                                     key={student.id}
                                     className="flex items-center justify-between py-2 text-sm"
@@ -358,14 +358,14 @@ function AdminDashboard({
                     </CardTitle>
                 </CardHeader>
                 <CardContent>
-                    {recentAudit.length === 0 ? (
+                    {(recentAudit ?? []).length === 0 ? (
                         <EmptyState
                             icon={ScrollText}
                             text="Nema audit zapisa."
                         />
                     ) : (
                         <ul className="divide-y">
-                            {recentAudit.map((entry) => (
+                            {(recentAudit ?? []).map((entry) => (
                                 <li
                                     key={entry.id}
                                     className="flex items-center justify-between py-2 text-sm"

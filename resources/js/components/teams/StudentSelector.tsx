@@ -31,8 +31,9 @@ function getInitials(name: string): string {
 export function StudentSelector({ teamId, students, max }: Props) {
     const [selectedIds, setSelectedIds] = useState<string[]>([]);
     const [submitting, setSubmitting] = useState(false);
+    const safeStudents = students ?? [];
 
-    if (students.length === 0) {
+    if (safeStudents.length === 0) {
         return (
             <p className="text-muted-foreground rounded-md border bg-muted/30 p-3 text-sm">
                 Nema dostupnih učenika za dodavanje. Provjeri spisak učenika svoje
@@ -41,7 +42,7 @@ export function StudentSelector({ teamId, students, max }: Props) {
         );
     }
 
-    const options: MultiSelectOption[] = students.map((s) => ({
+    const options: MultiSelectOption[] = safeStudents.map((s) => ({
         value: String(s.id),
         label: s.name,
         description: `Razred ${s.grade}`,

@@ -113,6 +113,16 @@ export default function Welcome({
 }: WelcomeProps) {
     const { auth } = usePage<SharedData>().props;
     const isAuthenticated = Boolean(auth?.user);
+    const safeSports = sports ?? [];
+    const safeUpcoming = upcoming_competitions ?? [];
+    const safeStats: LandingStats = stats ?? {
+        schools: 0,
+        team_members: 0,
+        teams: 0,
+        competitions: 0,
+        results: 0,
+        certificates: 0,
+    };
 
     const features = [
         {
@@ -166,10 +176,10 @@ export default function Welcome({
     ] as const;
 
     const statCards = [
-        { label: 'Registrovanih škola', value: stats.schools, icon: School },
-        { label: 'Učesnika u ekipama', value: stats.team_members, icon: Users },
-        { label: 'Organizovanih takmičenja', value: stats.competitions, icon: Trophy },
-        { label: 'Evidentiranih rezultata', value: stats.results, icon: Medal },
+        { label: 'Registrovanih škola', value: safeStats.schools, icon: School },
+        { label: 'Učesnika u ekipama', value: safeStats.team_members, icon: Users },
+        { label: 'Organizovanih takmičenja', value: safeStats.competitions, icon: Trophy },
+        { label: 'Evidentiranih rezultata', value: safeStats.results, icon: Medal },
     ] as const;
 
     return (
@@ -287,19 +297,19 @@ export default function Welcome({
                                 <div>
                                     <dt className="text-xs font-medium text-slate-500 dark:text-slate-400">Sportova</dt>
                                     <dd className="mt-1 text-2xl font-bold text-slate-900 dark:text-white">
-                                        {formatCount(sports.length)}
+                                        {formatCount(safeSports.length)}
                                     </dd>
                                 </div>
                                 <div>
                                     <dt className="text-xs font-medium text-slate-500 dark:text-slate-400">Ekipa</dt>
                                     <dd className="mt-1 text-2xl font-bold text-slate-900 dark:text-white">
-                                        {formatCount(stats.teams)}
+                                        {formatCount(safeStats.teams)}
                                     </dd>
                                 </div>
                                 <div>
                                     <dt className="text-xs font-medium text-slate-500 dark:text-slate-400">{'Š'}kola</dt>
                                     <dd className="mt-1 text-2xl font-bold text-slate-900 dark:text-white">
-                                        {formatCount(stats.schools)}
+                                        {formatCount(safeStats.schools)}
                                     </dd>
                                 </div>
                             </dl>
@@ -323,14 +333,14 @@ export default function Welcome({
                                         </span>
                                     </div>
 
-                                    {upcoming_competitions[0] ? (
+                                    {safeUpcoming[0] ? (
                                         <div className="mt-4 space-y-3">
                                             <div>
                                                 <p className="text-xs font-medium text-slate-500 dark:text-slate-400">
-                                                    {upcoming_competitions[0].sport?.name ?? 'Sport'}
+                                                    {safeUpcoming[0].sport?.name ?? 'Sport'}
                                                 </p>
                                                 <p className="mt-0.5 text-lg font-semibold leading-tight text-slate-900 dark:text-white">
-                                                    {upcoming_competitions[0].name}
+                                                    {safeUpcoming[0].name}
                                                 </p>
                                             </div>
                                             <div className="grid grid-cols-2 gap-3 text-sm">
@@ -339,7 +349,7 @@ export default function Welcome({
                                                         Datum
                                                     </p>
                                                     <p className="font-semibold text-slate-900 dark:text-white">
-                                                        {formatDate(upcoming_competitions[0].start_date)}
+                                                        {formatDate(safeUpcoming[0].start_date)}
                                                     </p>
                                                 </div>
                                                 <div className="rounded-lg bg-slate-100 px-3 py-2 dark:bg-slate-800/60">
@@ -347,7 +357,7 @@ export default function Welcome({
                                                         Lokacija
                                                     </p>
                                                     <p className="font-semibold text-slate-900 dark:text-white">
-                                                        {upcoming_competitions[0].location ?? '—'}
+                                                        {safeUpcoming[0].location ?? '—'}
                                                     </p>
                                                 </div>
                                             </div>
@@ -359,7 +369,7 @@ export default function Welcome({
                                     )}
 
                                     <div className="mt-5 grid grid-cols-3 gap-3 border-t border-slate-200 pt-4 dark:border-slate-800">
-                                        {sports.slice(0, 6).map((sport) => (
+                                        {safeSports.slice(0, 6).map((sport) => (
                                             <div
                                                 key={sport.id}
                                                 className="flex flex-col items-center gap-1 rounded-lg bg-slate-50 px-2 py-2 text-center text-xs font-medium text-slate-700 dark:bg-slate-800/60 dark:text-slate-200"
@@ -443,7 +453,7 @@ export default function Welcome({
                         </div>
 
                         <ul className="mt-10 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5">
-                            {sports.map((sport) => (
+                            {safeSports.map((sport) => (
                                 <li
                                     key={sport.id}
                                     className="group flex flex-col items-center gap-2 rounded-xl border border-slate-200 bg-white px-4 py-5 text-center shadow-sm transition-all hover:-translate-y-0.5 hover:border-amber-300 hover:shadow-md dark:border-slate-800 dark:bg-slate-900 dark:hover:border-amber-700"
@@ -498,13 +508,13 @@ export default function Welcome({
                         </div>
 
                         <div className="mt-10 grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-                            {upcoming_competitions.length === 0 && (
+                            {safeUpcoming.length === 0 && (
                                 <div className="col-span-full rounded-xl border border-dashed border-slate-300 bg-white p-10 text-center text-sm text-slate-500 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-400">
                                     Trenutno nema najavljenih takmi{'č'}enja. Provjerite kasnije ili pogledajte
                                     cio raspored.
                                 </div>
                             )}
-                            {upcoming_competitions.map((competition) => (
+                            {safeUpcoming.map((competition) => (
                                 <article
                                     key={competition.id}
                                     className="flex flex-col rounded-xl border border-slate-200 bg-white p-6 shadow-sm transition-all hover:-translate-y-0.5 hover:shadow-md dark:border-slate-800 dark:bg-slate-900"

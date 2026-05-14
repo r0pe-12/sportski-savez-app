@@ -37,7 +37,7 @@ export default function CompetitionsCreate({
     const [sportId, setSportId] = useState('');
     const [status, setStatus] = useState('draft');
 
-    const sportOptions: SelectFieldOption[] = sports.map((s) => ({
+    const sportOptions: SelectFieldOption[] = (sports ?? []).map((s) => ({
         value: String(s.id),
         label: s.name,
     }));

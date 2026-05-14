@@ -110,11 +110,11 @@ export default function CompetitionShow({
                 )}
 
                 <h2 className="text-lg font-medium">Prijavljene ekipe</h2>
-                {competition.teams.length === 0 ? (
+                {(competition.teams ?? []).length === 0 ? (
                     <p className="text-muted-foreground text-sm">Nema prijavljenih ekipa.</p>
                 ) : (
                     <ul className="list-disc pl-6 text-sm">
-                        {competition.teams.map((t) => (
+                        {(competition.teams ?? []).map((t) => (
                             <li key={t.id}>
                                 {t.name} ({t.school.name})
                             </li>

@@ -43,7 +43,7 @@ export function AuditLogFilters({ initial, users }: { initial: Filters; users: A
         filters.user_id || filters.action || filters.subject_type || filters.from || filters.to,
     );
 
-    const userOptions: SelectFieldOption[] = users.map((u) => ({
+    const userOptions: SelectFieldOption[] = (users ?? []).map((u) => ({
         value: String(u.id),
         label: u.name,
         description: u.email,

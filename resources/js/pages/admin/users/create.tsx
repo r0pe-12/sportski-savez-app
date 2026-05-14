@@ -46,7 +46,7 @@ function SchoolSelect({
                 placeholder="Odaberi školu…"
                 value={value}
                 onChange={setValue}
-                options={schools.map((s) => ({
+                options={(schools ?? []).map((s) => ({
                     value: String(s.id),
                     label: s.name,
                     description: s.code,
@@ -85,7 +85,7 @@ export default function UsersCreate({
                 sidebar={
                     <div className="bg-muted/30 rounded-xl border p-4 text-sm">
                         <h3 className="mb-2 font-medium">
-                            Uloga: {roles.find((r) => r.value === role)?.label}
+                            Uloga: {(roles ?? []).find((r) => r.value === role)?.label}
                         </h3>
                         <p className="text-muted-foreground text-xs leading-relaxed">
                             {ROLE_DESCRIPTIONS[role]}
@@ -129,7 +129,7 @@ export default function UsersCreate({
                                             label="Uloga"
                                             value={role}
                                             onChange={setRole}
-                                            options={roles.map((r) => ({
+                                            options={(roles ?? []).map((r) => ({
                                                 value: r.value,
                                                 label: r.label,
                                             }))}

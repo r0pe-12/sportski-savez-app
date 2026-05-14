@@ -15,13 +15,15 @@ export function Breadcrumbs({
 }: {
     breadcrumbs: BreadcrumbItemType[];
 }) {
+    const safeBreadcrumbs = breadcrumbs ?? [];
+
     return (
         <>
-            {breadcrumbs.length > 0 && (
+            {safeBreadcrumbs.length > 0 && (
                 <Breadcrumb>
                     <BreadcrumbList>
-                        {breadcrumbs.map((item, index) => {
-                            const isLast = index === breadcrumbs.length - 1;
+                        {safeBreadcrumbs.map((item, index) => {
+                            const isLast = index === safeBreadcrumbs.length - 1;
 
                             return (
                                 <Fragment key={index}>

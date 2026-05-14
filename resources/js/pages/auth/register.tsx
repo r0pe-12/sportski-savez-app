@@ -81,7 +81,7 @@ export default function Register({ schools }: { schools: School[] }) {
                                     placeholder="Odaberi školu…"
                                     value={schoolId}
                                     onChange={setSchoolId}
-                                    options={schools.map((s) => ({
+                                    options={(schools ?? []).map((s) => ({
                                         value: String(s.id),
                                         label: s.name,
                                         description: s.city,

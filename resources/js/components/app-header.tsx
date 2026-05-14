@@ -114,7 +114,7 @@ export function AppHeader({ breadcrumbs = [] }: Props) {
                                 <div className="flex h-full flex-1 flex-col space-y-4 p-4">
                                     <div className="flex h-full flex-col justify-between text-sm">
                                         <div className="flex flex-col space-y-4">
-                                            {mainNavItems.map((item) => (
+                                            {(mainNavItems ?? []).map((item) => (
                                                 <Link
                                                     key={item.title}
                                                     href={item.href}
@@ -129,7 +129,7 @@ export function AppHeader({ breadcrumbs = [] }: Props) {
                                         </div>
 
                                         <div className="flex flex-col space-y-4">
-                                            {rightNavItems.map((item) => (
+                                            {(rightNavItems ?? []).map((item) => (
                                                 <a
                                                     key={item.title}
                                                     href={toUrl(item.href)}
@@ -162,7 +162,7 @@ export function AppHeader({ breadcrumbs = [] }: Props) {
                     <div className="ml-6 hidden h-full items-center space-x-6 lg:flex">
                         <NavigationMenu className="flex h-full items-stretch">
                             <NavigationMenuList className="flex h-full items-stretch space-x-2">
-                                {mainNavItems.map((item, index) => (
+                                {(mainNavItems ?? []).map((item, index) => (
                                     <NavigationMenuItem
                                         key={index}
                                         className="relative flex h-full items-center"
@@ -202,7 +202,7 @@ export function AppHeader({ breadcrumbs = [] }: Props) {
                                 <Search className="!size-5 opacity-80 group-hover:opacity-100" />
                             </Button>
                             <div className="ml-1 hidden gap-1 lg:flex">
-                                {rightNavItems.map((item) => (
+                                {(rightNavItems ?? []).map((item) => (
                                     <Tooltip key={item.title}>
                                         <TooltipTrigger>
                                             <a
@@ -252,10 +252,10 @@ export function AppHeader({ breadcrumbs = [] }: Props) {
                     </div>
                 </div>
             </div>
-            {breadcrumbs.length > 1 && (
+            {(breadcrumbs ?? []).length > 1 && (
                 <div className="flex w-full border-b border-sidebar-border/70">
                     <div className="mx-auto flex h-12 w-full items-center justify-start px-4 text-neutral-500 md:max-w-7xl">
-                        <Breadcrumbs breadcrumbs={breadcrumbs} />
+                        <Breadcrumbs breadcrumbs={breadcrumbs ?? []} />
                     </div>
                 </div>
             )}

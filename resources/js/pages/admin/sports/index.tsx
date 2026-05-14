@@ -42,7 +42,7 @@ export default function SportsIndex({ sports }: { sports: Paginated }) {
                             </tr>
                         </thead>
                         <tbody>
-                            {sports.data.map((s) => (
+                            {(sports?.data ?? []).map((s) => (
                                 <tr key={s.id} className="border-t">
                                     <td className="p-2 font-medium">{s.name}</td>
                                     <td className="p-2">

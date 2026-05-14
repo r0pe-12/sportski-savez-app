@@ -40,7 +40,7 @@ export default function SchoolsIndex({ schools }: { schools: Page }) {
                             </tr>
                         </thead>
                         <tbody>
-                            {schools.data.map((s) => (
+                            {(schools?.data ?? []).map((s) => (
                                 <tr key={s.id} className="border-t">
                                     <td className="p-2">{s.code}</td>
                                     <td className="p-2">{s.name}</td>
