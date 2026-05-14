@@ -1,0 +1,76 @@
+@startuml state-team
+!theme plain
+title State machine — Team (životni ciklus ekipe)
+
+skinparam state {
+  BackgroundColor #FEFEFE
+  BorderColor #333333
+}
+
+[*] --> draft : profesor kreira ekipu \n(POST /teams)
+
+state draft {
+  draft : Profesor edituje, dodaje članove
+  draft : Upload ljekarskih potvrda
+  draft : signature == null
+}
+
+state submitted {
+  submitted : signature snimljen
+  submitted : signed_at + signature_ip
+  submitted : čeka admin pregled
+}
+
+state active {
+  active : odobrena za takmičenje
+  active : pojavljuje se u rasporedu
+}
+
+state rejected #FFE0E0 {
+  rejected : admin odbio (sa razlogom)
+}
+
+state cancelled #FFE0E0 {
+  cancelled : profesor ili admin otkazao
+}
+
+state withdrawn #FFE0E0 {
+  withdrawn : profesor povukao nakon active
+}
+
+state completed #E0FFE0 {
+  completed : rezultati uneseni
+  completed : medalja dodijeljena (ako gold/silver/bronze)
+}
+
+draft --> submitted : profesor digitalno potpisuje \n(svi članovi imaju valid potvrde)
+draft --> cancelled : profesor otkazuje draft
+
+submitted --> active : admin odobrava \n(team.approved)
+submitted --> rejected : admin odbija \n(uz razlog)
+submitted --> cancelled : admin force-cancel \n(nepravilna prijava)
+
+active --> completed : admin unosi rezultate \n(UC10)
+active --> withdrawn : profesor povlači \n(prije takmičenja)
+
+rejected --> [*]
+cancelled --> [*]
+withdrawn --> [*]
+completed --> [*]
+
+note bottom of rejected
+  **Terminalna stanja:**
+  rejected, cancelled, withdrawn, completed
+  — više nema tranzicija.
+end note
+
+note right of submitted
+  Tranzicija draft -> submitted zahtijeva:
+  - team.signature == professor.name (case-insensitive)
+  - svi članovi imaju MedicalCertificate sa
+    status=valid
+  - broj članova ∈ [sport.members_count,
+    sport.members_count + substitutes_count]
+end note
+
+@enduml

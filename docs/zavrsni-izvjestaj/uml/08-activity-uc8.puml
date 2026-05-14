@@ -1,0 +1,83 @@
+@startuml activity-uc8
+!theme plain
+title Activity dijagram — UC8 eDnevnik verifikacija učenika
+
+skinparam activity {
+  BackgroundColor #FEFEFE
+  BorderColor #333333
+  DiamondBackgroundColor #FFF8DC
+}
+
+start
+
+:Admin otvara Student profil;
+:Klikne dugme "Pokreni eDnevnik verifikaciju";
+:StudentVerificationController prima zahtjev;
+:Tranzicija: verification_status -> pending;
+:Dispatch VerifyStudentWithEDnevnikJob u queue;
+
+note right
+  Queue worker (database driver dev /
+  redis driver prod) pokupi job
+  asinhrono.
+end note
+
+:Queue worker poziva \nEDnevnikAdapter::fetchByJmb(jmb);
+
+partition "HTTP response handling" {
+  switch (HTTP status code)
+  case ( 200 OK )
+    :Parse JSON payload \n(name, birth_date, school_code, grade);
+
+    if (Svi podaci se podudaraju \nsa lokalnim Student modelom?) then (da)
+      :status = verified;
+      :Audit log: student.verified;
+    else (ne)
+      :status = mismatched;
+      :Audit log: student.mismatched \n(delta JSON);
+      :Notify admina da ručno odluči;
+    endif
+
+  case ( 404 Not Found )
+    :status = failed \n(reason: not_found);
+    :Audit log: student.verification_failed \n(reason=not_found);
+    :Notify admina "Učenik ne postoji u eDnevniku";
+
+  case ( 503 Service Unavailable )
+    :Retry br. 1: čekaj 2s;
+    if (Uspjeh?) then (ne)
+      :Retry br. 2: čekaj 4s \n(exponential backoff);
+      if (Uspjeh?) then (ne)
+        :Retry br. 3: čekaj 8s;
+        if (Uspjeh?) then (ne)
+          :status = failed \n(reason: service_unavailable);
+          :Audit log: student.verification_failed;
+        else (da)
+          :Vrati se na "Parse JSON";
+        endif
+      else (da)
+        :Vrati se na "Parse JSON";
+      endif
+    else (da)
+      :Vrati se na "Parse JSON";
+    endif
+
+  case ( 401 Unauthorized )
+    :CRITICAL: API ključ nevažeći ili istekao;
+    :status = failed \n(reason: api_key_invalid);
+    :Log sentry alert + notify admina;
+
+  case ( 429 Rate Limited )
+    :Čitaj Retry-After header;
+    :Pauziraj worker do navedeno vrijeme;
+    :Retry isti job nakon pauze;
+    :Vrati se na "Parse JSON";
+
+  endswitch
+}
+
+:Pošalji notifikaciju adminu o ishodu;
+
+stop
+
+@enduml

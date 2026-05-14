@@ -1,0 +1,86 @@
+@startuml activity-uc5
+!theme plain
+title Activity dijagram — UC5 Prijava ekipe na takmičenje
+
+skinparam activity {
+  BackgroundColor #FEFEFE
+  BorderColor #333333
+  DiamondBackgroundColor #FFF8DC
+}
+
+start
+
+:Profesor otvara stranicu takmičenja;
+:Klikne dugme "Prijavi ekipu na ovo takmičenje";
+
+if (Provjera preduslova: \nverified profesor + ima school_id \n+ registracija otvorena?) then (ne)
+  :Prikaži grešku 403/422;
+  stop
+else (da)
+endif
+
+:Kreiraj draft Team (status=draft);
+:Otvori stranicu Edit ekipe;
+
+note right
+  Loop traje dok broj članova ne dostigne
+  sport.members_count (za individualne)
+  ili members_count + substitutes_count
+  (za ekipne sportove).
+end note
+
+while (Broj članova < potreban broj?) is (da)
+  :Profesor unosi učenika (ime, jmb, datum rođenja);
+  :Upload PDF/JPG ljekarske potvrde;
+
+  fork
+    :Sinhrono: kreiraj MedicalCertificate \n(status=pending);
+    :Dispatch ValidateMedicalCertificateJob \nu queue (database driver);
+  fork again
+    :UI prikazuje "Pending OCR..." \nbadge na članu;
+  end fork
+
+  :OCR pipeline (asinhrono): \nFakeOcrAdapter::extract(file_path);
+
+  if (OCR confidence >= 0.8?) then (da)
+    if (Datum istekao?) then (da)
+      :status = expired;
+    else (ne)
+      if (Ime se podudara sa learner.name?) then (da)
+        :status = valid;
+      else (ne)
+        :status = invalid;
+      endif
+    endif
+  else (ne)
+    :status = manual_review \n(admin ručno odlučuje);
+  endif
+
+  :Audit log: medical_certificate.{status};
+  :Notify Profesora kroz NotificationService;
+endwhile (ne)
+
+if (Svi članovi imaju valid \nMedicalCertificate?) then (ne)
+  :Prikaži grešku "Nedovoljno validnih potvrda";
+  stop
+else (da)
+endif
+
+:Otvori formu za digitalni potpis;
+:Profesor unosi tekst potpisa \n(treba se podudarati sa registered name);
+
+if (Potpis == User.name?) then (ne)
+  :422 + greška "Potpis ne odgovara";
+  stop
+else (da)
+endif
+
+:TeamRegistrationService::submit();
+:Tranzicija: draft -> submitted;
+:Snimi: signature, signed_at, signature_ip;
+:Audit log: team.submitted;
+:Notify Profesora + Admin*;
+
+stop
+
+@enduml

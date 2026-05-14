@@ -1958,6 +1958,85 @@ ODLUKE_23,
 - **Stara `/teams/create` stranica i dalje radi** za scenario kad profesor želi da bira sport ručno
 ISHOD_23,
             ],
+            [
+                'broj' => 24,
+                'naslov' => '7 dodatnih UML dijagrama (Activity, State, ER, Object) + embed u Word',
+                'datum' => '2026-05-14',
+                'faza' => 'Predaja / Završni izvještaj',
+                'alat' => 'PlantUML + plantuml.com web servis (render_plantuml.py), Python pandoc build skripti (build_docx.py, build_docx_per_chapter.py)',
+                'cilj' => 'Pokriti sve obavezne UML notacije za ADIS predaju: Activity, State Machine, ER, Object — dodatak postojećim 7 dijagramima.',
+                'instrukcije' => <<<'INSTRUKCIJE_24'
+### Prompt 1
+
+Kreirati 7 dodatnih UML dijagrama za završni izvještaj (ADIS predmet):
+
+1. **07-activity-uc5.puml** — Activity dijagram za UC5 Prijava ekipe (start → preduslovi → loop dodaj učenika + upload + OCR fork → potpis → submit → end).
+2. **08-activity-uc8.puml** — Activity dijagram za UC8 eDnevnik verifikacija (HTTP response grane: 200/404/503/401/429 + retry sa exponential backoff).
+3. **09-state-team.puml** — State machine za Team (draft → submitted → active → completed; rejected/cancelled/withdrawn terminalna).
+4. **10-state-medical-certificate.puml** — State machine za MedicalCertificate (pending → valid/expired/invalid/manual_review/superseded).
+5. **11-state-student-verification.puml** — State machine za Student.verification_status (unverified → pending → verified/mismatched/failed).
+6. **12-er-diagram.puml** — ER dijagram (logički model baze: users, schools, sports, competitions, teams, team_members, medical_certificates, results, audit_log, notifications, jobs).
+7. **13-object-diagram.puml** — Object dijagram sa konkretnim demo instancama nakon DemoResetSeeder.
+
+Sve dijagrame render-ovati u PNG preko storage/app/render_plantuml.py (plantuml.com web servis), ažurirati build_docx.py + build_docx_per_chapter.py (UML_EMBEDS sa Slika 8–14), proširiti 02-projekat.md tabelu sa 7 novih redova, rebuild docx.
+
+Stilski standard: `!theme plain`, title na crnogorskom, konzistentno sa postojećim 00–06 dijagramima. Ne mijenjati postojeće dijagrame.
+INSTRUKCIJE_24,
+                'output' => <<<'OUTPUT_24'
+### Prompt 1
+
+Kreirano 7 novih .puml fajlova u `docs/zavrsni-izvjestaj/uml/`:
+
+- **07-activity-uc5.puml** — Activity dijagram UC5 sa PlantUML activity beta sintaksom (`:Action;`, `if/endif`, `while`, `fork`). Pokriva preduslove (verified profesor, ima school_id, registracija otvorena), loop dodavanja članova sa OCR fork-om (paralelno OCR job + UI pending prikaz), provjeru valid sertifikata, potpis sa provjerom imena, submit sa state tranzicijom draft → submitted.
+- **08-activity-uc8.puml** — Activity dijagram UC8 sa svih 5 HTTP response grana: 200 OK (verified ili mismatched), 404 Not Found, 503 Service Unavailable sa 3× retry exponential backoff, 401 Unauthorized (critical), 429 Rate Limited sa Retry-After header poštovanjem.
+- **09-state-team.puml** — State machine sa 7 stanja (draft, submitted, active, rejected, cancelled, withdrawn, completed) i svim tranzicijama iz spec §7.4.1. Terminalna stanja markirana note-om.
+- **10-state-medical-certificate.puml** — State machine sa 6 stanja (pending, valid, expired, invalid, manual_review, superseded) sa OCR pipeline i cron expiry tranzicijama iz spec §7.4.2.
+- **11-state-student-verification.puml** — State machine sa 5 stanja (unverified, pending, verified, mismatched, failed) sa retry i re-verifikacija tranzicijama iz spec §7.4.3.
+- **12-er-diagram.puml** — Logički ER model baze sa 12 tabela i kardinalitetom (||--o{ za 1-N, }o--o{ za M-N).
+- **13-object-diagram.puml** — Object dijagram sa demo instancama: admin, demoSchool, profPetar, studentMarko, stoniTenis, demoCompetition.
+
+PNG render preko `python storage/app/render_plantuml.py` (plantuml.com web servis). Svi PNG fajlovi snimljeni u `docs/zavrsni-izvjestaj/uml/render/`.
+
+Proširen `build_docx.py` UML_EMBEDS dict sa 7 novih ključeva (Slika 8–14) i `build_docx_per_chapter.py` PUML_TO_IMAGE dict isto. Tabela §8 u 02-projekat.md dobila 7 novih redova (#8–#14). Rebuild master docx i 7 per-chapter docx-ova bez greške.
+OUTPUT_24,
+                'odluke' => <<<'ODLUKE_24'
+### Prompt 1
+
+**Odluke:**
+
+1. **Activity dijagrami koriste PlantUML activity "beta" sintaksu** (`:Action;`, `if (...) then (yes) ... else (no) ... endif`, `while (cond) is (yes) ... endwhile`, `fork ... fork again ... end fork`) jer je preglednija i support-ovana na plantuml.com.
+2. **State dijagrami koriste klasičnu sintaksu** sa `[*]` initial/terminal i `state -> state : trigger` tranzicijama. Terminalna stanja markirana note-om umjesto duplim krugom (PlantUML state dijagrami nemaju eksplicitan terminal symbol).
+3. **ER dijagram koristi PlantUML "entity" + Chen-style notation** (`||--o{` za 1:N, `}o--o{` za M:N). Glavne tabele iz spec §7 + standardne Laravel auxiliary tabele (notifications, jobs, failed_jobs).
+4. **Object dijagram koristi class-style notation sa konkretnim vrijednostima** (jedinstvene id-eve, stringovi u quotes-ima) — demo data iz DemoResetSeeder.
+5. **Render preko plantuml.com** umjesto lokalnog Java jar-a — već instalirano, brže za 7 dijagrama. Timeout 30s je dovoljan.
+6. **Numeracija Slika** — postojeći 7 dijagrama (00–06) su Slika 1–7, novi 7 (07–13) su Slika 8–14. Demo screenshots ostaju Slika 7–12 u 03-implementacija-demonstracija.md (nezavisna numeracija po poglavlju).
+ODLUKE_24,
+                'ishod' => <<<'ISHOD_24'
+### Prompt 1
+
+**Kreirani fajlovi (.puml):**
+- docs/zavrsni-izvjestaj/uml/07-activity-uc5.puml
+- docs/zavrsni-izvjestaj/uml/08-activity-uc8.puml
+- docs/zavrsni-izvjestaj/uml/09-state-team.puml
+- docs/zavrsni-izvjestaj/uml/10-state-medical-certificate.puml
+- docs/zavrsni-izvjestaj/uml/11-state-student-verification.puml
+- docs/zavrsni-izvjestaj/uml/12-er-diagram.puml
+- docs/zavrsni-izvjestaj/uml/13-object-diagram.puml
+
+**Rendered PNG (svi u docs/zavrsni-izvjestaj/uml/render/):** 07-activity-uc5.png, 08-activity-uc8.png, 09-state-team.png, 10-state-medical-certificate.png, 11-state-student-verification.png, 12-er-diagram.png, 13-object-diagram.png — sve veličine renderovane bez problema kroz plantuml.com web servis.
+
+**Izmijenjeni build skripti:**
+- docs/zavrsni-izvjestaj/build_docx.py (UML_EMBEDS dict + 7 novih ključeva Slika 8–14)
+- docs/zavrsni-izvjestaj/build_docx_per_chapter.py (PUML_TO_IMAGE dict + 7 novih ključeva)
+- docs/zavrsni-izvjestaj/02-projekat.md (§8 UML tabela proširena sa 7 redova)
+
+**Rebuild docx:**
+- Glavni master `Zavrsni-izvjestaj-Sistem-skolskog-sporta-CG.docx` se uvećao zbog 7 novih embed-ovanih PNG slika.
+- 7 per-chapter docx-ova generisani bez greške.
+
+**Status:** Završni izvještaj sad ima ukupno **14 UML dijagrama** (Use Case, Class, 2× Sequence, Component, Package, Deployment, 2× Activity, 3× State Machine, ER, Object) — pokriva sve obavezne UML notacije za ADIS predaju.
+ISHOD_24,
+            ],
         ];
 
         foreach ($sesije as $sesija) {

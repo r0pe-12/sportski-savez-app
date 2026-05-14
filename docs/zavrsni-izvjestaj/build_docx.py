@@ -49,6 +49,13 @@ UML_EMBEDS = {
     "04-component-dijagram": ("Slika 5: Component dijagram — slojevita arhitektura sa adapter pattern", "uml/render/04-component-dijagram.png"),
     "05-package-dijagram": ("Slika 6: Package dijagram — Laravel struktura sa split route-ovima", "uml/render/05-package-dijagram.png"),
     "06-deployment-dijagram": ("Slika 7: Deployment dijagram — dev (lokalno SQLite + Fake adapteri) vs prod (Laravel Cloud)", "uml/render/06-deployment-dijagram.png"),
+    "07-activity-uc5": ("Slika 8: Activity dijagram UC5 — prijava ekipe (preduslovi, loop dodavanja članova sa OCR fork-om, potpis, submit)", "uml/render/07-activity-uc5.png"),
+    "08-activity-uc8": ("Slika 9: Activity dijagram UC8 — eDnevnik verifikacija (5 HTTP response grana: 200, 404, 503 sa 3× retry, 401, 429)", "uml/render/08-activity-uc8.png"),
+    "09-state-team": ("Slika 10: State machine — Team (draft → submitted → active → completed; rejected/cancelled/withdrawn terminalna)", "uml/render/09-state-team.png"),
+    "10-state-medical-certificate": ("Slika 11: State machine — MedicalCertificate (pending, valid, expired, invalid, manual_review, superseded)", "uml/render/10-state-medical-certificate.png"),
+    "11-state-student-verification": ("Slika 12: State machine — Student.verification_status (unverified, pending, verified, mismatched, failed)", "uml/render/11-state-student-verification.png"),
+    "12-er-diagram": ("Slika 13: ER dijagram — logički model baze (12 tabela sa kardinalitetom)", "uml/render/12-er-diagram.png"),
+    "13-object-diagram": ("Slika 14: Object dijagram — snapshot demo data-e nakon DemoResetSeeder (admin, demoSchool, profPetar, studentMarko, stoniTenis, demoCompetition, demoTeam, demoMember, demoMc, auditEntry)", "uml/render/13-object-diagram.png"),
 }
 
 # Demo screenshot-ovi koje treba embed-ovati u Poglavlje 3

@@ -166,17 +166,24 @@ Tree-shakable: nekorišćene rute se ne uključuju u bundle.
 
 ## 8. UML dijagrami
 
-Šest UML dijagrama generisanih iz **stvarno implementiranog koda** (Phase 0–3, v1.0 tag), izvor PlantUML + (planiran) PNG render preko VS Code "PlantUML" extension-a.
+**14 UML dijagrama** generisanih iz **stvarno implementiranog koda** (Phase 0–3, v1.0 tag) + dodatni dijagrami za ADIS predaju (Activity, State Machine, ER, Object). Izvor: PlantUML, PNG render preko `storage/app/render_plantuml.py` (plantuml.com web servis).
 
-| # | Dijagram | Izvor | Pokriva |
-|---|---|---|---|
-| 1 | [Use Case dijagram](uml/00-use-case-dijagram.puml) | spec §5 + Projektna_analitika §2 | 3 primarna aktera (Prof/Učenik/Admin) + eDnevnik (eksterni) + svih 10 UC-ova sa `<<include>>` relacijama (UC5→UC6, UC7→UC8) |
-| 2 | [Klasni dijagram](uml/01-klasni-dijagram.puml) | `app/Models/` + `app/Enums/` | Domain model: 11 entiteta + 7 enum-a + STI User/Professor |
-| 3 | [Sequence UC5](uml/02-sequence-uc5.puml) | `TeamController` + `TeamRegistrationService` + `FakeOcrAdapter` + `ValidateMedicalCertificateJob` | Prijava ekipe: async OCR upload + sync submit |
-| 4 | [Sequence UC8](uml/03-sequence-uc8.puml) | `StudentVerificationController` + `EDnevnikVerificationService` + `FakeEDnevnikAdapter` | eDnevnik verifikacija: 3 grane (verified/mismatched/unavailable) |
-| 5 | [Component dijagram](uml/04-component-dijagram.puml) | spec §9.2 + `app/` struktura | Slojevita arhitektura sa adapter pattern |
-| 6 | [Package dijagram](uml/05-package-dijagram.puml) | `app/`, `routes/`, `resources/js/`, `database/`, `tests/` | Laravel struktura sa split route-ovima |
-| 7 | [Deployment dijagram](uml/06-deployment-dijagram.puml) | `composer.json` + `.env.example` + spec §11 | Dev (SQLite + log mail + Fake adapteri) vs prod (Laravel Cloud) |
+| # | Dijagram | Tip | Izvor | Pokriva |
+|---|---|---|---|---|
+| 1 | [Use Case dijagram](uml/00-use-case-dijagram.puml) | Use Case | spec §5 + Projektna_analitika §2 | 3 primarna aktera (Prof/Učenik/Admin) + eDnevnik (eksterni) + svih 10 UC-ova sa `<<include>>` relacijama (UC5→UC6, UC7→UC8) |
+| 2 | [Klasni dijagram](uml/01-klasni-dijagram.puml) | Class | `app/Models/` + `app/Enums/` | Domain model: 11 entiteta + 7 enum-a + STI User/Professor |
+| 3 | [Sequence UC5](uml/02-sequence-uc5.puml) | Sequence | `TeamController` + `TeamRegistrationService` + `FakeOcrAdapter` + `ValidateMedicalCertificateJob` | Prijava ekipe: async OCR upload + sync submit |
+| 4 | [Sequence UC8](uml/03-sequence-uc8.puml) | Sequence | `StudentVerificationController` + `EDnevnikVerificationService` + `FakeEDnevnikAdapter` | eDnevnik verifikacija: 3 grane (verified/mismatched/unavailable) |
+| 5 | [Component dijagram](uml/04-component-dijagram.puml) | Component | spec §9.2 + `app/` struktura | Slojevita arhitektura sa adapter pattern |
+| 6 | [Package dijagram](uml/05-package-dijagram.puml) | Package | `app/`, `routes/`, `resources/js/`, `database/`, `tests/` | Laravel struktura sa split route-ovima |
+| 7 | [Deployment dijagram](uml/06-deployment-dijagram.puml) | Deployment | `composer.json` + `.env.example` + spec §11 | Dev (SQLite + log mail + Fake adapteri) vs prod (Laravel Cloud) |
+| 8 | [Activity UC5](uml/07-activity-uc5.puml) | Activity | `TeamController` + `TeamRegistrationService` flow | Prijava ekipe step-by-step: preduslovi, loop dodavanja članova sa OCR fork-om (paralelni job + UI pending badge), provjera valid sertifikata, potpis, submit |
+| 9 | [Activity UC8](uml/08-activity-uc8.puml) | Activity | `EDnevnikVerificationService` HTTP error handling | eDnevnik verifikacija sa svih 5 HTTP response grana: 200 OK (verified ili mismatched), 404, 503 sa 3× retry exp backoff, 401 critical, 429 sa Retry-After |
+| 10 | [State Team](uml/09-state-team.puml) | State Machine | spec §7.4.1 + `App\Enums\TeamStatus` | Životni ciklus Team entiteta: 7 stanja (draft, submitted, active, rejected, cancelled, withdrawn, completed) + sve tranzicije sa trigerima |
+| 11 | [State MedicalCertificate](uml/10-state-medical-certificate.puml) | State Machine | spec §7.4.2 + `App\Enums\MedicalCertificateStatus` | OCR pipeline: pending → valid/expired/invalid/manual_review/superseded sa cron expiry tranzicijom |
+| 12 | [State Student verification](uml/11-state-student-verification.puml) | State Machine | spec §7.4.3 + `App\Enums\StudentVerificationStatus` | eDnevnik verifikacija lifecycle: unverified → pending → verified/mismatched/failed sa retry policy |
+| 13 | [ER dijagram](uml/12-er-diagram.puml) | Entity-Relationship | `database/migrations/` + `App\Models\` | Logički model baze: 12 tabela (schools, users, sports, competitions, teams, team_members, medical_certificates, results, audit_log, notifications, jobs, failed_jobs) sa kardinalitetom |
+| 14 | [Object dijagram](uml/13-object-diagram.puml) | Object | `database/seeders/DemoResetSeeder.php` | Snapshot demo data-e: 10 konkretnih instanci (admin, demoSchool, profPetar, studentMarko, stoniTenis, demoCompetition, demoTeam, demoMember, demoMc, auditEntry) sa svim atributima i relacijama |
 
 Detalji i uputstvo za render: [`uml/README.md`](uml/README.md).
 

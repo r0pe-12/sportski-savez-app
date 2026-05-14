@@ -1,0 +1,64 @@
+@startuml state-student-verification
+!theme plain
+title State machine — Student.verification_status (eDnevnik verifikacija)
+
+skinparam state {
+  BackgroundColor #FEFEFE
+  BorderColor #333333
+}
+
+[*] --> unverified : student registracija \n(self-service ili admin import)
+
+state unverified {
+  unverified : default nakon kreiranja
+  unverified : podaci uneseni ručno
+}
+
+state pending #FFF5CC {
+  pending : VerifyStudentWithEDnevnikJob \ndispatch-ovan u queue
+  pending : čeka HTTP response
+}
+
+state verified #E0FFE0 {
+  verified : podaci match-uju eDnevnik
+  verified : može biti član ekipe
+}
+
+state mismatched #FFE8D0 {
+  mismatched : delta sa eDnevnikom (ime, \ndatum rođenja, škola, ili razred)
+  mismatched : admin ručno odlučuje
+}
+
+state failed #FFE0E0 {
+  failed : eDnevnik nedostupan
+  failed : ili 404 (učenik ne postoji)
+  failed : ili 401 (API key nevažeći)
+}
+
+unverified --> pending : admin pokreće verifikaciju \n(UC8)
+
+pending --> verified : 200 OK + svi podaci match
+pending --> mismatched : 200 OK + delta postoji
+pending --> failed : 404 Not Found \nili 503 timeout (3× retry) \nili 401 Unauthorized
+
+mismatched --> verified : admin ručno potvrđuje \n(prihvata delta)
+mismatched --> unverified : admin reset \n(zahtijeva re-import)
+
+failed --> pending : admin retry \n(nakon što se eDnevnik vrati online)
+
+verified --> pending : re-verifikacija \n(npr. nakon promjene podataka)
+
+note right of pending
+  Retry policy (spec §7.4.3):
+  - 503: 3× exp backoff (2s, 4s, 8s)
+  - 429: čitaj Retry-After header
+  - 401: critical, ne retry-uje se
+end note
+
+note bottom of failed
+  failed nije terminalno —
+  admin može retry-ovati kad
+  eDnevnik bude dostupan.
+end note
+
+@enduml

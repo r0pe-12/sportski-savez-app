@@ -1,0 +1,73 @@
+@startuml state-medical-certificate
+!theme plain
+title State machine — MedicalCertificate (životni ciklus ljekarske potvrde)
+
+skinparam state {
+  BackgroundColor #FEFEFE
+  BorderColor #333333
+}
+
+[*] --> pending : profesor upload-uje \n(POST /team-members/{id}/certificate)
+
+state pending {
+  pending : Job u queue
+  pending : OCR još nije završen
+}
+
+state valid #E0FFE0 {
+  valid : OCR uspio
+  valid : datum nije istekao
+  valid : ime se podudara
+}
+
+state expired #FFE8D0 {
+  expired : valid_to < today
+}
+
+state invalid #FFE0E0 {
+  invalid : ime/datum mismatch
+  invalid : ili OCR confidence < 0.8 + admin reject
+}
+
+state manual_review #FFF5CC {
+  manual_review : OCR neuspješan
+  manual_review : ili low confidence
+  manual_review : admin odlučuje ručno
+}
+
+state superseded #E0E0FF {
+  superseded : profesor uploadovao novu potvrdu
+  superseded : stara više nije aktivna
+}
+
+pending --> valid : OCR uspio + datumi OK + ime OK
+pending --> expired : OCR uspio ali valid_to < today
+pending --> invalid : ime ili datum mismatch
+pending --> manual_review : OCR confidence < 0.8 \nili OCR exception
+
+valid --> expired : cron daily \n(valid_to prošao)
+valid --> superseded : profesor upload-uje novu
+
+manual_review --> valid : admin approve
+manual_review --> invalid : admin reject
+manual_review --> superseded : profesor upload-uje novu
+
+expired --> [*]
+invalid --> [*]
+superseded --> [*]
+
+note right of pending
+  Validation kriterijumi (spec §7.4.2):
+  - extracted_name ~~ student.name
+    (Levenshtein <= 2)
+  - valid_to >= today
+  - ocr_confidence >= 0.8
+end note
+
+note bottom of superseded
+  **Terminalna stanja:**
+  expired, invalid, superseded
+  — Team submit zahtijeva valid status.
+end note
+
+@enduml

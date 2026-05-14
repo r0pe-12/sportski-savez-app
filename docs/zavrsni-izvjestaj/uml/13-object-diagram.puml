@@ -1,0 +1,151 @@
+@startuml object-diagram
+!theme plain
+title Object dijagram — snapshot demo data-e nakon DemoResetSeeder
+
+skinparam object {
+  BackgroundColor #FEFEFE
+  BorderColor #333333
+}
+
+' === Administracija ===
+
+object "admin : User" as admin {
+  id = 1
+  name = "Sistem Administrator"
+  email = "admin@savez.test"
+  role = "admin"
+  school_id = null
+  verified = true
+  verification_status = "verified"
+}
+
+' === Škola ===
+
+object "demoSchool : School" as demoSchool {
+  id = 1
+  code = "DEMO-PG-001"
+  name = "OŠ Demo Škola"
+  city = "Podgorica"
+  address = "Bulevar Sv. Petra Cetinjskog 1"
+}
+
+' === Profesor ===
+
+object "profPetar : User" as profPetar {
+  id = 2
+  name = "Petar Profesor"
+  email = "profesor@demo.test"
+  role = "professor"
+  school_id = 1
+  verified = true
+  verification_status = "verified"
+}
+
+' === Učenik ===
+
+object "studentMarko : User" as studentMarko {
+  id = 3
+  name = "Marko Marković"
+  email = "marko@demo.test"
+  role = "student"
+  school_id = 1
+  jmb = "0103010250001"
+  birth_date = "2010-03-01"
+  grade = 4
+  verification_status = "verified"
+}
+
+' === Sport ===
+
+object "stoniTenis : Sport" as stoniTenis {
+  id = 7
+  slug = "stoni-tenis"
+  name = "Stoni tenis"
+  type = "individual_sport"
+  members_count = 1
+  substitutes_count = 0
+}
+
+' === Takmičenje ===
+
+object "demoCompetition : Competition" as demoCompetition {
+  id = 4
+  slug = "demo-prvenstvo-stoni-tenis-2027"
+  name = "Demo Prvenstvo Stoni tenis 2027"
+  sport_id = 7
+  start_date = "2026-07-14"
+  end_date = "2026-07-16"
+  status = "open_registration"
+  year = 2027
+  location = "Podgorica"
+}
+
+' === Ekipa ===
+
+object "demoTeam : Team" as demoTeam {
+  id = 11
+  team_uuid = "f3a1b2c4-..."
+  school_id = 1
+  competition_id = 4
+  professor_id = 2
+  status = "submitted"
+  signature = "Petar Profesor"
+  signed_at = "2026-05-12 14:23:11"
+  signature_ip = "127.0.0.1"
+}
+
+' === Član ekipe ===
+
+object "demoMember : TeamMember" as demoMember {
+  id = 21
+  team_id = 11
+  student_id = 3
+  position = "Prvi pojedinac"
+}
+
+' === Ljekarska potvrda ===
+
+object "demoMc : MedicalCertificate" as demoMc {
+  id = 31
+  team_member_id = 21
+  path = "private/certificates/2026/marko-valid.pdf"
+  status = "valid"
+  issued_at = "2026-04-15"
+  expires_at = "2027-04-15"
+  extracted_name = "Marko Marković"
+  ocr_confidence = 0.92
+  doctor_name = "Dr Ana Anić"
+  institution = "Dom zdravlja Podgorica"
+}
+
+' === Audit log zapis ===
+
+object "auditEntry : AuditLogEntry" as auditEntry {
+  id = "9b1c2..."
+  user_id = 2
+  action = "team.submitted"
+  subject_type = "App\\Models\\Team"
+  subject_id = 11
+  payload = "{...}"
+  ip = "127.0.0.1"
+  created_at = "2026-05-12 14:23:11"
+}
+
+' === Linije veze ===
+
+demoSchool "1" -- "*" profPetar : zaposlen u
+demoSchool "1" -- "*" studentMarko : pohađa
+demoSchool "1" -- "*" demoTeam : prijavila
+
+stoniTenis "1" -- "*" demoCompetition : pripada sportu
+demoCompetition "1" -- "*" demoTeam : ekipe registrovane
+
+demoTeam "*" -- "1" profPetar : odgovoran profesor
+demoTeam "1" -- "*" demoMember : članovi
+demoMember "*" -- "1" studentMarko : student je
+demoMember "1" -- "*" demoMc : ljekarske potvrde
+
+profPetar "1" -- "*" auditEntry : izvršio akciju
+demoTeam "1" -- "*" auditEntry : subject
+
+@enduml

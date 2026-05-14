@@ -1,0 +1,211 @@
+@startuml er-diagram
+!theme plain
+title ER dijagram — logički model baze (Sistem školskog sporta CG)
+
+skinparam linetype ortho
+skinparam entity {
+  BackgroundColor #FEFEFE
+  BorderColor #333333
+}
+
+' === Korisnici i organizacije ===
+
+entity "schools" as schools {
+  * id : bigint <<PK>>
+  --
+  * code : varchar <<unique>>
+  * name : varchar
+  * city : varchar
+  * address : varchar
+  phone : varchar
+  created_at : timestamp
+  updated_at : timestamp
+}
+
+entity "users" as users {
+  * id : bigint <<PK>>
+  --
+  * name : varchar
+  * email : varchar <<unique>>
+  * password : varchar
+  * role : enum <admin|professor|student>
+  school_id : bigint <<FK>>
+  jmb : varchar(13)
+  birth_date : date
+  grade : tinyint
+  verification_status : enum <unverified|pending|verified|mismatched|failed>
+  verified : boolean
+  two_factor_secret : text
+  two_factor_recovery_codes : text
+  photo_path : varchar
+  created_at : timestamp
+  updated_at : timestamp
+}
+
+' === Domen sporta ===
+
+entity "sports" as sports {
+  * id : bigint <<PK>>
+  --
+  * slug : varchar <<unique>>
+  * name : varchar
+  * type : enum <individual_sport|team_sport>
+  * members_count : tinyint
+  substitutes_count : tinyint
+  description : text
+  created_at : timestamp
+  updated_at : timestamp
+}
+
+entity "competitions" as competitions {
+  * id : bigint <<PK>>
+  --
+  * slug : varchar <<unique>>
+  * name : varchar
+  * sport_id : bigint <<FK>>
+  * start_date : date
+  * end_date : date
+  * status : enum <draft|open_registration|closed|completed>
+  * year : smallint
+  location : varchar
+  created_at : timestamp
+  updated_at : timestamp
+}
+
+' === Ekipe i članstvo ===
+
+entity "teams" as teams {
+  * id : bigint <<PK>>
+  --
+  * team_uuid : uuid <<unique>>
+  * school_id : bigint <<FK>>
+  * competition_id : bigint <<FK>>
+  * professor_id : bigint <<FK>>
+  * status : enum <draft|submitted|active|rejected|cancelled|withdrawn|completed>
+  name : varchar
+  signature : varchar
+  signed_at : timestamp
+  signature_ip : varchar
+  rejection_reason : text
+  created_at : timestamp
+  updated_at : timestamp
+}
+
+entity "team_members" as team_members {
+  * id : bigint <<PK>>
+  --
+  * team_id : bigint <<FK>>
+  * student_id : bigint <<FK>>
+  position : varchar
+  created_at : timestamp
+  updated_at : timestamp
+}
+
+' === Medicina i rezultati ===
+
+entity "medical_certificates" as mc {
+  * id : bigint <<PK>>
+  --
+  * team_member_id : bigint <<FK>>
+  * path : varchar
+  * status : enum <pending|valid|expired|invalid|manual_review|superseded>
+  issued_at : date
+  expires_at : date
+  extracted_name : varchar
+  ocr_confidence : decimal(3,2)
+  doctor_name : varchar
+  institution : varchar
+  created_at : timestamp
+  updated_at : timestamp
+}
+
+entity "results" as results {
+  * id : bigint <<PK>>
+  --
+  * subject_type : varchar <morph type>
+  * subject_id : bigint <morph id>
+  * competition_id : bigint <<FK>>
+  placement : smallint
+  medal : enum <gold|silver|bronze>
+  points : int
+  notes : text
+  created_at : timestamp
+  updated_at : timestamp
+}
+
+' === Auditabilnost i infrastruktura ===
+
+entity "audit_log" as audit {
+  * id : uuid <<PK>>
+  --
+  user_id : bigint <<FK>>
+  * action : varchar
+  * subject_type : varchar
+  subject_id : bigint
+  payload : json
+  ip : varchar
+  user_agent : varchar
+  created_at : timestamp
+}
+
+entity "notifications" as notif {
+  * id : uuid <<PK>>
+  --
+  * type : varchar
+  * notifiable_type : varchar
+  * notifiable_id : bigint
+  * data : json
+  read_at : timestamp
+  created_at : timestamp
+  updated_at : timestamp
+}
+
+entity "jobs" as jobs {
+  * id : bigint <<PK>>
+  --
+  * queue : varchar
+  * payload : longtext
+  * attempts : tinyint
+  reserved_at : int
+  available_at : int
+  created_at : int
+}
+
+entity "failed_jobs" as failed {
+  * id : bigint <<PK>>
+  --
+  * uuid : uuid <<unique>>
+  * connection : text
+  * queue : text
+  * payload : longtext
+  * exception : longtext
+  failed_at : timestamp
+}
+
+' === Relacije sa kardinalitetom ===
+
+schools ||--o{ users : "1:N (zaposleni / učenici)"
+schools ||--o{ teams : "1:N"
+sports ||--o{ competitions : "1:N"
+competitions ||--o{ teams : "1:N"
+competitions ||--o{ results : "1:N (preko polymorphic)"
+users ||--o{ teams : "1:N (professor_id)"
+teams ||--o{ team_members : "1:N"
+users ||--o{ team_members : "1:N (student_id)"
+team_members ||--o{ mc : "1:N (više potvrda kroz vrijeme)"
+users ||--o{ audit : "1:N"
+users ||--o{ notif : "1:N (notifiable polymorphic)"
+
+note bottom of results
+  results.subject je polymorphic:
+  - subject_type = 'App\\Models\\Team' → ekipni sport
+  - subject_type = 'App\\Models\\User' → individualni sport
+end note
+
+note bottom of audit
+  audit_log koristi uuid PK
+  zbog event-source pattern-a;
+  nikad ne brišemo zapise.
+end note
+
+@enduml
