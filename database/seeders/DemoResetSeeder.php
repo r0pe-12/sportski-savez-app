@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Enums\CompetitionStatus;
 use App\Enums\SportType;
 use App\Models\Competition;
 use App\Models\School;
@@ -176,7 +177,7 @@ class DemoResetSeeder extends Seeder
             'location' => 'Sportski centar Morača, Podgorica',
             'start_date' => now()->addMonths(2)->startOfDay()->toDateString(),
             'end_date' => now()->addMonths(2)->addDays(2)->startOfDay()->toDateString(),
-            'status' => 'active',
+            'status' => CompetitionStatus::Open,
             'year' => 2027,
         ]);
         $this->command->info("  - Takmičenje: {$competition->name} (start: {$competition->start_date})");
