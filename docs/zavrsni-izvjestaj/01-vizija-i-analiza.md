@@ -46,6 +46,8 @@ Sportski savez Crne Gore organizuje školska sportska takmičenja, ali se cijeli
 
 (Iz Projektna_analitika §2 + spec §5.)
 
+**Use Case dijagram** (UML standard — akteri, sistemska granica, UC-ovi i njihove veze): vidi [`uml/00-use-case-dijagram.puml`](uml/00-use-case-dijagram.puml).
+
 | ID | Naziv | Aktor | Status v1.0 |
 |---|---|---|---|
 | UC1 | Registracija | Profesor / Učenik | ✅ Implementirano |

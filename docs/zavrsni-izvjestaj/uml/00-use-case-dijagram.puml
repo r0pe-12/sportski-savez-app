@@ -1,0 +1,78 @@
+@startuml use-case-dijagram
+!theme plain
+title Use Case dijagram — Sistem školskog sporta Crne Gore
+
+left to right direction
+skinparam packageStyle rectangle
+skinparam usecase {
+    BackgroundColor #FEFEFE
+    BorderColor #2C3E50
+}
+skinparam actor {
+    BackgroundColor #ECF0F1
+    BorderColor #2C3E50
+}
+
+' Primarni akteri (lijevo)
+actor "Profesor\nfizičkog vaspitanja" as Prof
+actor "Učenik" as Student
+actor "Administrator\nSportskog saveza" as Admin
+
+' Sistemska granica
+rectangle "Sistem školskog sporta CG" {
+    usecase "UC1\nRegistracija" as UC1
+    usecase "UC2\nPrijava na sistem\n(login)" as UC2
+    usecase "UC3\nPregled profila\ni istorije" as UC3
+    usecase "UC4\nPregled rasporeda\ntakmičenja" as UC4
+    usecase "UC5\nPrijava ekipe\nna takmičenje" as UC5 #FFD580
+    usecase "UC6\nOCR validacija\nljekarske potvrde" as UC6
+    usecase "UC7\nUpravljanje\nkorisnicima i školama" as UC7
+    usecase "UC8\nVerifikacija učenika\n(eDnevnik)" as UC8
+    usecase "UC9\nUpravljanje sportovima\ni rasporedom" as UC9
+    usecase "UC10\nUnos rezultata\ni medalja" as UC10
+}
+
+' Eksterni sistem (desno)
+actor "eDnevnik\n(eksterni sistem)" as EDnevnik <<external>>
+
+' Profesor — primarni aktor UC5 (centralni)
+Prof --> UC1
+Prof --> UC2
+Prof --> UC3
+Prof --> UC4
+Prof --> UC5
+
+' Učenik — read-only
+Student --> UC1
+Student --> UC2
+Student --> UC3
+Student --> UC4
+
+' Admin — globalna prava
+Admin --> UC2
+Admin --> UC7
+Admin --> UC8
+Admin --> UC9
+Admin --> UC10
+
+' Eksterni sistem
+EDnevnik <-- UC8 : "API poziv\n(JMB lookup)"
+
+' Include relacije
+UC5 .> UC6 : <<include>>
+UC7 .> UC8 : <<include>>
+
+' Note za centralni UC
+note top of UC5
+  CENTRALNI use case.
+  Orkestrira 7 entiteta,
+  uključuje OCR pipeline (UC6),
+  završava sa potpisom i submit-om.
+end note
+
+note right of UC8
+  AZLP-kritičan: svaki pristup
+  eDnevniku loguje se u audit log.
+end note
+
+@enduml

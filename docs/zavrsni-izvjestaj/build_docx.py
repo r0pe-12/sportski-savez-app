@@ -42,12 +42,13 @@ lang: sr
 
 # UML slike koje treba embed-ovati u Poglavlje 2
 UML_EMBEDS = {
-    "01-klasni-dijagram": ("Slika 1: Klasni dijagram — domain model (11 entiteta + 7 enum-a + STI hijerarhija User → Professor)", "uml/render/01-klasni-dijagram.png"),
-    "02-sequence-uc5": ("Slika 2: Sequence dijagram UC5 — async OCR upload + sync submit", "uml/render/02-sequence-uc5.png"),
-    "03-sequence-uc8": ("Slika 3: Sequence dijagram UC8 — eDnevnik verifikacija (3 grane)", "uml/render/03-sequence-uc8.png"),
-    "04-component-dijagram": ("Slika 4: Component dijagram — slojevita arhitektura sa adapter pattern", "uml/render/04-component-dijagram.png"),
-    "05-package-dijagram": ("Slika 5: Package dijagram — Laravel struktura sa split route-ovima", "uml/render/05-package-dijagram.png"),
-    "06-deployment-dijagram": ("Slika 6: Deployment dijagram — dev (lokalno SQLite + Fake adapteri) vs prod (Laravel Cloud)", "uml/render/06-deployment-dijagram.png"),
+    "00-use-case-dijagram": ("Slika 1: Use Case dijagram — 3 primarna aktera + eDnevnik (eksterni) + 10 UC-ova sa <<include>> relacijama (UC5→UC6, UC7→UC8)", "uml/render/00-use-case-dijagram.png"),
+    "01-klasni-dijagram": ("Slika 2: Klasni dijagram — domain model (11 entiteta + 7 enum-a + STI hijerarhija User → Professor)", "uml/render/01-klasni-dijagram.png"),
+    "02-sequence-uc5": ("Slika 3: Sequence dijagram UC5 — async OCR upload + sync submit", "uml/render/02-sequence-uc5.png"),
+    "03-sequence-uc8": ("Slika 4: Sequence dijagram UC8 — eDnevnik verifikacija (3 grane)", "uml/render/03-sequence-uc8.png"),
+    "04-component-dijagram": ("Slika 5: Component dijagram — slojevita arhitektura sa adapter pattern", "uml/render/04-component-dijagram.png"),
+    "05-package-dijagram": ("Slika 6: Package dijagram — Laravel struktura sa split route-ovima", "uml/render/05-package-dijagram.png"),
+    "06-deployment-dijagram": ("Slika 7: Deployment dijagram — dev (lokalno SQLite + Fake adapteri) vs prod (Laravel Cloud)", "uml/render/06-deployment-dijagram.png"),
 }
 
 # Demo screenshot-ovi koje treba embed-ovati u Poglavlje 3

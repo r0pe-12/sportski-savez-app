@@ -170,12 +170,13 @@ Tree-shakable: nekorišćene rute se ne uključuju u bundle.
 
 | # | Dijagram | Izvor | Pokriva |
 |---|---|---|---|
-| 1 | [Klasni dijagram](uml/01-klasni-dijagram.puml) | `app/Models/` + `app/Enums/` | Domain model: 11 entiteta + 7 enum-a + STI User/Professor |
-| 2 | [Sequence UC5](uml/02-sequence-uc5.puml) | `TeamController` + `TeamRegistrationService` + `FakeOcrAdapter` + `ValidateMedicalCertificateJob` | Prijava ekipe: async OCR upload + sync submit |
-| 3 | [Sequence UC8](uml/03-sequence-uc8.puml) | `StudentVerificationController` + `EDnevnikVerificationService` + `FakeEDnevnikAdapter` | eDnevnik verifikacija: 3 grane (verified/mismatched/unavailable) |
-| 4 | [Component dijagram](uml/04-component-dijagram.puml) | spec §9.2 + `app/` struktura | Slojevita arhitektura sa adapter pattern |
-| 5 | [Package dijagram](uml/05-package-dijagram.puml) | `app/`, `routes/`, `resources/js/`, `database/`, `tests/` | Laravel struktura sa split route-ovima |
-| 6 | [Deployment dijagram](uml/06-deployment-dijagram.puml) | `composer.json` + `.env.example` + spec §11 | Dev (SQLite + log mail + Fake adapteri) vs prod (Laravel Cloud) |
+| 1 | [Use Case dijagram](uml/00-use-case-dijagram.puml) | spec §5 + Projektna_analitika §2 | 3 primarna aktera (Prof/Učenik/Admin) + eDnevnik (eksterni) + svih 10 UC-ova sa `<<include>>` relacijama (UC5→UC6, UC7→UC8) |
+| 2 | [Klasni dijagram](uml/01-klasni-dijagram.puml) | `app/Models/` + `app/Enums/` | Domain model: 11 entiteta + 7 enum-a + STI User/Professor |
+| 3 | [Sequence UC5](uml/02-sequence-uc5.puml) | `TeamController` + `TeamRegistrationService` + `FakeOcrAdapter` + `ValidateMedicalCertificateJob` | Prijava ekipe: async OCR upload + sync submit |
+| 4 | [Sequence UC8](uml/03-sequence-uc8.puml) | `StudentVerificationController` + `EDnevnikVerificationService` + `FakeEDnevnikAdapter` | eDnevnik verifikacija: 3 grane (verified/mismatched/unavailable) |
+| 5 | [Component dijagram](uml/04-component-dijagram.puml) | spec §9.2 + `app/` struktura | Slojevita arhitektura sa adapter pattern |
+| 6 | [Package dijagram](uml/05-package-dijagram.puml) | `app/`, `routes/`, `resources/js/`, `database/`, `tests/` | Laravel struktura sa split route-ovima |
+| 7 | [Deployment dijagram](uml/06-deployment-dijagram.puml) | `composer.json` + `.env.example` + spec §11 | Dev (SQLite + log mail + Fake adapteri) vs prod (Laravel Cloud) |
 
 Detalji i uputstvo za render: [`uml/README.md`](uml/README.md).
 
