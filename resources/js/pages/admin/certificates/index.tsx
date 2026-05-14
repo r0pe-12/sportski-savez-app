@@ -3,7 +3,9 @@ import { CheckCircle2, FileCheck2 } from 'lucide-react';
 import { useState } from 'react';
 import { CertificateStatusBadge } from '@/components/medical-certificates/CertificateStatusBadge';
 import { Button } from '@/components/ui/button';
-import { NativeSelect } from '@/components/ui/native-select';
+import { FilterBar } from '@/components/ui/filter-bar';
+import { SelectField  } from '@/components/ui/select-field';
+import type {SelectFieldOption} from '@/components/ui/select-field';
 import AppLayout from '@/layouts/app-layout';
 import { formatDate } from '@/lib/format-date';
 
@@ -134,41 +136,36 @@ export default function AdminCertificatesIndex({
                     </div>
                 </div>
 
-                <div className="grid gap-3 rounded-xl border bg-card p-4 sm:grid-cols-2 lg:grid-cols-4">
-                    <div className="grid gap-1">
-                        <label className="text-muted-foreground text-xs">Status</label>
-                        <NativeSelect
-                            value={local.status}
-                            onChange={(e) => apply({ status: e.target.value })}
-                        >
-                            <option value="all">Svi statusi</option>
-                            {statuses.map((s) => (
-                                <option key={s.value} value={s.value}>
-                                    {statusLabelMap[s.value] ?? s.label}
-                                </option>
-                            ))}
-                        </NativeSelect>
-                    </div>
+                <FilterBar
+                    hasActiveFilters={local.status !== 'all' || local.school_id !== ''}
+                    onReset={() => apply({ status: 'all', school_id: '' })}
+                >
+                    <SelectField
+                        label="Status"
+                        placeholder="Svi statusi"
+                        value={local.status === 'all' ? '' : local.status}
+                        onChange={(v) => apply({ status: v || 'all' })}
+                        options={
+                            statuses.map((s) => ({
+                                value: s.value,
+                                label: statusLabelMap[s.value] ?? s.label,
+                            })) as SelectFieldOption[]
+                        }
+                    />
 
-                    <div className="grid gap-1">
-                        <label className="text-muted-foreground text-xs">Škola</label>
-                        <NativeSelect
-                            value={local.school_id === '' ? '' : String(local.school_id)}
-                            onChange={(e) =>
-                                apply({
-                                    school_id: e.target.value === '' ? '' : Number(e.target.value),
-                                })
-                            }
-                        >
-                            <option value="">Sve škole</option>
-                            {schools.map((s) => (
-                                <option key={s.id} value={s.id}>
-                                    {s.name}
-                                </option>
-                            ))}
-                        </NativeSelect>
-                    </div>
-                </div>
+                    <SelectField
+                        label="Škola"
+                        placeholder="Sve škole"
+                        value={local.school_id === '' ? '' : String(local.school_id)}
+                        onChange={(v) =>
+                            apply({ school_id: v === '' ? '' : Number(v) })
+                        }
+                        options={schools.map((s) => ({
+                            value: String(s.id),
+                            label: s.name,
+                        }))}
+                    />
+                </FilterBar>
 
                 {isEmpty ? (
                     <div className="flex flex-col items-center gap-3 rounded-xl border bg-card p-12 text-center">

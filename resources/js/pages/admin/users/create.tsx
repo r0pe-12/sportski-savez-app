@@ -16,7 +16,7 @@ import InputError from '@/components/input-error';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { NativeSelect } from '@/components/ui/native-select';
+import { SelectField } from '@/components/ui/select-field';
 import AppLayout from '@/layouts/app-layout';
 
 type School = { id: number; name: string; code: string };
@@ -27,6 +27,37 @@ const ROLE_DESCRIPTIONS: Record<string, string> = {
     professor: 'Prijavljuje ekipe i upload-uje medicinske potvrde za učenike svoje škole.',
     student: 'Pristup ličnom profilu, istoriji takmičenja i medalja.',
 };
+
+function SchoolSelect({
+    schools,
+    error,
+}: {
+    schools: School[];
+    error?: string;
+}) {
+    const [value, setValue] = useState('');
+
+    return (
+        <>
+            <SelectField
+                id="school_id"
+                name="school_id"
+                label="Škola"
+                placeholder="Odaberi školu…"
+                value={value}
+                onChange={setValue}
+                options={schools.map((s) => ({
+                    value: String(s.id),
+                    label: s.name,
+                    description: s.code,
+                }))}
+                required
+                aria-invalid={error ? true : undefined}
+            />
+            <InputError message={error} />
+        </>
+    );
+}
 
 export default function UsersCreate({
     schools,
@@ -92,24 +123,19 @@ export default function UsersCreate({
                                     description="Uloga određuje pristupna prava i koji su podaci obavezni."
                                 >
                                     <FormField>
-                                        <Label htmlFor="role">Uloga</Label>
-                                        <NativeSelect
+                                        <SelectField
                                             id="role"
                                             name="role"
+                                            label="Uloga"
                                             value={role}
-                                            onChange={(e) =>
-                                                setRole(e.target.value)
-                                            }
-                                        >
-                                            {roles.map((r) => (
-                                                <option
-                                                    key={r.value}
-                                                    value={r.value}
-                                                >
-                                                    {r.label}
-                                                </option>
-                                            ))}
-                                        </NativeSelect>
+                                            onChange={setRole}
+                                            options={roles.map((r) => ({
+                                                value: r.value,
+                                                label: r.label,
+                                            }))}
+                                            required
+                                            aria-invalid={errors.role ? true : undefined}
+                                        />
                                         <InputError message={errors.role} />
                                     </FormField>
                                 </FormSection>
@@ -167,32 +193,9 @@ export default function UsersCreate({
                                         description="Profesori prijavljuju samo svoje učenike. Učenici pripadaju ovoj školi."
                                     >
                                         <FormField>
-                                            <Label htmlFor="school_id">
-                                                Škola
-                                            </Label>
-                                            <NativeSelect
-                                                id="school_id"
-                                                name="school_id"
-                                                required
-                                                defaultValue=""
-                                            >
-                                                <option value="" disabled>
-                                                    — odaberi školu —
-                                                </option>
-                                                {schools.map((s) => (
-                                                    <option
-                                                        key={s.id}
-                                                        value={s.id}
-                                                    >
-                                                        {s.name}{' '}
-                                                        <span className="text-muted-foreground">
-                                                            ({s.code})
-                                                        </span>
-                                                    </option>
-                                                ))}
-                                            </NativeSelect>
-                                            <InputError
-                                                message={errors.school_id}
+                                            <SchoolSelect
+                                                schools={schools}
+                                                error={errors.school_id}
                                             />
                                         </FormField>
                                     </FormSection>

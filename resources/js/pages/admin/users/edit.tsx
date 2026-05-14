@@ -16,7 +16,7 @@ import InputError from '@/components/input-error';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { NativeSelect } from '@/components/ui/native-select';
+import { SelectField } from '@/components/ui/select-field';
 import AppLayout from '@/layouts/app-layout';
 import type { SchoolSummary } from '@/types/auth';
 
@@ -43,6 +43,9 @@ export default function UsersEdit({
     roles: Role[];
 }) {
     const [role, setRole] = useState(user.role);
+    const [schoolId, setSchoolId] = useState(
+        user.school?.id ? String(user.school.id) : '',
+    );
 
     return (
         <AppLayout
@@ -109,24 +112,19 @@ export default function UsersEdit({
                                     description="Pažljivo — promjena uloge mijenja sve pristupe."
                                 >
                                     <FormField>
-                                        <Label htmlFor="role">Uloga</Label>
-                                        <NativeSelect
+                                        <SelectField
                                             id="role"
                                             name="role"
+                                            label="Uloga"
                                             value={role}
-                                            onChange={(e) =>
-                                                setRole(e.target.value)
-                                            }
-                                        >
-                                            {roles.map((r) => (
-                                                <option
-                                                    key={r.value}
-                                                    value={r.value}
-                                                >
-                                                    {r.label}
-                                                </option>
-                                            ))}
-                                        </NativeSelect>
+                                            onChange={setRole}
+                                            options={roles.map((r) => ({
+                                                value: r.value,
+                                                label: r.label,
+                                            }))}
+                                            required
+                                            aria-invalid={errors.role ? true : undefined}
+                                        />
                                         <InputError message={errors.role} />
                                     </FormField>
                                 </FormSection>
@@ -170,29 +168,21 @@ export default function UsersEdit({
                                         description="Profesori vide samo učenike iz svoje škole."
                                     >
                                         <FormField>
-                                            <Label htmlFor="school_id">
-                                                Škola
-                                            </Label>
-                                            <NativeSelect
+                                            <SelectField
                                                 id="school_id"
                                                 name="school_id"
-                                                defaultValue={
-                                                    user.school?.id ?? ''
-                                                }
+                                                label="Škola"
+                                                placeholder="Odaberi školu…"
+                                                value={schoolId}
+                                                onChange={setSchoolId}
+                                                options={schools.map((s) => ({
+                                                    value: String(s.id),
+                                                    label: s.name,
+                                                    description: s.code,
+                                                }))}
                                                 required
-                                            >
-                                                <option value="" disabled>
-                                                    — odaberi —
-                                                </option>
-                                                {schools.map((s) => (
-                                                    <option
-                                                        key={s.id}
-                                                        value={s.id}
-                                                    >
-                                                        {s.name} ({s.code})
-                                                    </option>
-                                                ))}
-                                            </NativeSelect>
+                                                aria-invalid={errors.school_id ? true : undefined}
+                                            />
                                             <InputError
                                                 message={errors.school_id}
                                             />

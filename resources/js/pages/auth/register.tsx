@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { SelectField } from '@/components/ui/select-field';
 import { Spinner } from '@/components/ui/spinner';
 import { login } from '@/routes';
 import { store } from '@/routes/register';
@@ -16,6 +17,7 @@ type Role = 'professor' | 'student';
 
 export default function Register({ schools }: { schools: School[] }) {
     const [role, setRole] = useState<Role>('professor');
+    const [schoolId, setSchoolId] = useState<string>('');
 
     return (
         <>
@@ -29,19 +31,20 @@ export default function Register({ schools }: { schools: School[] }) {
                 {({ processing, errors }) => (
                     <>
                         <div className="grid gap-6">
-                            <div className="grid gap-2">
-                                <Label htmlFor="role">Uloga</Label>
-                                <select
+                            <div className="grid gap-1.5">
+                                <SelectField
                                     id="role"
                                     name="role"
+                                    label="Uloga"
                                     value={role}
-                                    onChange={(e) => setRole(e.target.value as Role)}
-                                    className="border-input bg-background h-9 rounded-md border px-3 text-sm"
+                                    onChange={(v) => setRole(v as Role)}
+                                    options={[
+                                        { value: 'professor', label: 'Profesor' },
+                                        { value: 'student', label: 'Učenik' },
+                                    ]}
                                     required
-                                >
-                                    <option value="professor">Profesor</option>
-                                    <option value="student">Učenik</option>
-                                </select>
+                                    aria-invalid={errors.role ? true : undefined}
+                                />
                                 <InputError message={errors.role} />
                             </div>
 
@@ -70,21 +73,22 @@ export default function Register({ schools }: { schools: School[] }) {
                                 <InputError message={errors.email} />
                             </div>
 
-                            <div className="grid gap-2">
-                                <Label htmlFor="school_id">Škola</Label>
-                                <select
+                            <div className="grid gap-1.5">
+                                <SelectField
                                     id="school_id"
                                     name="school_id"
+                                    label="Škola"
+                                    placeholder="Odaberi školu…"
+                                    value={schoolId}
+                                    onChange={setSchoolId}
+                                    options={schools.map((s) => ({
+                                        value: String(s.id),
+                                        label: s.name,
+                                        description: s.city,
+                                    }))}
                                     required
-                                    className="border-input bg-background h-9 rounded-md border px-3 text-sm"
-                                >
-                                    <option value="">— odaberi školu —</option>
-                                    {schools.map((s) => (
-                                        <option key={s.id} value={s.id}>
-                                            {s.name} ({s.city})
-                                        </option>
-                                    ))}
-                                </select>
+                                    aria-invalid={errors.school_id ? true : undefined}
+                                />
                                 <InputError message={errors.school_id} />
                             </div>
 

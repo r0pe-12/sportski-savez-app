@@ -1,8 +1,11 @@
 import { Head, Link, router } from '@inertiajs/react';
+import { Search } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 import { VerificationStatusBadge } from '@/components/students/verification-status-badge';
+import { FilterBar, FilterBarChip } from '@/components/ui/filter-bar';
 import { Input } from '@/components/ui/input';
-import { NativeSelect } from '@/components/ui/native-select';
+import { SelectField  } from '@/components/ui/select-field';
+import type {SelectFieldOption} from '@/components/ui/select-field';
 import AppLayout from '@/layouts/app-layout';
 
 type Student = {
@@ -37,7 +40,7 @@ type Props = {
     filters: Filters;
 };
 
-const statusOptions: { value: string; label: string }[] = [
+const STATUS_OPTIONS: SelectFieldOption[] = [
     { value: 'unverified', label: 'Neverifikovan' },
     { value: 'pending', label: 'U toku' },
     { value: 'verified', label: 'Verifikovan' },
@@ -97,6 +100,18 @@ export default function StudentsAdminIndex({ students, schools, filters }: Props
     }, [searchValue, filters]);
 
     const isMismatchedFilter = filters.status === 'mismatched';
+    const hasActiveFilters = Boolean(filters.q || filters.school_id || filters.status);
+
+    const resetFilters = () => {
+        setSearchValue('');
+        lastApplied.current = '';
+        router.get(window.location.pathname, {}, { preserveScroll: true, replace: true });
+    };
+
+    const schoolOptions: SelectFieldOption[] = schools.map((s) => ({
+        value: String(s.id),
+        label: s.name,
+    }));
 
     return (
         <AppLayout breadcrumbs={[{ title: 'Učenici', href: '/admin/students' }]}>
@@ -104,94 +119,68 @@ export default function StudentsAdminIndex({ students, schools, filters }: Props
             <div className="space-y-4 p-6">
                 <h1 className="text-2xl font-semibold">Učenici</h1>
 
-                <div className="flex flex-wrap items-end gap-3 rounded border p-3">
-                    <div className="flex flex-col">
+                <FilterBar
+                    hasActiveFilters={hasActiveFilters}
+                    onReset={resetFilters}
+                >
+                    <div className="flex flex-col gap-1.5">
                         <label
-                            className="text-muted-foreground mb-1 text-xs"
+                            className="text-foreground text-sm font-medium leading-none"
                             htmlFor="filter-search"
                         >
-                            Pretraga (ime ili JMB)
+                            Pretraga
                         </label>
-                        <Input
-                            id="filter-search"
-                            type="search"
-                            placeholder="npr. Marko ili 0101..."
-                            className="w-64"
-                            value={searchValue}
-                            onChange={(e) => setSearchValue(e.target.value)}
-                        />
+                        <div className="relative">
+                            <Search className="text-muted-foreground pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2" />
+                            <Input
+                                id="filter-search"
+                                type="search"
+                                placeholder="Ime ili JMB…"
+                                className="h-10 pl-9"
+                                value={searchValue}
+                                onChange={(e) => setSearchValue(e.target.value)}
+                            />
+                        </div>
                     </div>
 
-                    <div className="flex flex-col">
-                        <label
-                            className="text-muted-foreground mb-1 text-xs"
-                            htmlFor="filter-school"
-                        >
-                            Škola
-                        </label>
-                        <NativeSelect
-                            id="filter-school"
-                            className="w-56"
-                            value={filters.school_id ?? ''}
-                            onChange={(e) =>
-                                applyFilters(
-                                    {
-                                        school_id: e.target.value ? Number(e.target.value) : null,
-                                    },
-                                    filters,
-                                )
-                            }
-                        >
-                            <option value="">Sve</option>
-                            {schools.map((s) => (
-                                <option key={s.id} value={s.id}>
-                                    {s.name}
-                                </option>
-                            ))}
-                        </NativeSelect>
-                    </div>
+                    <SelectField
+                        id="filter-school"
+                        label="Škola"
+                        placeholder="Sve škole"
+                        value={filters.school_id ? String(filters.school_id) : ''}
+                        onChange={(v) =>
+                            applyFilters(
+                                { school_id: v ? Number(v) : null },
+                                filters,
+                            )
+                        }
+                        options={schoolOptions}
+                    />
 
-                    <div className="flex flex-col">
-                        <label
-                            className="text-muted-foreground mb-1 text-xs"
-                            htmlFor="filter-status"
-                        >
-                            Status verifikacije
-                        </label>
-                        <NativeSelect
-                            id="filter-status"
-                            className="w-56"
-                            value={filters.status ?? ''}
-                            onChange={(e) =>
-                                applyFilters({ status: e.target.value || null }, filters)
-                            }
-                        >
-                            <option value="">Svi</option>
-                            {statusOptions.map((s) => (
-                                <option key={s.value} value={s.value}>
-                                    {s.label}
-                                </option>
-                            ))}
-                        </NativeSelect>
-                    </div>
+                    <SelectField
+                        id="filter-status"
+                        label="Status verifikacije"
+                        placeholder="Svi statusi"
+                        value={filters.status ?? ''}
+                        onChange={(v) =>
+                            applyFilters({ status: v || null }, filters)
+                        }
+                        options={STATUS_OPTIONS}
+                    />
 
-                    <button
-                        type="button"
+                    <FilterBarChip
+                        active={isMismatchedFilter}
+                        tone="red"
                         onClick={() =>
                             applyFilters(
                                 { status: isMismatchedFilter ? null : 'mismatched' },
                                 filters,
                             )
                         }
-                        className={`rounded-full border px-3 py-1 text-xs font-medium transition ${
-                            isMismatchedFilter
-                                ? 'border-red-400 bg-red-100 text-red-900'
-                                : 'border-red-200 bg-red-50 text-red-800 hover:bg-red-100'
-                        }`}
                     >
                         Mismatched
-                    </button>
-                </div>
+                    </FilterBarChip>
+                </FilterBar>
 
                 <div className="overflow-x-auto rounded border">
                     <table className="w-full text-sm">
@@ -231,7 +220,9 @@ export default function StudentsAdminIndex({ students, schools, filters }: Props
                                         colSpan={6}
                                         className="text-muted-foreground p-4 text-center"
                                     >
-                                        Nema učenika za zadate filtere.
+                                        {hasActiveFilters
+                                            ? 'Nema rezultata sa primijenjenim filterima.'
+                                            : 'Nema učenika.'}
                                     </td>
                                 </tr>
                             )}

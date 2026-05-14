@@ -1,5 +1,7 @@
 import { Head, Link, router } from '@inertiajs/react';
-import { NativeSelect } from '@/components/ui/native-select';
+import { FilterBar, FilterBarChip } from '@/components/ui/filter-bar';
+import { SelectField  } from '@/components/ui/select-field';
+import type {SelectFieldOption} from '@/components/ui/select-field';
 import AppLayout from '@/layouts/app-layout';
 import { formatDate } from '@/lib/format-date';
 
@@ -37,16 +39,21 @@ type Props = {
 };
 
 const statusLabels: Record<string, { label: string; className: string }> = {
-    draft: { label: 'Skica', className: 'bg-zinc-100 text-zinc-800' },
-    submitted: { label: 'Predata', className: 'bg-amber-100 text-amber-800' },
-    active: { label: 'Aktivna', className: 'bg-green-100 text-green-800' },
-    rejected: { label: 'Odbijena', className: 'bg-red-100 text-red-800' },
-    cancelled: { label: 'Otkazana', className: 'bg-zinc-100 text-zinc-800' },
-    withdrawn: { label: 'Povučena', className: 'bg-zinc-100 text-zinc-800' },
-    completed: { label: 'Završena', className: 'bg-blue-100 text-blue-800' },
+    draft: { label: 'Skica', className: 'bg-zinc-100 text-zinc-800 dark:bg-zinc-800 dark:text-zinc-200' },
+    submitted: { label: 'Predata', className: 'bg-amber-100 text-amber-800 dark:bg-amber-900/40 dark:text-amber-200' },
+    active: { label: 'Aktivna', className: 'bg-green-100 text-green-800 dark:bg-green-900/40 dark:text-green-200' },
+    rejected: { label: 'Odbijena', className: 'bg-red-100 text-red-800 dark:bg-red-900/40 dark:text-red-200' },
+    cancelled: { label: 'Otkazana', className: 'bg-zinc-100 text-zinc-800 dark:bg-zinc-800 dark:text-zinc-200' },
+    withdrawn: { label: 'Povučena', className: 'bg-zinc-100 text-zinc-800 dark:bg-zinc-800 dark:text-zinc-200' },
+    completed: { label: 'Završena', className: 'bg-blue-100 text-blue-800 dark:bg-blue-900/40 dark:text-blue-200' },
 };
 
 const statusOrder = ['draft', 'submitted', 'active', 'rejected', 'cancelled', 'withdrawn', 'completed'];
+
+const STATUS_OPTIONS: SelectFieldOption[] = statusOrder.map((s) => ({
+    value: s,
+    label: statusLabels[s]?.label ?? s,
+}));
 
 function renderDate(value: string | null): string {
     return formatDate(value) || '—';
@@ -80,6 +87,21 @@ function applyFilters(next: Partial<Filters>, current: Filters) {
 
 export default function AdminTeamsIndex({ teams, competitions, schools, filters }: Props) {
     const isPendingFilter = filters.status === 'submitted';
+    const hasActiveFilters = Boolean(filters.status || filters.competition_id || filters.school_id);
+
+    const resetFilters = () => {
+        router.get(window.location.pathname, {}, { preserveScroll: true, replace: true });
+    };
+
+    const competitionOptions: SelectFieldOption[] = competitions.map((c) => ({
+        value: String(c.id),
+        label: c.name,
+    }));
+
+    const schoolOptions: SelectFieldOption[] = schools.map((s) => ({
+        value: String(s.id),
+        label: s.name,
+    }));
 
     return (
         <AppLayout breadcrumbs={[{ title: 'Ekipe', href: '/admin/teams' }]}>
@@ -87,100 +109,60 @@ export default function AdminTeamsIndex({ teams, competitions, schools, filters 
             <div className="space-y-4 p-6">
                 <h1 className="text-2xl font-semibold">Sve ekipe</h1>
 
-                <div className="flex flex-wrap items-end gap-3 rounded border p-3">
-                    <div className="flex flex-col">
-                        <label className="text-muted-foreground mb-1 text-xs" htmlFor="filter-status">
-                            Status
-                        </label>
-                        <NativeSelect
-                            id="filter-status"
-                            className="w-44"
-                            value={filters.status ?? ''}
-                            onChange={(e) =>
-                                applyFilters({ status: e.target.value || null }, filters)
-                            }
-                        >
-                            <option value="">Svi</option>
-                            {statusOrder.map((s) => (
-                                <option key={s} value={s}>
-                                    {statusLabels[s]?.label ?? s}
-                                </option>
-                            ))}
-                        </NativeSelect>
-                    </div>
+                <FilterBar
+                    hasActiveFilters={hasActiveFilters}
+                    onReset={resetFilters}
+                >
+                    <SelectField
+                        id="filter-status"
+                        label="Status"
+                        placeholder="Svi statusi"
+                        value={filters.status ?? ''}
+                        onChange={(v) => applyFilters({ status: v || null }, filters)}
+                        options={STATUS_OPTIONS}
+                    />
 
-                    <div className="flex flex-col">
-                        <label
-                            className="text-muted-foreground mb-1 text-xs"
-                            htmlFor="filter-competition"
-                        >
-                            Takmičenje
-                        </label>
-                        <NativeSelect
-                            id="filter-competition"
-                            className="w-56"
-                            value={filters.competition_id ?? ''}
-                            onChange={(e) =>
-                                applyFilters(
-                                    {
-                                        competition_id: e.target.value
-                                            ? Number(e.target.value)
-                                            : null,
-                                    },
-                                    filters,
-                                )
-                            }
-                        >
-                            <option value="">Sva</option>
-                            {competitions.map((c) => (
-                                <option key={c.id} value={c.id}>
-                                    {c.name}
-                                </option>
-                            ))}
-                        </NativeSelect>
-                    </div>
+                    <SelectField
+                        id="filter-competition"
+                        label="Takmičenje"
+                        placeholder="Sva takmičenja"
+                        value={filters.competition_id ? String(filters.competition_id) : ''}
+                        onChange={(v) =>
+                            applyFilters(
+                                { competition_id: v ? Number(v) : null },
+                                filters,
+                            )
+                        }
+                        options={competitionOptions}
+                    />
 
-                    <div className="flex flex-col">
-                        <label className="text-muted-foreground mb-1 text-xs" htmlFor="filter-school">
-                            Škola
-                        </label>
-                        <NativeSelect
-                            id="filter-school"
-                            className="w-56"
-                            value={filters.school_id ?? ''}
-                            onChange={(e) =>
-                                applyFilters(
-                                    { school_id: e.target.value ? Number(e.target.value) : null },
-                                    filters,
-                                )
-                            }
-                        >
-                            <option value="">Sve</option>
-                            {schools.map((s) => (
-                                <option key={s.id} value={s.id}>
-                                    {s.name}
-                                </option>
-                            ))}
-                        </NativeSelect>
-                    </div>
+                    <SelectField
+                        id="filter-school"
+                        label="Škola"
+                        placeholder="Sve škole"
+                        value={filters.school_id ? String(filters.school_id) : ''}
+                        onChange={(v) =>
+                            applyFilters(
+                                { school_id: v ? Number(v) : null },
+                                filters,
+                            )
+                        }
+                        options={schoolOptions}
+                    />
 
-                    <button
-                        type="button"
+                    <FilterBarChip
+                        active={isPendingFilter}
+                        tone="amber"
                         onClick={() =>
                             applyFilters(
                                 { status: isPendingFilter ? null : 'submitted' },
                                 filters,
                             )
                         }
-                        className={`rounded-full border px-3 py-1 text-xs font-medium transition ${
-                            isPendingFilter
-                                ? 'border-amber-400 bg-amber-100 text-amber-900'
-                                : 'border-amber-200 bg-amber-50 text-amber-800 hover:bg-amber-100'
-                        }`}
                     >
                         Čeka odobrenje
-                    </button>
-                </div>
+                    </FilterBarChip>
+                </FilterBar>
 
                 <div className="overflow-x-auto rounded border">
                     <table className="w-full text-sm">
@@ -231,7 +213,9 @@ export default function AdminTeamsIndex({ teams, competitions, schools, filters 
                                         colSpan={6}
                                         className="text-muted-foreground p-4 text-center"
                                     >
-                                        Nema prijavljenih ekipa.
+                                        {hasActiveFilters
+                                            ? 'Nema rezultata sa primijenjenim filterima.'
+                                            : 'Nema prijavljenih ekipa.'}
                                     </td>
                                 </tr>
                             )}

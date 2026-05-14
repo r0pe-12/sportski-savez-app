@@ -1,5 +1,6 @@
 import { Form, Head, Link } from '@inertiajs/react';
 import { Trophy } from 'lucide-react';
+import { useState } from 'react';
 import {
     FormCard,
     FormCardBody,
@@ -15,11 +16,13 @@ import InputError from '@/components/input-error';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { NativeSelect } from '@/components/ui/native-select';
+import { SelectField } from '@/components/ui/select-field';
 import { Textarea } from '@/components/ui/textarea';
 import AppLayout from '@/layouts/app-layout';
 
 export default function SportsCreate() {
+    const [type, setType] = useState('team_sport');
+
     return (
         <AppLayout
             breadcrumbs={[
@@ -96,20 +99,19 @@ export default function SportsCreate() {
                                         </FormField>
                                     </FormGrid>
                                     <FormField>
-                                        <Label htmlFor="type">Tip sporta</Label>
-                                        <NativeSelect
+                                        <SelectField
                                             id="type"
                                             name="type"
-                                            defaultValue="team_sport"
+                                            label="Tip sporta"
+                                            value={type}
+                                            onChange={setType}
+                                            options={[
+                                                { value: 'team_sport', label: 'Timski sport' },
+                                                { value: 'individual_sport', label: 'Individualni sport' },
+                                            ]}
                                             required
-                                        >
-                                            <option value="team_sport">
-                                                Timski sport
-                                            </option>
-                                            <option value="individual_sport">
-                                                Individualni sport
-                                            </option>
-                                        </NativeSelect>
+                                            aria-invalid={errors.type ? true : undefined}
+                                        />
                                         <InputError message={errors.type} />
                                     </FormField>
                                 </FormSection>

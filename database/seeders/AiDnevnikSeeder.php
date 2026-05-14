@@ -1859,6 +1859,105 @@ ODLUKE_22,
 4. Postojeći Pest test za redirect će fail-ovati — popraviti zajedno u sljedećoj sesiji.
 ISHOD_22,
             ],
+            [
+                'broj' => 23,
+                'naslov' => 'Direct prijava ekipe sa stranice takmičenja (UC5 streamline)',
+                'datum' => '2026-05-14',
+                'faza' => 'Post-predaja / UX polish',
+                'alat' => 'Claude Code Opus 4.7 (1M context)',
+                'cilj' => 'Skratiti UC5 (Prijava ekipe) tako da profesor sa stranice takmičenja direktnim klikom kreira draft team — bez koraka biranja sporta i takmičenja u /teams/create.',
+                'instrukcije' => <<<'INSTRUKCIJE_23'
+### Prompt 1
+
+Dodaj mogućnost profesoru da prijavi ekipu **direktno sa stranice takmičenja** (`/competitions/{slug}`), bez potrebe da ide na /teams/create i bira sport/takmičenje ručno.
+
+**Cilj UX:**
+- Profesor otvori `/competitions/{slug}` → vidi CTA "Prijavi ekipu na ovo takmičenje"
+- Ako je već prijavio ekipu → link na /teams/{id}/edit ili /review zavisno od statusa
+- Drugi korisnici (admin, učenik, gost) ne vide CTA
+
+**Implementacija:**
+- Novi endpoint `POST /competitions/{competition}/teams/create` koji odmah kreira draft team i redirektuje na /teams/{team}/edit
+- Authorization: profesor verified, nema već team za competition+school, registracija otvorena
+- Backend: dodaj props `professor_team_id` i `can_register_team` u CompetitionController@show
+- Frontend: conditional CTA blok u competition/show.tsx, Wayfinder rute, shadcn/ui Button + Card
+- Koristi postojeći TeamRegistrationService za validaciju (ne duplikat logike)
+INSTRUKCIJE_23,
+                'output' => <<<'OUTPUT_23'
+### Prompt 1
+
+Istraženo trenutno stanje: `CompetitionController@show` minimalno prosleđuje samo `competition` sa relacijama. `competition/show.tsx` stranica jednostavna - hero + lista ekipa, bez CTA.
+
+Plan implementacije:
+1. Backend: dopuniti `CompetitionController@show` props (professor_team_id, can_register_team, reason kod ne-može)
+2. Backend: novi `CompetitionTeamController@store` (POST /competitions/{competition}/teams) koji koristi `TeamRegistrationService::createDraftTeam`
+3. Routes: dodati u `routes/teams.php` ili novi fajl
+4. Frontend: CTA Card blok sa useForm i Wayfinder rutama
+5. Build + Pint
+
+Implementirano:
+
+1. **`app/Http/Controllers/CompetitionTeamController.php`** (novi) — `store(Request, Competition)` metoda. Authorization preko `TeamPolicy.create` (admin ili verified profesor). Checks: competition u `open_registration`, user ima school_id, nema postojeću ekipu za isti competition+school. Ako postoji ekipa za istu kombinaciju → redirect na edit (draft) ili review (ostali statusi). Inače `Team::create` sa status=Draft + audit log `team.created` sa `source='competition_page'`.
+
+2. **`routes/competitions.php`** — dodata POST ruta `competitions/{competition:slug}/teams` → `competitions.teams.store` u istom `auth+verified` middleware grupom.
+
+3. **`app/Http/Controllers/CompetitionController.php`** — proširio `show()` sa novim props: `professorTeam` (id+status nullable), `canRegisterTeam` (bool), `registerDisabledReason` (string nullable). Logika: ako je user profesor, prvo provjeri postojeću ekipu (po professor_id), inače razmotri zašto ne može — verified_at, school_id, competition.status, postojeća ekipa škole.
+
+4. **`resources/js/pages/competitions/show.tsx`** — refaktor sa CTA Card blokom (`ProfessorRegistrationCard`):
+- postojeća ekipa → Card sa statusom + `<Link>` na edit (draft) ili review (ostali)
+- može se registrovati → Card sa formom + Button sa `useForm.post` na Wayfinder rutu
+- razlog blokiran → Card sa porukom (verified, school, registracija zatvorena, već prijavljena)
+- admin/učenik/gost → ne vide ništa
+
+5. **Wayfinder regen + npm run build** — pravilno generisan `@/routes/competitions/teams` modul, build prošao.
+
+6. **`vendor/bin/pint --dirty --format agent`** — `passed`.
+
+7. **TypeScript check** — 0 grešaka u novim/izmijenjenim fajlovima (pre-existing errors u nezavisnim fajlovima nisu dirani).
+OUTPUT_23,
+                'odluke' => <<<'ODLUKE_23'
+### Prompt 1
+
+- Endpoint **POST /competitions/{competition}/teams** (resourceful, kraće od /teams/create varijante)
+- TeamRegistrationService već postoji - koristim postojeće `createDraftTeam` metode ili ekvivalent
+- Authorization preko TeamPolicy.create + custom check za duplikat (jedan team po competition+school)
+- Frontend CTA samo u show.tsx; /teams/create ostaje funkcionalan
+- Status kojem se redirektuje: draft → /teams/{id}/edit, submitted/active/rejected → /teams/{id}/review
+
+- Slug binding na novoj ruti (`competition:slug`) jer korisnik već stiže preko slug URL-a (konzistentno sa show)
+- Duplikat handling: ako postoji team za competition+school, ne baca 422 nego redirektuje na edit/review (idempotent UX — drugi tab, dvostruki klik)
+- Wayfinder generiše `competitions.teams.store` automatski na osnovu route imena
+- Frontend: koristi `usePage<SharedData>` za role check, plus backend `canRegisterTeam`/`registerDisabledReason` props za precizan razlog
+- Sport i takmičenje **se ne biraju u formi** — sve iz konteksta, jedan klik = jedan request
+ODLUKE_23,
+                'ishod' => <<<'ISHOD_23'
+### Prompt 1
+
+**Zatvoreno.**
+
+**Izmijenjeni/novi fajlovi:**
+- `app/Http/Controllers/CompetitionTeamController.php` (novi)
+- `app/Http/Controllers/CompetitionController.php` (proširen)
+- `routes/competitions.php` (nova ruta)
+- `resources/js/pages/competitions/show.tsx` (CTA blok)
+- `resources/js/routes/competitions/teams/index.ts` (auto-generated Wayfinder)
+
+**Endpoint:** `POST /competitions/{competition:slug}/teams` → `competitions.teams.store`
+
+**Rebuild:** da, `npm run build` prošao, `vendor/bin/pint` passed.
+
+**Edge cases pokriveni:**
+- Profesor već ima **draft** ekipu → redirect na `/teams/{id}/edit`
+- Profesor već ima **submitted/active/rejected/withdrawn** ekipu → redirect na `/teams/{id}/review`
+- Dvostruki klik / dvije tab-e → idempotent (drugi POST naidje na existing pa redirect umjesto 422)
+- Profesor nije verified → CTA blokiran sa porukom 'Vaš nalog još nije verifikovan'
+- Registracija zatvorena → CTA blokiran sa porukom 'Registracija za ovo takmičenje nije otvorena'
+- Druga škola već prijavila ekipu — ne blokira (svaka škola ima svoju)
+- Ista škola, drugi profesor već prijavio — CTA blokiran sa porukom 'Vaša škola već ima prijavljenu ekipu'
+- Admin/student/gost — ne vide nijedan CTA blok
+- **Stara `/teams/create` stranica i dalje radi** za scenario kad profesor želi da bira sport ručno
+ISHOD_23,
+            ],
         ];
 
         foreach ($sesije as $sesija) {

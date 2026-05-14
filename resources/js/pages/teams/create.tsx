@@ -3,7 +3,8 @@ import { useState } from 'react';
 import InputError from '@/components/input-error';
 import { SportTypeBadge } from '@/components/sports/SportTypeBadge';
 import { Button } from '@/components/ui/button';
-import { Label } from '@/components/ui/label';
+import { SelectField  } from '@/components/ui/select-field';
+import type {SelectFieldOption} from '@/components/ui/select-field';
 import AppLayout from '@/layouts/app-layout';
 import { formatDate } from '@/lib/format-date';
 
@@ -22,8 +23,14 @@ type Competition = {
 };
 
 export default function TeamsCreate({ competitions }: { competitions: Competition[] }) {
-    const [selectedId, setSelectedId] = useState<number | null>(null);
-    const selected = competitions.find((c) => c.id === selectedId);
+    const [selectedId, setSelectedId] = useState<string>('');
+    const selected = competitions.find((c) => String(c.id) === selectedId);
+
+    const competitionOptions: SelectFieldOption[] = competitions.map((c) => ({
+        value: String(c.id),
+        label: c.name,
+        description: `${c.sport.name} · ${formatDate(c.start_date) || c.start_date}`,
+    }));
 
     return (
         <AppLayout
@@ -39,25 +46,18 @@ export default function TeamsCreate({ competitions }: { competitions: Competitio
                 <Form action="/teams" method="post" className="space-y-4">
                     {({ errors, processing }) => (
                         <>
-                            <div className="grid gap-2">
-                                <Label htmlFor="competition_id">Takmičenje</Label>
-                                <select
-                                    id="competition_id"
-                                    name="competition_id"
-                                    required
-                                    value={selectedId ?? ''}
-                                    onChange={(e) => setSelectedId(Number(e.target.value))}
-                                    className="bg-background h-9 rounded-md border px-3"
-                                >
-                                    <option value="">— odaberi takmičenje —</option>
-                                    {competitions.map((c) => (
-                                        <option key={c.id} value={c.id}>
-                                            {c.name} — {c.sport.name} ({formatDate(c.start_date)})
-                                        </option>
-                                    ))}
-                                </select>
-                                <InputError message={errors.competition_id} />
-                            </div>
+                            <SelectField
+                                id="competition_id"
+                                name="competition_id"
+                                label="Takmičenje"
+                                placeholder="Odaberi takmičenje…"
+                                value={selectedId}
+                                onChange={setSelectedId}
+                                options={competitionOptions}
+                                required
+                                aria-invalid={errors.competition_id ? true : undefined}
+                            />
+                            <InputError message={errors.competition_id} />
 
                             {selected && (
                                 <div className="bg-muted rounded border p-3">

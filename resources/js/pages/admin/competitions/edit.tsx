@@ -1,5 +1,6 @@
 import { Form, Head, Link } from '@inertiajs/react';
 import { CalendarDays } from 'lucide-react';
+import { useState } from 'react';
 import {
     FormCard,
     FormCardBody,
@@ -14,7 +15,8 @@ import InputError from '@/components/input-error';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { NativeSelect } from '@/components/ui/native-select';
+import { SelectField  } from '@/components/ui/select-field';
+import type {SelectFieldOption} from '@/components/ui/select-field';
 import AppLayout from '@/layouts/app-layout';
 import { formatDate } from '@/lib/format-date';
 
@@ -39,6 +41,13 @@ const STATUS_LABELS: Record<string, string> = {
     completed: 'Završeno',
 };
 
+const STATUS_OPTIONS: SelectFieldOption[] = [
+    { value: 'draft', label: 'Skica' },
+    { value: 'open_registration', label: 'Prijave otvorene' },
+    { value: 'in_progress', label: 'U toku' },
+    { value: 'completed', label: 'Završeno' },
+];
+
 export default function CompetitionsEdit({
     competition,
     sports,
@@ -46,6 +55,14 @@ export default function CompetitionsEdit({
     competition: Competition;
     sports: SportOption[];
 }) {
+    const [sportId, setSportId] = useState(String(competition.sport_id));
+    const [status, setStatus] = useState(competition.status);
+
+    const sportOptions: SelectFieldOption[] = sports.map((s) => ({
+        value: String(s.id),
+        label: s.name,
+    }));
+
     return (
         <AppLayout
             breadcrumbs={[
@@ -139,19 +156,16 @@ export default function CompetitionsEdit({
                                         </FormField>
                                     </FormGrid>
                                     <FormField>
-                                        <Label htmlFor="sport_id">Sport</Label>
-                                        <NativeSelect
+                                        <SelectField
                                             id="sport_id"
                                             name="sport_id"
-                                            defaultValue={competition.sport_id}
+                                            label="Sport"
+                                            value={sportId}
+                                            onChange={setSportId}
+                                            options={sportOptions}
                                             required
-                                        >
-                                            {sports.map((s) => (
-                                                <option key={s.id} value={s.id}>
-                                                    {s.name}
-                                                </option>
-                                            ))}
-                                        </NativeSelect>
+                                            aria-invalid={errors.sport_id ? true : undefined}
+                                        />
                                         <InputError
                                             message={errors.sport_id}
                                         />
@@ -220,28 +234,16 @@ export default function CompetitionsEdit({
                                 >
                                     <FormGrid cols={2}>
                                         <FormField>
-                                            <Label htmlFor="status">
-                                                Status
-                                            </Label>
-                                            <NativeSelect
+                                            <SelectField
                                                 id="status"
                                                 name="status"
-                                                defaultValue={competition.status}
+                                                label="Status"
+                                                value={status}
+                                                onChange={setStatus}
+                                                options={STATUS_OPTIONS}
                                                 required
-                                            >
-                                                <option value="draft">
-                                                    Skica
-                                                </option>
-                                                <option value="open_registration">
-                                                    Prijave otvorene
-                                                </option>
-                                                <option value="in_progress">
-                                                    U toku
-                                                </option>
-                                                <option value="completed">
-                                                    Završeno
-                                                </option>
-                                            </NativeSelect>
+                                                aria-invalid={errors.status ? true : undefined}
+                                            />
                                             <InputError
                                                 message={errors.status}
                                             />

@@ -1,7 +1,9 @@
 import { Head, Link, router } from '@inertiajs/react';
 import { Award, Pencil, Trash2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { NativeSelect } from '@/components/ui/native-select';
+import { FilterBar } from '@/components/ui/filter-bar';
+import { SelectField  } from '@/components/ui/select-field';
+import type {SelectFieldOption} from '@/components/ui/select-field';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import AppLayout from '@/layouts/app-layout';
 import { formatDate } from '@/lib/format-date';
@@ -124,6 +126,24 @@ export default function CompetitionsIndex({
     };
 
     const total = competitions.total ?? competitions.data.length;
+    const hasActiveFilters = Boolean(status || sportId || year);
+
+    const STATUS_OPTIONS: SelectFieldOption[] = [
+        { value: 'draft', label: 'Skica' },
+        { value: 'open_registration', label: 'Prijave otvorene' },
+        { value: 'in_progress', label: 'U toku' },
+        { value: 'completed', label: 'Završeno' },
+    ];
+
+    const sportOptions: SelectFieldOption[] = sports.map((s) => ({
+        value: String(s.id),
+        label: s.name,
+    }));
+
+    const yearOptionsList: SelectFieldOption[] = yearOptions.map((y) => ({
+        value: String(y),
+        label: String(y),
+    }));
 
     return (
         <AppLayout breadcrumbs={[{ title: 'Takmičenja', href: '/admin/competitions' }]}>
@@ -142,60 +162,32 @@ export default function CompetitionsIndex({
                         </Link>
                     </div>
 
-                    <div className="flex flex-wrap items-end gap-3 rounded-md border p-3">
-                        <div className="grid gap-1">
-                            <label className="text-muted-foreground text-xs">Status</label>
-                            <NativeSelect
-                                value={status}
-                                onChange={(e) => applyFilters({ status: e.target.value })}
-                                className="min-w-44"
-                            >
-                                <option value="">Svi statusi</option>
-                                <option value="draft">Skica</option>
-                                <option value="open_registration">Prijave otvorene</option>
-                                <option value="in_progress">U toku</option>
-                                <option value="completed">Završeno</option>
-                            </NativeSelect>
-                        </div>
-
-                        <div className="grid gap-1">
-                            <label className="text-muted-foreground text-xs">Sport</label>
-                            <NativeSelect
-                                value={sportId}
-                                onChange={(e) => applyFilters({ sport_id: e.target.value })}
-                                className="min-w-44"
-                            >
-                                <option value="">Svi sportovi</option>
-                                {sports.map((s) => (
-                                    <option key={s.id} value={s.id}>
-                                        {s.name}
-                                    </option>
-                                ))}
-                            </NativeSelect>
-                        </div>
-
-                        <div className="grid gap-1">
-                            <label className="text-muted-foreground text-xs">Godina</label>
-                            <NativeSelect
-                                value={year}
-                                onChange={(e) => applyFilters({ year: e.target.value })}
-                                className="min-w-32"
-                            >
-                                <option value="">Sve godine</option>
-                                {yearOptions.map((y) => (
-                                    <option key={y} value={y}>
-                                        {y}
-                                    </option>
-                                ))}
-                            </NativeSelect>
-                        </div>
-
-                        {(status || sportId || year) && (
-                            <Button variant="ghost" size="sm" onClick={resetFilters}>
-                                Resetuj filtere
-                            </Button>
-                        )}
-                    </div>
+                    <FilterBar
+                        hasActiveFilters={hasActiveFilters}
+                        onReset={resetFilters}
+                    >
+                        <SelectField
+                            label="Status"
+                            placeholder="Svi statusi"
+                            value={status}
+                            onChange={(v) => applyFilters({ status: v })}
+                            options={STATUS_OPTIONS}
+                        />
+                        <SelectField
+                            label="Sport"
+                            placeholder="Svi sportovi"
+                            value={sportId}
+                            onChange={(v) => applyFilters({ sport_id: v })}
+                            options={sportOptions}
+                        />
+                        <SelectField
+                            label="Godina"
+                            placeholder="Sve godine"
+                            value={year}
+                            onChange={(v) => applyFilters({ year: v })}
+                            options={yearOptionsList}
+                        />
+                    </FilterBar>
 
                     <div className="overflow-x-auto rounded border">
                         <table className="w-full text-sm">
@@ -213,7 +205,9 @@ export default function CompetitionsIndex({
                                 {competitions.data.length === 0 ? (
                                     <tr>
                                         <td colSpan={6} className="text-muted-foreground p-6 text-center">
-                                            Nema takmičenja koja odgovaraju filterima.
+                                            {hasActiveFilters
+                                                ? 'Nema rezultata sa primijenjenim filterima.'
+                                                : 'Nema takmičenja.'}
                                         </td>
                                     </tr>
                                 ) : (
