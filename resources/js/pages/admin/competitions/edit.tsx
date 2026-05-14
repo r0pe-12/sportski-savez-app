@@ -16,6 +16,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { NativeSelect } from '@/components/ui/native-select';
 import AppLayout from '@/layouts/app-layout';
+import { formatDate } from '@/lib/format-date';
 
 type SportOption = { id: number; name: string; type: string };
 
@@ -90,8 +91,8 @@ export default function CompetitionsEdit({
                             <div className="flex justify-between gap-2">
                                 <dt>Period</dt>
                                 <dd>
-                                    {competition.start_date} ÷{' '}
-                                    {competition.end_date}
+                                    {formatDate(competition.start_date)} ÷{' '}
+                                    {formatDate(competition.end_date)}
                                 </dd>
                             </div>
                         </dl>

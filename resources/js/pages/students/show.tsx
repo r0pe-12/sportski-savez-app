@@ -3,6 +3,7 @@ import { CompetitionHistoryList } from '@/components/students/CompetitionHistory
 import { MedalShelf } from '@/components/students/MedalShelf';
 import { StudentHero } from '@/components/students/StudentHero';
 import AppLayout from '@/layouts/app-layout';
+import { formatDate } from '@/lib/format-date';
 
 type HistoryEntry = {
     team_id: number;
@@ -69,7 +70,7 @@ export default function StudentShow({ student }: { student: StudentProp }) {
                         JMB:{' '}
                         <span className="font-mono">{student.jmb ?? '—'}</span>
                     </p>
-                    <p>Datum rođenja: {student.birth_date ?? '—'}</p>
+                    <p>Datum rođenja: {formatDate(student.birth_date) || '—'}</p>
                     <p>Telefon: {student.phone ?? '—'}</p>
                     <p>Email: {student.email}</p>
                 </section>

@@ -5,6 +5,7 @@ import { SportTypeBadge } from '@/components/sports/SportTypeBadge';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import AppLayout from '@/layouts/app-layout';
+import { formatDate } from '@/lib/format-date';
 
 type Competition = {
     id: number;
@@ -51,7 +52,7 @@ export default function TeamsCreate({ competitions }: { competitions: Competitio
                                     <option value="">— odaberi takmičenje —</option>
                                     {competitions.map((c) => (
                                         <option key={c.id} value={c.id}>
-                                            {c.name} — {c.sport.name} ({c.start_date})
+                                            {c.name} — {c.sport.name} ({formatDate(c.start_date)})
                                         </option>
                                     ))}
                                 </select>

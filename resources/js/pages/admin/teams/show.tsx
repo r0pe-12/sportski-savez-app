@@ -19,6 +19,7 @@ import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import AppLayout from '@/layouts/app-layout';
+import { formatDateTime } from '@/lib/format-date';
 
 type CertificateStatus =
     | 'pending'
@@ -216,22 +217,8 @@ const verificationBadge: Record<
     },
 };
 
-function formatDateTime(iso: string | null): string {
-    if (!iso) {
-return '—';
-}
-
-    try {
-        return new Date(iso).toLocaleString('sr-Latn-ME', {
-            day: '2-digit',
-            month: '2-digit',
-            year: 'numeric',
-            hour: '2-digit',
-            minute: '2-digit',
-        });
-    } catch {
-        return iso;
-    }
+function renderDateTime(iso: string | null): string {
+    return formatDateTime(iso) || '—';
 }
 
 function CertificateSummaryPanel({ summary }: { summary: CertificateSummary }) {
@@ -289,7 +276,7 @@ function TeamMetaPanel({ team }: { team: Team }) {
                 <div className="flex justify-between gap-2">
                     <dt>Datum prijave</dt>
                     <dd className="text-foreground">
-                        {formatDateTime(team.signed_at)}
+                        {renderDateTime(team.signed_at)}
                     </dd>
                 </div>
                 <div className="border-t pt-2">
@@ -389,7 +376,7 @@ function AuditHistoryList({ entries }: { entries: AuditEntry[] }) {
                             )}
                         </span>
                         <span>·</span>
-                        <span>{formatDateTime(entry.created_at)}</span>
+                        <span>{renderDateTime(entry.created_at)}</span>
                     </div>
                 </li>
             ))}

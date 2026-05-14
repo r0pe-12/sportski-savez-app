@@ -13,7 +13,8 @@ use App\Services\MedicalCertificateStateMachine;
 use App\Services\PrivateFileStorage;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\RedirectResponse;
-use Symfony\Component\HttpFoundation\RedirectResponse as SymfonyRedirectResponse;
+use Inertia\Inertia;
+use Inertia\Response as InertiaResponse;
 
 class MedicalCertificateController extends Controller
 {
@@ -53,13 +54,73 @@ class MedicalCertificateController extends Controller
         return back();
     }
 
-    public function show(MedicalCertificate $certificate): SymfonyRedirectResponse
+    public function show(MedicalCertificate $certificate): InertiaResponse
     {
         $this->authorize('view', $certificate);
 
-        $url = $this->storage->temporaryUrl($certificate->path, 5);
+        $certificate->load([
+            'teamMember.student:id,name,email,jmb',
+            'teamMember.team.competition.sport',
+            'teamMember.team.school',
+        ]);
 
-        return redirect()->away($url);
+        $signedUrl = $this->storage->temporaryUrl($certificate->path, 5);
+        $extension = strtolower(pathinfo((string) $certificate->original_filename, PATHINFO_EXTENSION));
+        $isImage = in_array($extension, ['jpg', 'jpeg', 'png', 'webp', 'gif'], true);
+
+        $this->audit->log('certificate.viewed', $certificate);
+
+        $member = $certificate->teamMember;
+        $student = $member?->student;
+        $team = $member?->team;
+        $competition = $team?->competition;
+        $sport = $competition?->sport;
+        $school = $team?->school;
+
+        return Inertia::render('certificates/show', [
+            'certificate' => [
+                'id' => $certificate->id,
+                'status' => $certificate->status->value,
+                'original_filename' => $certificate->original_filename,
+                'extracted_name' => $certificate->extracted_name,
+                'ocr_confidence' => $certificate->ocr_confidence !== null
+                    ? (float) $certificate->ocr_confidence
+                    : null,
+                'issued_at' => $certificate->issued_at?->toIso8601String(),
+                'expires_at' => $certificate->expires_at?->toIso8601String(),
+                'created_at' => $certificate->created_at?->toIso8601String(),
+                'updated_at' => $certificate->updated_at?->toIso8601String(),
+                'extension' => $extension,
+                'is_image' => $isImage,
+            ],
+            'student' => $student ? [
+                'id' => $student->id,
+                'name' => $student->name,
+                'email' => $student->email,
+                'jmb' => $student->jmb,
+            ] : null,
+            'team' => $team ? [
+                'id' => $team->id,
+                'school' => $school ? [
+                    'id' => $school->id,
+                    'name' => $school->name,
+                ] : null,
+                'competition' => $competition ? [
+                    'id' => $competition->id,
+                    'name' => $competition->name,
+                    'sport' => $sport ? [
+                        'id' => $sport->id,
+                        'name' => $sport->name,
+                    ] : null,
+                ] : null,
+                'position' => $member->position,
+            ] : null,
+            'signedUrl' => $signedUrl,
+            'permissions' => [
+                'can_manual_approve' => request()->user()?->can('manualApprove', $certificate) ?? false,
+                'can_reject' => request()->user()?->can('reject', $certificate) ?? false,
+            ],
+        ]);
     }
 
     public function destroy(Team $team, TeamMember $member): RedirectResponse

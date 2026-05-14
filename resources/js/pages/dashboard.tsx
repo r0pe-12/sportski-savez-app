@@ -12,6 +12,7 @@ import {
 import type { ComponentType } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import AppLayout from '@/layouts/app-layout';
+import { formatDateTime } from '@/lib/format-date';
 import { dashboard } from '@/routes';
 import type { SharedData } from '@/types/auth';
 
@@ -123,22 +124,8 @@ function StatCard({
     );
 }
 
-function formatRelativeDate(iso: string | null): string {
-    if (!iso) {
-        return '—';
-    }
-
-    try {
-        return new Date(iso).toLocaleString('sr-Latn-ME', {
-            day: '2-digit',
-            month: '2-digit',
-            year: 'numeric',
-            hour: '2-digit',
-            minute: '2-digit',
-        });
-    } catch {
-        return iso;
-    }
+function renderTimestamp(iso: string | null): string {
+    return formatDateTime(iso) || '—';
 }
 
 function EmptyState({
@@ -250,7 +237,7 @@ function AdminDashboard({
                                             <div className="truncate text-xs text-muted-foreground">
                                                 Profesor:{' '}
                                                 {team.professor ?? '—'} ·{' '}
-                                                {formatRelativeDate(
+                                                {renderTimestamp(
                                                     team.updated_at,
                                                 )}
                                             </div>
@@ -294,7 +281,7 @@ function AdminDashboard({
                                             </div>
                                             <div className="truncate text-xs text-muted-foreground">
                                                 {cert.filename ?? '—'} ·{' '}
-                                                {formatRelativeDate(
+                                                {renderTimestamp(
                                                     cert.uploaded_at,
                                                 )}
                                             </div>
@@ -391,7 +378,7 @@ function AdminDashboard({
                                         </div>
                                         <div className="truncate text-xs text-muted-foreground">
                                             {entry.user ?? 'sistem'} ·{' '}
-                                            {formatRelativeDate(
+                                            {renderTimestamp(
                                                 entry.created_at,
                                             )}
                                         </div>

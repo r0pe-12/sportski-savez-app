@@ -1,6 +1,7 @@
 import { Head, Link, router } from '@inertiajs/react';
 import { NativeSelect } from '@/components/ui/native-select';
 import AppLayout from '@/layouts/app-layout';
+import { formatDate } from '@/lib/format-date';
 
 type TeamRow = {
     id: number;
@@ -47,22 +48,8 @@ const statusLabels: Record<string, { label: string; className: string }> = {
 
 const statusOrder = ['draft', 'submitted', 'active', 'rejected', 'cancelled', 'withdrawn', 'completed'];
 
-function formatDate(value: string | null): string {
-    if (!value) {
-        return '—';
-    }
-
-    const d = new Date(value);
-
-    if (Number.isNaN(d.getTime())) {
-        return '—';
-    }
-
-    const dd = String(d.getDate()).padStart(2, '0');
-    const mm = String(d.getMonth() + 1).padStart(2, '0');
-    const yyyy = d.getFullYear();
-
-    return `${dd}.${mm}.${yyyy}`;
+function renderDate(value: string | null): string {
+    return formatDate(value) || '—';
 }
 
 function applyFilters(next: Partial<Filters>, current: Filters) {
@@ -226,7 +213,7 @@ export default function AdminTeamsIndex({ teams, competitions, schools, filters 
                                                 {meta.label}
                                             </span>
                                         </td>
-                                        <td className="p-2">{formatDate(t.signed_at)}</td>
+                                        <td className="p-2">{renderDate(t.signed_at)}</td>
                                         <td className="p-2">
                                             <Link
                                                 className="text-primary hover:underline"

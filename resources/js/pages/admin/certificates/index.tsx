@@ -5,6 +5,7 @@ import { CertificateStatusBadge } from '@/components/medical-certificates/Certif
 import { Button } from '@/components/ui/button';
 import { NativeSelect } from '@/components/ui/native-select';
 import AppLayout from '@/layouts/app-layout';
+import { formatDate } from '@/lib/format-date';
 
 type School = { id: number; name: string };
 type Sport = { id: number; name: string };
@@ -59,22 +60,8 @@ const statusLabelMap: Record<string, string> = {
     superseded: 'Zamijenjena',
 };
 
-function formatDate(iso: string | null): string {
-    if (!iso) {
-        return '—';
-    }
-
-    const d = new Date(iso);
-
-    if (Number.isNaN(d.getTime())) {
-        return '—';
-    }
-
-    return d.toLocaleDateString('sr-Latn-ME', {
-        year: 'numeric',
-        month: '2-digit',
-        day: '2-digit',
-    });
+function renderDate(iso: string | null): string {
+    return formatDate(iso) || '—';
 }
 
 export default function AdminCertificatesIndex({
@@ -246,15 +233,14 @@ export default function AdminCertificatesIndex({
                                                 <CertificateStatusBadge status={c.status} />
                                             </td>
                                             <td className="p-3 text-xs">
-                                                {formatDate(c.created_at)}
+                                                {renderDate(c.created_at)}
                                             </td>
                                             <td className="p-3">
                                                 <Link
                                                     href={`/certificates/${c.id}`}
                                                     className="text-primary hover:underline"
-                                                    target="_blank"
                                                 >
-                                                    Pogledaj PDF
+                                                    Detalji
                                                 </Link>
                                             </td>
                                             <td className="p-3">

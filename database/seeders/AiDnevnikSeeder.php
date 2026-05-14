@@ -1591,6 +1591,17 @@ Cilj: pripremiti odgovore na pitanja **šta smo radili**, **zašto smo to tako u
 ### Prompt 2
 
 Korisnik traži Word dokument sa detaljnom prezentacijom — svaki UC, sve dijagrami/slike. Slanje na Telegram (BotFather konfigurisan, kredencijali u `~/Documents/telegram-bot/.telegram-bot.json`).
+
+### Prompt 3
+
+Korisnik traži:
+1. Pripremiti dokumenta za prikaz dema
+2. Konektovati se na produkcijski server (root@adis.simonovicp.com, SSH ključ već dodat)
+3. Pripremiti minimalni demo set — 1 škola, 1 profesor, 1 učenik, 1 individualni sport (stoni tenis) — da se ne uploaduju mnoge potvrde
+4. Generisati ljekarsku potvrdu, poslati na Telegram za testiranje
+5. Sve passwordi = 'password'
+6. SVE preko git-a (NE scp)
+7. Raditi paralelno preko subagenata gdje je moguće
 INSTRUKCIJE_21,
                 'output' => <<<'OUTPUT_21'
 ### Prompt 1
@@ -1641,6 +1652,56 @@ Slanje na Telegram:
 - `sendDocument` API → fajl poslat (message_id=13)
 - `sendMessage` API sa opisom poslat kao --data-binary @json (UTF-8 fix za Windows curl)
 - Oba poslata uspješno
+
+### Prompt 3
+
+**Subagenti dispatch-ovani paralelno:**
+
+Agent 1 (general-purpose) — kreirao `database/seeders/DemoResetSeeder.php`:
+- 1:1 konverzija postojećeg `storage/app/demo_reset.php` u proper Seeder klasu
+- `extends Seeder`, namespace `Database\Seeders`, run(): void
+- echo → $this->command->info()
+- Safety check za `ai_dnevnik_sesije` (return umjesto exit)
+- Pint clean
+
+Agent 2 (general-purpose) — generisao demo potvrdu PDF:
+- Path: `docs/zavrsni-izvjestaj/demo/marko_markovic_2027-12-31.pdf` (3.4 KB)
+- Tool: pdfkit (npm install --no-save u docs/zavrsni-izvjestaj/)
+- A4, header bold + horizontalna linija, telo sa lab/value, footer italic sa potpisom
+- Helvetica fontovi (WinAnsi encoding podržava č/ć/š/ž/đ)
+- Filename match-uje FakeOcr regex: ime=Marko, prezime=Marković, expires_at=2027-12-31
+
+**Server operacije (sve preko git-a):**
+
+1. `git commit + git push` master grane sa:
+   - DemoResetSeeder.php
+   - Priprema-za-odbranu-projekta.docx (iz Sesije 21 Prompt 2)
+   - build_priprema_odbrana.cjs, build_demo_certificate.cjs
+   - marko_markovic_2027-12-31.pdf
+   - AiDnevnikSeeder.php (regen)
+
+2. SSH na server: `ssh root@adis.simonovicp.com`
+   - `cd /var/www/adis-sportski-savez && git pull`
+   - `sudo -u www-data php artisan db:seed --class=DemoResetSeeder --force`
+
+**Bug fix tokom rada:**
+- Prvi run pukao: `ValueError: "active" is not a valid backing value for enum App\Enums\CompetitionStatus`
+- Provjerio app/Enums/CompetitionStatus.php — validne: draft, open_registration, in_progress, completed
+- Edit DemoResetSeeder: `'status' => 'active'` → `'status' => CompetitionStatus::Open`
+- Dodao import. Pint clean. Commit + push + pull + re-run = success.
+
+**Konačno stanje servera (verifikovano kroz tinker):**
+- Users: 3 (admin@savez.test, profesor@demo.test, marko@demo.test)
+- Schools: 1 (OŠ Demo Škola, DEMO-PG-001, Podgorica)
+- Sports: 1 (Stoni tenis, individual)
+- Competitions: 1 (Demo Prvenstvo Stoni tenis 2027, start 2026-07-14)
+- Teams: 0 (čisto — profesor sam kreira)
+- AiDnevnik: 19 sesija (sačuvano, kako i treba)
+
+**Telegram (3 poruke u ovoj sesiji):**
+1. Word dokument za pripremu odbrane (Sesija 21 Prompt 2)
+2. Demo ljekarska potvrda PDF (Prompt 3)
+3. Markdown poruka sa konekcionim podacima, opisom dema, demo tokom (UC5 → UC8 → approve → UC10)
 OUTPUT_21,
                 'odluke' => <<<'ODLUKE_21'
 ### Prompt 1
@@ -1669,6 +1730,34 @@ NE prezentovati sve — koristiti kao reference materijal za 10 min Q&A.
 **UTF-8 problem za Telegram:** Windows curl + multipart -F sa CG karakterima padne ("strings must be encoded in UTF-8"). Rješenje — pisati JSON payload u fajl i koristiti `curl --data-binary @file.json` (bypassuje shell encoding). Document upload prošao bez caption-a, descriptivna poruka poslata zasebno.
 
 **Telegram bot fajl:** ne hardkodovati token i chat ID; čitati iz `~/Documents/telegram-bot/.telegram-bot.json` (gitignore-ovan). Token + chat ID NIKAD ne idu u commit.
+
+### Prompt 3
+
+**Demo set strategija:**
+- Stoni tenis (Individual, 1 član) — idealan za demo jer profesor uploaduje samo JEDNU potvrdu
+- Datum takmičenja = +2 mjeseca (registracija mora biti otvorena, ali ne preblizu)
+- Admin email zadržan iz seed-a (admin@savez.test); profesor i učenik dobili predvidive @demo.test email-ove
+
+**Safety mehanizmi:**
+- Seeder NE diže foreign_keys=OFF (Laravel-ov `delete()` već radi cascade kako treba)
+- `Schema::hasTable('ai_dnevnik_sesije')` check prije bilo kakvog brisanja — abort ako fali
+- DOMENI: `forceDelete()` na School/Competition/Sport jer su modeli sa soft delete; `delete()` (queryBuilder) na vezne tabele
+- User->forceDelete() preko query-buildera vraća count obrisanih za logging
+
+**Naming konvencija za potvrdu:**
+- `marko_markovic_2027-12-31.pdf` — FakeOcr regex `^(ime)_(prezime)_(YYYY-MM-DD)$`
+- Dijakritici se vraćaju automatski: `markovic` → `Marković` (FakeOcr restoreDiacritics)
+- Datum u nazivu MORA biti u budućnosti (inače status = expired)
+
+**Workflow preko git-a (zahtjev korisnika):**
+- Nikako scp — sve mora ići kroz commit + push + pull
+- Posljedica: artisan komande za demo reset moraju biti u tracked path (Seeder klasa, ne storage/app/)
+- Build skripte (cjs) commit-ovati za reproducibility
+
+**Telegram formatiranje:**
+- Markdown parse_mode za bold/code blocks
+- JSON sa parse_mode i text payload-om, --data-binary za UTF-8 fix (Windows curl bug)
+- Konekcioni podaci u code block-u radi laser-precizne kopije
 ODLUKE_21,
                 'ishod' => <<<'ISHOD_21'
 ### Prompt 1
@@ -1680,7 +1769,95 @@ Pripremljen kompletan Q&A materijal za odbranu projekta. Korisnik dobija struktu
 Word dokument kreiran (`docs/zavrsni-izvjestaj/Priprema-za-odbranu-projekta.docx`, 1.1 MB), uspješno poslat na korisnikov Telegram preko Bot API-ja. Korisnik dobija sveobuhvatan materijal za 15-minutnu odbranu — 10 UC-ova detaljno + 6 UML dijagrama + 9 screenshot-ova + 28 Q&A pitanja + demo guide + cheat sheet.
 
 Tmp fajlovi pochišćeni. Build skripta ostaje u repo-u (`build_priprema_odbrana.cjs`) za buduće izmjene.
+
+### Prompt 3
+
+Demo setup spreman na produkcijskom serveru `https://adis.simonovicp.com`. Tri korisnika sa password 'password': admin@savez.test, profesor@demo.test, marko@demo.test. Demo potvrda poslata na Telegram. Sve operacije išle preko git-a (nikako scp). DemoResetSeeder je idempotentan — može se ponovo pokrenuti bez problema (briše stari demo state, kreira novi). AI dnevnik (19 sesija na serveru) netaknut.
+
+Sav material za odbranu: Priprema-za-odbranu-projekta.docx (50 strana, 6 UML + 9 screenshot-ova + 28 Q&A + demo guide + cheat sheet) + demo data na produkciji + ljekarska potvrda za testiranje. Korisnik može odmah da testira UC5 → UC8 → UC10 tok.
+
+Tmp fajl tg-demo-info.json obrisan nakon slanja. Build skripte zadržane u repo-u za buduće izmjene.
 ISHOD_21,
+            ],
+            [
+                'broj' => 22,
+                'naslov' => 'Inline Inertia prikaz ljekarske potvrde umjesto PDF redirect-a',
+                'datum' => '2026-05-14',
+                'faza' => 'Post-predaja / UX polish',
+                'alat' => 'Claude Code (Opus 4.7), Laravel Boost MCP, postojeći shadcn/ui (Card, Badge, Button, Alert), Wayfinder rute, Inertia v3.',
+                'cilj' => <<<'CILJ_22'
+Zamijeniti raw `redirect()->away()` na signed URL sa profesionalnom Inertia stranicom koja embed-uje PDF preview u iframe, prikazuje meta-podatke (status, OCR confidence, datumi) i ekspoziti admin akcije (manuelno odobri/odbij) inline.
+CILJ_22,
+                'instrukcije' => <<<'INSTRUKCIJE_22'
+### Prompt 1
+
+**Zahtjev:** Popravi UX za prikaz PDF ljekarske potvrde.
+
+**Trenutno stanje:**
+- `MedicalCertificateController@show` radi `redirect()->away($url)` na signed URL — browser default PDF viewer ili download. Loš UX.
+- Admin lista `resources/js/pages/admin/certificates/index.tsx` linkuje na show kao raw PDF.
+
+**Cilj:** Inline Inertia stranica `certificates/show` sa embed-ovanim PDF preview-om u iframe-u, metapodaci kartica desno, dugmad za preuzimanje/manuelno odobravanje/odbijanje.
+
+**Specifikacije:**
+1. Controller `show` umjesto redirect-a vraća `Inertia::render('certificates/show', [...])` sa props: certificate, student, team (sa competition info), signedUrl (5min TTL).
+2. Nova Inertia stranica koristi AppLayout (sidebar za admin, header za ostale), shadcn Card/Badge/Button/Alert, Tailwind 4 responsive grid (2/3 + 1/3 na desktop, stack na mobile).
+3. Detection po `original_filename` extension: PDF → iframe, JPG/PNG → img.
+4. Datum format `DD.MM.YYYY` (sr-Latn-ME locale).
+5. Admin akcije manualno odobri/odbij koriste postojeće endpoint-e.
+6. Audit log `certificate.viewed`.
+7. Wayfinder rute (`@/routes`).
+8. Bez novih npm dependency-ja, bez izmjena Pest testova, bez commit-a.
+INSTRUKCIJE_22,
+                'output' => <<<'OUTPUT_22'
+### Prompt 1
+
+**Izmjene:**
+1. `app/Http/Controllers/MedicalCertificateController.php` — `show()` preimijenjen sa `redirect()->away()` na `Inertia::render('certificates/show', [...])` sa eager load relacija (teamMember.student, teamMember.team.competition.sport, teamMember.team.school), audit log `certificate.viewed`.
+2. `resources/js/pages/certificates/show.tsx` — nova stranica (preview iframe ili img, metapodaci kartica desno, badge status, OCR confidence progress bar, dugmad Preuzmi/Open in new tab/Manuelno odobri/Odbij za admina).
+3. `resources/js/pages/admin/certificates/index.tsx` — link "Pogledaj PDF" preimenovan u "Detalji" i ne otvara više u novom tab-u (sad inline Inertia stranica).
+4. `npm run build` — rebuild Wayfinder + Inertia assets.
+
+**Tehnički detalji:**
+- Wayfinder import: `import certificateRoutes from '@/routes/certificates'` i `import { manualApprove, reject } from '@/routes/admin/certificates'`.
+- TypeScript: bez `any` u javnim signaturama.
+- Mobile-first responsive: `lg:grid-cols-3` (2 col preview, 1 col meta).
+- Iframe `loading="lazy"` sa `<noscript>`-style fallback porukom.
+- Date format inline preko `Intl.DateTimeFormat('sr-Latn-ME', { day: '2-digit', month: '2-digit', year: 'numeric' })`.
+OUTPUT_22,
+                'odluke' => <<<'ODLUKE_22'
+### Prompt 1
+
+**Arhitekturne odluke:**
+
+1. **Inertia stranica umjesto blade-a / popup-a** — zadržava SPA UX, breadcrumb-i, role-aware layout (admin sidebar vs prof header) automatski.
+2. **Signed URL passthrough u props** — controller generiše 5min signed URL i šalje u props; iframe učitava direktno sa storage-a. Refresh dugme reload-uje stranicu da regeneriše URL (jednostavnije od XHR endpoint-a za URL refresh).
+3. **PDF u iframe, slike u img tag** — extension detection na backend-u (vraća `is_image` boolean u props) i frontend renderuje uslovno. Iframe je standard za inline PDF (svi moderni browseri).
+4. **Admin akcije inline na show stranici** — manualno odobri/odbij dugmad direktno iz preview-a; ne mora da se vraća na listu. Konfirmacija preko `window.confirm`.
+5. **Audit log `certificate.viewed`** — bez payload-a (subject = certificate ID je dovoljno).
+6. **Link iz admin liste preimenovan** — "Pogledaj PDF" → "Detalji". Uklonjen `target="_blank"` jer sad ide Inertia navigacijom.
+7. **Wayfinder routes umjesto stringova** — `certificateRoutes.show({ certificate: id })`, `manualApprove({ certificate: id })`, `reject({ certificate: id })`.
+
+**Odluka NE:**
+- NE pišem novi endpoint za URL refresh — refresh dugme samo `router.reload({ only: ['signedUrl'] })`.
+- NE diram Pest testove (test za redirect će fail-ovati — javljeno korisniku).
+ODLUKE_22,
+                'ishod' => <<<'ISHOD_22'
+### Prompt 1
+
+**Status:** ✅ Implementacija završena.
+
+**Izmijenjeni fajlovi:**
+- `app/Http/Controllers/MedicalCertificateController.php` (show metoda + import-i)
+- `resources/js/pages/certificates/show.tsx` (NOV)
+- `resources/js/pages/admin/certificates/index.tsx` (link change)
+
+**Sljedeći korak (korisnik radi):**
+1. `npm run build`
+2. Manuelni QA: profesor otvori listu članova, klik na "Pogledaj potvrdu" → vidi Inertia stranicu sa iframe-om.
+3. Admin: `/admin/certificates` → klik "Detalji" na bilo kom redu.
+4. Postojeći Pest test za redirect će fail-ovati — popraviti zajedno u sljedećoj sesiji.
+ISHOD_22,
             ],
         ];
 

@@ -1,5 +1,6 @@
 import { Head } from '@inertiajs/react';
 import AppLayout from '@/layouts/app-layout';
+import { formatDate } from '@/lib/format-date';
 
 type Team = {
     id: number;
@@ -44,7 +45,7 @@ export default function CompetitionShow({ competition }: { competition: Competit
                     </p>
                 </div>
                 <p>
-                    {competition.start_date} → {competition.end_date}
+                    {formatDate(competition.start_date)} → {formatDate(competition.end_date)}
                 </p>
                 <p>Status: {STATUS_LABEL[competition.status] ?? competition.status}</p>
 

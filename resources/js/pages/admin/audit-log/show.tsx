@@ -1,6 +1,7 @@
 import { Head } from '@inertiajs/react';
 import { AuditPayloadViewer } from '@/components/audit/AuditPayloadViewer';
 import AppLayout from '@/layouts/app-layout';
+import { formatDateTime } from '@/lib/format-date';
 
 type Entry = {
     id: string;
@@ -28,7 +29,7 @@ export default function AuditLogShow({ entry }: { entry: Entry }) {
                 <dl className="grid gap-2 text-sm sm:grid-cols-2">
                     <div>
                         <dt className="text-muted-foreground">Vrijeme</dt>
-                        <dd>{entry.created_at}</dd>
+                        <dd>{formatDateTime(entry.created_at)}</dd>
                     </div>
                     <div>
                         <dt className="text-muted-foreground">Korisnik</dt>

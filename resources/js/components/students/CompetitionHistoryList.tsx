@@ -1,3 +1,5 @@
+import { formatDate } from '@/lib/format-date';
+
 type HistoryEntry = {
     team_id: number;
     competition: { name: string; start_date: string | null; slug: string };
@@ -50,7 +52,7 @@ export function CompetitionHistoryList({
                         <p className="text-xs text-muted-foreground">
                             {h.sport.name}
                             {h.competition.start_date
-                                ? ` · ${h.competition.start_date}`
+                                ? ` · ${formatDate(h.competition.start_date)}`
                                 : ''}
                         </p>
                     </div>

@@ -10,12 +10,10 @@
 use App\Http\Controllers\AiDnevnikController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\ScheduleController;
+use App\Http\Controllers\WelcomeController;
 use Illuminate\Support\Facades\Route;
-use Laravel\Fortify\Features;
 
-Route::inertia('/', 'welcome', [
-    'canRegister' => Features::enabled(Features::registration()),
-])->name('home');
+Route::get('/', [WelcomeController::class, 'index'])->name('home');
 
 Route::get('/ai-dnevnik', [AiDnevnikController::class, 'show'])->name('ai-dnevnik');
 

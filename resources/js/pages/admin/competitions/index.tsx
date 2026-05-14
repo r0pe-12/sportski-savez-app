@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { NativeSelect } from '@/components/ui/native-select';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import AppLayout from '@/layouts/app-layout';
+import { formatDate } from '@/lib/format-date';
 import { cn } from '@/lib/utils';
 
 type CompetitionRow = {
@@ -53,21 +54,11 @@ const STATUS_META: Record<string, { label: string; className: string }> = {
 };
 
 function formatDateRange(start: string, end: string): string {
-    const startDate = new Date(start);
-    const endDate = new Date(end);
+    const startFmt = formatDate(start);
+    const endFmt = formatDate(end);
 
-    if (Number.isNaN(startDate.getTime()) || Number.isNaN(endDate.getTime())) {
+    if (startFmt === '' || endFmt === '') {
         return `${start} – ${end}`;
-    }
-
-    const opts: Intl.DateTimeFormatOptions = { day: '2-digit', month: '2-digit', year: 'numeric' };
-    const startFmt = startDate.toLocaleDateString('sr-Latn', opts);
-    const endFmt = endDate.toLocaleDateString('sr-Latn', opts);
-
-    if (startDate.getFullYear() === endDate.getFullYear()) {
-        const startShort = startDate.toLocaleDateString('sr-Latn', { day: '2-digit', month: '2-digit' });
-
-        return `${startShort}. – ${endFmt}`;
     }
 
     return `${startFmt} – ${endFmt}`;

@@ -1,6 +1,7 @@
 import { Head, Link } from '@inertiajs/react';
 import { AuditLogFilters } from '@/components/audit/AuditLogFilters';
 import AppLayout from '@/layouts/app-layout';
+import { formatDateTime } from '@/lib/format-date';
 
 type Entry = {
     id: string;
@@ -68,7 +69,7 @@ export default function AuditLogIndex({ entries, filters, users }: Props) {
                             )}
                             {entries.data.map((e) => (
                                 <tr key={e.id} className="border-t">
-                                    <td className="p-2 text-xs">{e.created_at}</td>
+                                    <td className="p-2 text-xs">{formatDateTime(e.created_at)}</td>
                                     <td className="p-2">
                                         {e.user?.name ?? <span className="text-muted-foreground">— sistem —</span>}
                                     </td>

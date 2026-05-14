@@ -1,4 +1,5 @@
 import { Link } from '@inertiajs/react';
+import { formatDate } from '@/lib/format-date';
 
 type Competition = {
     id: number;
@@ -22,7 +23,7 @@ export function CompetitionCard({ competition }: { competition: Competition }) {
                 {competition.sport.name} · {competition.location}
             </p>
             <p className="text-xs">
-                {competition.start_date} → {competition.end_date}
+                {formatDate(competition.start_date)} → {formatDate(competition.end_date)}
             </p>
         </Link>
     );

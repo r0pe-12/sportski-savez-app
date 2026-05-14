@@ -4,6 +4,7 @@ import type {ReactNode} from 'react';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { formatDate } from '@/lib/format-date';
 
 interface Sesija {
     id: number;
@@ -59,12 +60,6 @@ const VRSTE = [
 ] as const;
 
 type VrstaId = (typeof VRSTE)[number]['id'];
-
-function formatDatum(iso: string): string {
-    const d = new Date(iso);
-
-    return d.toLocaleDateString('sr-Latn-ME', { day: '2-digit', month: '2-digit', year: 'numeric' });
-}
 
 function renderInline(text: string): ReactNode[] {
     const tokens = text.split(/(\*\*[^*]+\*\*|`[^`]+`)/g);
@@ -364,7 +359,7 @@ return;
                                                         <Badge variant="default" className="text-sm font-semibold">
                                                             Sesija {sesija.broj}
                                                         </Badge>
-                                                        <span className="text-sm text-muted-foreground">{formatDatum(sesija.datum)}</span>
+                                                        <span className="text-sm text-muted-foreground">{formatDate(sesija.datum)}</span>
                                                     </div>
                                                     <h4 className="text-lg font-semibold leading-tight pt-1">{sesija.naslov}</h4>
                                                 </CardHeader>
