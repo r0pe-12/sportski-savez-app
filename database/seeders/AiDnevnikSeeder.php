@@ -1574,6 +1574,114 @@ chown -R www-data:www-data .
 ```
 ISHOD_20,
             ],
+            [
+                'broj' => 21,
+                'naslov' => 'Priprema za odbranu projekta — Q&A za ADIS završni ispit',
+                'datum' => '2026-05-14',
+                'faza' => 'Predaja / odbrana',
+                'alat' => 'Claude Code (Opus 4.7), Laravel Boost MCP, spec v1.1 i meta-plan v1.2 kao izvor istine.',
+                'cilj' => 'Pripremiti odgovore na pitanja šta smo radili, zašto smo to tako uradili i kako sistem funkcioniše — za 5 min prezentaciju + 10 min Q&A pred profesorom.',
+                'instrukcije' => <<<'INSTRUKCIJE_21'
+### Prompt 1
+
+Korisnik (Petar) traži pripremu za odbranu projekta. Ispit je koncipiran kao odbrana projekta — 5 min prezentacije + 10 min profesorovih pitanja. Kroz pitanja mogu se provući teorijska pitanja iz ADIS-a.
+
+Cilj: pripremiti odgovore na pitanja **šta smo radili**, **zašto smo to tako uradili** i **kako sistem funkcioniše**.
+
+### Prompt 2
+
+Korisnik traži Word dokument sa detaljnom prezentacijom — svaki UC, sve dijagrami/slike. Slanje na Telegram (BotFather konfigurisan, kredencijali u `~/Documents/telegram-bot/.telegram-bot.json`).
+INSTRUKCIJE_21,
+                'output' => <<<'OUTPUT_21'
+### Prompt 1
+
+Pročitan spec v1.1 (`specs/001-sportski-savez.md`) i meta-plan v1.2 (`specs/000-paralelni-plan.md`).
+
+Provjereno stanje implementacije:
+- **75 ruta** u `php artisan route:list` pokriva admin panel, teams, students, sports, competitions, schedule, audit log, ai-dnevnik
+- **12 modela** u `app/Models/`: User (STI), Student, Professor, School, Sport, Competition, Team, TeamMember, MedicalCertificate, Result, AuditLogEntry, AiDnevnikSesija
+- **7 servisa** u `app/Services/`: AuditLogger, EDnevnikVerificationService, MedicalCertificateStateMachine, PrivateFileStorage, ResultEntryService, StudentHistoryService, TeamRegistrationService
+- **2 adapter modula** u `app/Adapters/`: EDnevnik/ (FakeEDnevnikAdapter), Ocr/ (FakeOcrAdapter)
+- **14 migracija** kreira sve entitete iz spec sekcije 7
+
+Pripremljen materijal za odbranu organizovan u 4 sekcije:
+1. **Šta je sistem** — problem, rješenje, akteri, UC katalog
+2. **Šta smo uradili** — arhitektura, stack, ključne implementacione odluke
+3. **Zašto smo to tako uradili** — opravdanje odluka (Fortify vs Sanctum, SQLite vs Postgres, mock adapteri, monolit vs microservisi, STI vs zasebne tabele)
+4. **Kako funkcioniše** — UC5 i UC8 end-to-end, state dijagrami, audit log, queue
+
+Plus: očekivana teorijska pitanja (ADIS gradivo) — UML, OOAD, SDLC, AZLP.
+
+### Prompt 2
+
+Kreiran sveobuhvatan Word dokument `docs/zavrsni-izvjestaj/Priprema-za-odbranu-projekta.docx` (1.1 MB) sa:
+- **Naslovnom stranom** + sadržajem (TOC)
+- **Glava 0:** Format ispita i strategija (5min prezentacija + 10min Q&A)
+- **Glava 1:** Vizija i analiza (problem, rješenje, stakeholderi, obim)
+- **Glava 2:** Akteri i UC katalog (10 UC-ova u tabeli)
+- **Glava 3:** Domain model + **klasni dijagram** (slika)
+- **Glava 4:** Arhitektura (4 sloja) + **komponentni, paket, deployment dijagrami** (3 slike)
+- **Glava 5:** Svih 10 UC-ova detaljno + **sekvencni dijagrami UC5 i UC8** + **9 screenshot-ova** iz aplikacije
+- **Glava 6:** 3 state dijagrama (Team, MedicalCertificate, Student)
+- **Glava 7:** Tehnološki stack + skretanja od dizajna + queue strategija
+- **Glava 8:** AZLP + audit log + Policy matrica
+- **Glava 9:** 28 Q&A pitanja sa kratkim + detaljnim odgovorima (vizija, arhitektura, implementacija, teorija, teška pitanja)
+- **Glava 10:** Demo guide korak-po-korak
+- **Glava 11:** Cheat sheet — šta moraš napamet
+
+Tehnička realizacija:
+- Korišten `docx-js` paket (skill `document-skills:docx`)
+- Style sa Calibri fontom, plavom paletom (1F4E79, 2E75B6, D5E8F0)
+- 6 UML dijagrama embed-ovano iz `docs/zavrsni-izvjestaj/uml/render/`
+- 9 screenshot-ova iz `docs/zavrsni-izvjestaj/demo/screenshots/`
+- A4 format, ~2cm margine, header + footer sa brojem strane
+
+Slanje na Telegram:
+- Botov token i chat ID učitani iz `C:\Users\simon\Documents\telegram-bot\.telegram-bot.json`
+- `sendDocument` API → fajl poslat (message_id=13)
+- `sendMessage` API sa opisom poslat kao --data-binary @json (UTF-8 fix za Windows curl)
+- Oba poslata uspješno
+OUTPUT_21,
+                'odluke' => <<<'ODLUKE_21'
+### Prompt 1
+
+Format pripreme: **Q&A sa konkretnim odgovorima koje korisnik može direktno koristiti**, ne meta-savjeti tipa "pripremi ovo". Svako pitanje ima:
+- **Kratak odgovor** (1–2 rečenice za usmenu prezentaciju)
+- **Detaljniji background** (ako profesor produbi pitanje)
+- **Konkretan citat iz koda/spec-a** (path:linija) kao backup
+
+Grupisano u 4 kategorije:
+- **A. Vizija i analiza** (UC katalog, akteri, domain model)
+- **B. Arhitektura i dizajn** (slojevi, stack, ključne odluke + njihovo opravdanje)
+- **C. Implementacija** (state dijagrami, queue, audit log, file storage, OCR pipeline)
+- **D. ADIS teorijska pitanja** (UML notacija, OOAD principi, SDLC, V&V, AZLP)
+
+NE prezentovati sve — koristiti kao reference materijal za 10 min Q&A.
+
+### Prompt 2
+
+**Format Word-a:** A4 (ne US Letter — relevantnije za CG/Evropu), Calibri font, plava paleta odgovara akademskom kontekstu. TOC sa hyperlink-ima ka glavama.
+
+**Slike u Word-u:** UML dijagrami inline (centered, ~600x420 px), screenshot-ovi nešto manji (~500x300 px), caption ispod svake slike u italics. Sve embed-ovano (ne linkovano) — fajl je samostalan.
+
+**Q&A struktura:** Svako pitanje ima emoji marker (❓), kratki odgovor (zelena boja "Kratko:"), detaljan odgovor (narandžasta "Detaljno:"). 28 pitanja podijeljeno u 5 kategorija.
+
+**UTF-8 problem za Telegram:** Windows curl + multipart -F sa CG karakterima padne ("strings must be encoded in UTF-8"). Rješenje — pisati JSON payload u fajl i koristiti `curl --data-binary @file.json` (bypassuje shell encoding). Document upload prošao bez caption-a, descriptivna poruka poslata zasebno.
+
+**Telegram bot fajl:** ne hardkodovati token i chat ID; čitati iz `~/Documents/telegram-bot/.telegram-bot.json` (gitignore-ovan). Token + chat ID NIKAD ne idu u commit.
+ODLUKE_21,
+                'ishod' => <<<'ISHOD_21'
+### Prompt 1
+
+Pripremljen kompletan Q&A materijal za odbranu projekta. Korisnik dobija strukturirane odgovore koje može direktno koristiti tokom 5 min prezentacije + 10 min Q&A.
+
+### Prompt 2
+
+Word dokument kreiran (`docs/zavrsni-izvjestaj/Priprema-za-odbranu-projekta.docx`, 1.1 MB), uspješno poslat na korisnikov Telegram preko Bot API-ja. Korisnik dobija sveobuhvatan materijal za 15-minutnu odbranu — 10 UC-ova detaljno + 6 UML dijagrama + 9 screenshot-ova + 28 Q&A pitanja + demo guide + cheat sheet.
+
+Tmp fajlovi pochišćeni. Build skripta ostaje u repo-u (`build_priprema_odbrana.cjs`) za buduće izmjene.
+ISHOD_21,
+            ],
         ];
 
         foreach ($sesije as $sesija) {
